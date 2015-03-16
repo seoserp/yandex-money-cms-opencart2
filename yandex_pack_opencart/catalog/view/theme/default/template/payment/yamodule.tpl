@@ -1,4 +1,10 @@
 <?php if ($kassa_mode){ ?>
+	<style>
+	input[name="paymentType"] {
+		margin:0px !important;
+		position:relative !important;
+	}
+	</style>
 	<form method="POST" action="<?php echo $kassa_action; ?>">
 		<div class="buttons">
 			<h3><?php echo $method_label; ?></h3>	
