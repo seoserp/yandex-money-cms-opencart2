@@ -52,6 +52,19 @@
 							<td><label for="ym7"><?php echo $method_alfa_text;?></label></td>
 						</tr>
 					<?php } ?>
+					<? if ($method_ma ){?>
+						<tr class="highlight">
+							<td><input type="radio" name="paymentType" value="MA" id="ym8"></td>
+							<td><label for="ym8"><?php echo $method_ma_text;?></label></td>
+						</tr>
+					<?php } ?>
+					<? if ($method_pb ){?>
+						<tr class="highlight">
+							<td><input type="radio" name="paymentType" value="PB" id="ym9"></td>
+							<td><label for="ym9"><?php echo $method_pb_text;?></label></td>
+						</tr>
+					<?php } ?>
+					
 		   		</tbody>
 			</table>
 			<input type="hidden" name="shopid" value="<?php echo $shop_id;?>">

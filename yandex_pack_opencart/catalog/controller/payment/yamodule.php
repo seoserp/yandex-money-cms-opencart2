@@ -31,6 +31,8 @@ class ControllerPaymentYamodule extends Controller
 		$data['shopFailURL'] = $this->url->link('checkout/failure', '', 'SSL');
 		$data['comment'] = $order_info['comment'];
 		$data['sum'] = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
+		$data['method_ma'] = $this->config->get('ya_kassa_ma');
+		$data['method_pb'] = $this->config->get('ya_kassa_pb');
 		$data['method_ym'] = $this->config->get('ya_kassa_wallet');
 		$data['method_cards'] = $this->config->get('ya_kassa_card');
 		$data['method_cash'] = $this->config->get('ya_kassa_terminal');
@@ -39,6 +41,8 @@ class ControllerPaymentYamodule extends Controller
 		$data['method_sb'] = $this->config->get('ya_kassa_sber');
 		$data['method_alfa'] = $this->config->get('ya_kassa_alfa');
 		$data['method_label'] =  $this->language->get('text_method');
+		$data['method_ma_text'] =  $this->language->get('text_method_ma');
+		$data['method_pb_text'] =  $this->language->get('text_method_pb');
 		$data['method_ym_text'] =  $this->language->get('text_method_ym');
 		$data['method_cards_text'] =  $this->language->get('text_method_cards');
 		$data['method_cash_text'] =  $this->language->get('text_method_cash');
