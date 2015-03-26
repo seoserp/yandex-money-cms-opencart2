@@ -333,6 +333,13 @@
 											<div class="checkbox">
 												<label for="ya_kassa_alfa"><input type="checkbox" <?php echo ($ya_kassa_alfa ? ' checked="checked"' : ''); ?> name="ya_kassa_alfa" id="ya_kassa_alfa" class="" value="1"/> <?php echo $kassa_alfa; ?></label>
 											</div>
+											<div class="checkbox">
+												<label for="ya_kassa_ma"><input type="checkbox" <?php echo ($ya_kassa_ma ? ' checked="checked"' : ''); ?> name="ya_kassa_ma" id="ya_kassa_ma" class="" value="1"/> <?php echo $kassa_ma; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_kassa_pb"><input type="checkbox" <?php echo ($ya_kassa_pb ? ' checked="checked"' : ''); ?> name="ya_kassa_pb" id="ya_kassa_pb" class="" value="1"/> <?php echo $kassa_pb; ?></label>
+											</div>
+											
 										</div>
 									</div>
 									<div class="form-group">

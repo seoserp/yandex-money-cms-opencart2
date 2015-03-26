@@ -26,6 +26,8 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_sber',
 		'ya_kassa_alfa',
 		'ya_kassa_wm',
+		'ya_kassa_pb',
+		'ya_kassa_ma',
 		'ya_kassa_os'
 	);
 
@@ -464,6 +466,8 @@ class ControllerFeedYamodule extends Controller {
 		$data['kassa_sid'] = $this->language->get('kassa_sid');
 		$data['kassa_scid'] = $this->language->get('kassa_scid');
 		$data['kassa_pw'] = $this->language->get('kassa_pw');
+		$data['kassa_ma'] = $this->language->get('kassa_ma');
+		$data['kassa_pb'] = $this->language->get('kassa_pb');
 		$data['kassa_wm'] = $this->language->get('kassa_wm');
 		$data['kassa_mobile'] = $this->language->get('kassa_mobile');
 		$data['kassa_sber'] = $this->language->get('kassa_sber');
