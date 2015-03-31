@@ -148,9 +148,59 @@ class ControllerFeedYamodule extends Controller {
 		return $data;
 	}
 
+	public function Sget($name)
+	{
+		$query = $this->db->query('SELECT * FROM '.DB_PREFIX.'setting WHERE `key` = "'.$name.'"');
+		return ($query->row['value'] ? $query->row['value'] : '');
+	}
+
+	public function sendStatistics()
+	{
+		$headers = array();
+		$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+
+		$this->load->model('yamodule/cryptor');
+		$array = array(
+			'url' => $this->Sget('config_url'),
+			'cms' => 'opencart2',
+			'version' => VERSION,
+			'email' => $this->Sget('config_email'),
+			'shopid' => $this->Sget('ya_kassa_sid'),
+			'settings' => array(
+				'kassa' => $this->Sget('ya_kassa_active'),
+				'p2p' => $this->Sget('ya_p2p_active'),
+				'metrika' => $this->Sget('ya_metrika_active'),
+			)
+		);
+
+		$key_crypt = $array['url'];
+		$this->model_yamodule_cryptor->setKey($key_crypt);
+		$array_crypt = $this->model_yamodule_cryptor->encrypt($array);
+
+		$url = 'https://statcms.yamoney.ru/';
+		$curlOpt = array(
+			CURLOPT_HEADER => false,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_SSL_VERIFYPEER => false,
+			CURLOPT_SSL_VERIFYHOST => false,
+			CURLINFO_HEADER_OUT => true,
+			CURLOPT_POST => true,
+		);
+
+		$curlOpt[CURLOPT_HTTPHEADER] = $headers;
+		$curlOpt[CURLOPT_POSTFIELDS] = http_build_query(array('data' => $array_crypt));
+
+		$curl = curl_init($url);
+		curl_setopt_array($curl, $curlOpt);
+		$rbody = curl_exec($curl);
+		$errno = curl_errno($curl);
+		$error = curl_error($curl);
+		$rcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		curl_close($curl);
+	}
+
 	public function saveData($source)
 	{
-		// $this->sendSettings($_POST, $this->request->post['type_data']);
 		foreach ($source as $s)
 			if (isset($this->request->post[$s]))
 				$this->model_setting_setting->editSetting($s, $this->request->post);
@@ -173,7 +223,6 @@ class ControllerFeedYamodule extends Controller {
 				$this->session->data['p2p_status'] = array();
 				$this->saveData($this->fields_p2p);
 				$this->session->data['p2p_status'][] = $this->success_alert('Настройки успешно сохранены!');
-				// $this->session->data['p2p_status'][] = $this->errors_alert('Настройки успешно сохранены!');
 				if($this->request->post['ya_p2p_active'] == 1)
 					$this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
 				break;
@@ -197,6 +246,8 @@ class ControllerFeedYamodule extends Controller {
 				break;
 			
 		}
+
+		$this->sendStatistics();
 	}
 
 	public function initForm($array)
@@ -674,7 +725,13 @@ class ControllerFeedYamodule extends Controller {
 		$user['status'] = true;
 		$user['password'] = rand(100000, 500000);
 		$customer_id = $this->addCustomer($user);
+		$this->load->model('extension/extension');
 		$this->model_setting_setting->editSetting('yandexbuy_customer', array('yandexbuy_customer' => $customer_id));
+		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 1));
+		$this->model_extension_extension->install('payment', 'yamodule');
+		$this->load->model('user/user_group');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'payment/yamodule');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'payment/yamodule');
 	}
 
 	public function addCustomer($data) {
@@ -699,6 +756,9 @@ class ControllerFeedYamodule extends Controller {
 	public function uninstall()
 	{
 		$cu = $this->getCustomer($this->config->get('yandexbuy_customer'));
+		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 0));
+		$this->load->model('extension/extension');
+		$this->model_extension_extension->uninstall('payment', 'yamodule');
 		if ($cu['customer_id'] && $cu['address_id'])
 		{
 			$this->db->query("DELETE FROM " . DB_PREFIX . "customer WHERE customer_id = ".$cu['customer_id']);

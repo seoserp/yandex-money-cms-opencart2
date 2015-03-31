@@ -4,6 +4,7 @@ class ControllerPaymentYamodule extends Controller {
 	public function index() {
 		$this->load->language('payment/yamodule');
 		$this->document->setTitle($this->language->get('heading_title'));
+		$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 	}
 
 	public function install() {
