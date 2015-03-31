@@ -173,7 +173,7 @@ class ControllerFeedYamodule extends Controller {
 			)
 		);
 
-		$key_crypt = $array['url'];
+		$key_crypt = gethostbyname($_SERVER['HTTP_HOST']);
 		$this->model_yamodule_cryptor->setKey($key_crypt);
 		$array_crypt = $this->model_yamodule_cryptor->encrypt($array);
 
