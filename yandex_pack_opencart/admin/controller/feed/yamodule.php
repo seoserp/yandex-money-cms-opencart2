@@ -151,7 +151,7 @@ class ControllerFeedYamodule extends Controller {
 	public function Sget($name)
 	{
 		$query = $this->db->query('SELECT * FROM '.DB_PREFIX.'setting WHERE `key` = "'.$name.'"');
-		return ($query->row['value'] ? $query->row['value'] : '');
+		return (isset($query->row['value']) ? $query->row['value'] : '');
 	}
 
 	public function sendStatistics()
