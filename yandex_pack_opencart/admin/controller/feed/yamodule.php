@@ -167,9 +167,9 @@ class ControllerFeedYamodule extends Controller {
 			'email' => $this->Sget('config_email'),
 			'shopid' => $this->Sget('ya_kassa_sid'),
 			'settings' => array(
-				'kassa' => $this->Sget('ya_kassa_active'),
-				'p2p' => $this->Sget('ya_p2p_active'),
-				'metrika' => $this->Sget('ya_metrika_active'),
+				'kassa' => (bool) $this->Sget('ya_kassa_active'),
+				'p2p' => (bool) $this->Sget('ya_p2p_active'),
+				'metrika' =>(bool) $this->Sget('ya_metrika_active'),
 			)
 		);
 

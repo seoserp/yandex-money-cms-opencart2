@@ -27,38 +27,38 @@
 							<td><input type="radio" name="paymentType" value="GP" id="ym3"></td>
 							<td><label for="ym3"><?php echo $method_cash_text;?></label></td>
 						</tr>
-					<?}?>
-					<? if ($method_mobile ){?>
+					<?php } ?>
+					<?php if ($method_mobile ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="MC" id="ym4"></td>
 							<td><label for="ym4"><?php echo $method_mobile_text;?></label></td>
 						</tr>
 					<?php } ?>
-					<? if ($method_wm ){?>
+					<?php if ($method_wm ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="WM" id="ym5"></td>
 							<td><label for="ym5"><?php echo $method_wm_text;?></label></td>
 						</tr>
 					<?php } ?>
-					<? if ($method_sb ){?>
+					<?php if ($method_sb ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="SB" id="ym6"></td>
 							<td><label for="ym6"><?php echo $method_sber_text;?></label></td>
 						</tr>
 					<?php } ?>
-					<? if ($method_alfa ){?>
+					<?php if ($method_alfa ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="AB" id="ym7"></td>
 							<td><label for="ym7"><?php echo $method_alfa_text;?></label></td>
 						</tr>
 					<?php } ?>
-					<? if ($method_ma ){?>
+					<?php if ($method_ma ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="MA" id="ym8"></td>
 							<td><label for="ym8"><?php echo $method_ma_text;?></label></td>
 						</tr>
 					<?php } ?>
-					<? if ($method_pb ){?>
+					<?php if ($method_pb ){?>
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="PB" id="ym9"></td>
 							<td><label for="ym9"><?php echo $method_pb_text;?></label></td>
