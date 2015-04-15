@@ -1,6 +1,6 @@
 #Инструкция по установке модуля в CMS [Opencart V2](http://www.opencart.com/?route=download/download)
 
-0.  [Скачайте модуль](https://github.com/yandex-money/yandex-money-cms-opencart2/raw/master/pack_yandex_oc.zip)
+0.  [Скачайте модуль](https://github.com/yandex-money/yandex-money-cms-opencart2/raw/master/yandex_pack_opencart.zip)
 
 1. 	**Сделайте бекап!**
 
