@@ -161,7 +161,7 @@ class ControllerFeedYamodule extends Controller {
 
 		$this->load->model('yamodule/cryptor');
 		$array = array(
-			'url' => $this->Sget('config_url'),
+			'url' => HTTP_CATALOG,
 			'cms' => 'opencart2',
 			'version' => VERSION,
 			'email' => $this->Sget('config_email'),
@@ -561,7 +561,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['ya_market_size_options'] = array();
 		$data['ya_market_color_options'] = array();
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
-		$data['heading_title'] = $this->language->get('heading_title_ya');
+		$data['heading_title'] = $this->language->get('heading_title_ya').' ('.$this->language->get('ya_version').')';
 		$data['market'] = $this->language->get('market');
 		$data['kassa'] = $this->language->get('kassa');
 		$data['metrika'] = $this->language->get('metrika');
@@ -605,7 +605,6 @@ class ControllerFeedYamodule extends Controller {
 		$currencies = $this->model_localisation_currency->getCurrencies();
 		$allowed_currencies = array_flip(array('RUR', 'RUB', 'BYR', 'KZT', 'UAH'));
 		$data['currencies'] = array_intersect_key($currencies, $allowed_currencies);
-		$data['heading_title'] = $this->language->get('heading_title_ya');
 		$data['button_cancel'] = $this->language->get('button_cancel');
 		$data['text_installed'] = $this->language->get('text_installed');
 
