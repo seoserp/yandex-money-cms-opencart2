@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS OpenCart2';
 $_['heading_title_ya']      = 'Y.CMS OpenCart2';
-$_['ya_version']      = '1.0.0';
+$_['ya_version']      = '1.0.1';
 
 // Text
 $_['p2p']          = 'Яндекс.Деньги';

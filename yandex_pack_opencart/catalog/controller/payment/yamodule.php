@@ -26,7 +26,7 @@ class ControllerPaymentYamodule extends Controller
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
 		$data['shop_id'] = $this->config->get('ya_kassa_sid');
 		$data['scid'] = $this->config->get('ya_kassa_scid');
-		$data['customerNumber'] = $order_info['payment_firstname'] . ' ' . $order_info['payment_address_1'] . ' ' . $order_info['payment_address_2'] . ' ' . $order_info['payment_city'] . ' ' . $order_info['email'];
+		$data['customerNumber'] = $order_info['email'];
 		$data['shopSuccessURL'] = $this->url->link('checkout/success', '', 'SSL');
 		$data['shopFailURL'] = $this->url->link('checkout/failure', '', 'SSL');
 		$data['comment'] = $order_info['comment'];
