@@ -200,13 +200,21 @@ class ControllerFeedYamodule extends Controller {
 	}
 
 	public function saveData($source)
-	{
-		foreach ($source as $s)
-			if (isset($this->request->post[$s]))
-				$this->model_setting_setting->editSetting($s, $this->request->post);
-			else
-				$this->model_setting_setting->editSetting($s, array($s => 0));
-	}
+		{
+			foreach ($source as $s)
+			{
+				$false = false;
+				if (in_array($s, array('ya_market_color_options', 'ya_market_size_options')))
+					$false = array(0);
+				else
+					$false = 0;
+
+				if (isset($this->request->post[$s]) && !empty($this->request->post[$s]))
+					$this->model_setting_setting->editSetting($s, $this->request->post);
+				else
+					$this->model_setting_setting->editSetting($s, array($s => $false));
+			}
+		}
 
 	public function processSave()
 	{
@@ -667,6 +675,8 @@ class ControllerFeedYamodule extends Controller {
 			'ya_metrika_hash' => 1,
 			'ya_metrika_cart' => 1,
 			'ya_metrika_order' => 1,
+			'ya_market_color_options' => array(),
+			'ya_market_size_options' => array(),
 			'ya_market_active' => 0,
 			'ya_market_prostoy' => 0,
 			'ya_market_set_available' => 2,
