@@ -35,8 +35,6 @@ class ControllerFeedYamodule extends Controller {
 		'ya_metrika_active',
 		'ya_metrika_number',
 		'ya_metrika_idapp',
-		'ya_metrika_uname',
-		'ya_metrika_upw',
 		'ya_metrika_pw',
 		'ya_metrika_webvizor',
 		'ya_metrika_otkaz',
@@ -72,8 +70,6 @@ class ControllerFeedYamodule extends Controller {
 		'ya_pokupki_stoken',
 		'ya_pokupki_yapi',
 		'ya_pokupki_number',
-		'ya_pokupki_login',
-		'ya_pokupki_upw',
 		'ya_pokupki_idapp',
 		'ya_pokupki_pw',
 		'ya_pokupki_idpickup',
@@ -93,10 +89,6 @@ class ControllerFeedYamodule extends Controller {
 			$data['pokupki_status'][] = $this->errors_alert('URL api не заполнен');
 		if ($this->config->get('ya_pokupki_number') == '')
 			$data['pokupki_status'][] = $this->errors_alert('Номер кампании не заполнен');
-		if ($this->config->get('ya_pokupki_login') == '')
-			$data['pokupki_status'][] = $this->errors_alert('Логин пользователя yandex не заполнен');
-		if ($this->config->get('ya_pokupki_upw') == '')
-			$data['pokupki_status'][] = $this->errors_alert('Пароль yandex не заполнен');
 		if ($this->config->get('ya_pokupki_idapp') == '')
 			$data['pokupki_status'][] = $this->errors_alert('ID приложения не заполнен');
 		if ($this->config->get('ya_pokupki_pw') == '')
@@ -115,10 +107,6 @@ class ControllerFeedYamodule extends Controller {
 			$data['metrika_status'][] = $this->errors_alert('ID Приложения не заполнено');
 		if ($this->config->get('ya_metrika_pw') == '')
 			$data['metrika_status'][] = $this->errors_alert('Пароль приложения не заполнено');
-		if ($this->config->get('ya_metrika_uname') == '')
-			$data['metrika_status'][] = $this->errors_alert('Имя пользователя yandex не заполнено');
-		if ($this->config->get('ya_metrika_upw') == '')
-			$data['metrika_status'][] = $this->errors_alert('Пароль пользователя yandex не заполнен');
 		if ($this->config->get('ya_metrika_o2auth') == '')
 			$data['metrika_status'][] = $this->errors_alert('Получите токен OAuth');
 		
@@ -281,7 +269,9 @@ class ControllerFeedYamodule extends Controller {
 			$data['ya_market_lnk_yml'] = HTTP_CATALOG.'index.php?route=feed/yamarket';
 		}
 
+		$data['ya_metrika_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_metrika_idapp').'&device_id='.md5('metrika'.$this->config->get('ya_metrika_idapp')).'&client_secret='.$this->config->get('ya_metrika_pw');
 		$data['ya_metrika_callback'] = $this->url->link('feed/yamodule/preparem', 'token='.$this->session->data['token'], 'SSL');
+		$data['ya_pokupki_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_pokupki_idapp').'&device_id='.md5('pokupki'.$this->config->get('ya_pokupki_idapp')).'&client_secret='.$this->config->get('ya_pokupki_pw');
 		$data['ya_pokupki_callback'] = $this->url->link('feed/yamodule/preparep', 'token='.$this->session->data['token'], 'SSL');
 		$data['ya_pokupki_gtoken'] = $this->config->get('ya_pokupki_gtoken');
 		$data['ya_metrika_o2auth'] = $this->config->get('ya_metrika_o2auth');
@@ -293,12 +283,12 @@ class ControllerFeedYamodule extends Controller {
 	
 	public function preparem()
 	{
-		return $this->gocurl('m', 'grant_type=password&username='.$this->config->get('ya_metrika_uname').'&password='.$this->config->get('ya_metrika_upw').'&client_id='.$this->config->get('ya_metrika_idapp').'&client_secret='.$this->config->get('ya_metrika_pw'));
+		return $this->gocurl('m', 'grant_type=authorization_code&code='.$this->request->get['code'].'&client_id='.$this->config->get('ya_metrika_idapp').'&client_secret='.$this->config->get('ya_metrika_pw'));
 	}
 	
 	public function preparep()
 	{
-		return $this->gocurl('p', 'grant_type=password&username='.$this->config->get('ya_pokupki_login').'&password='.$this->config->get('ya_pokupki_upw').'&client_id='.$this->config->get('ya_pokupki_idapp').'&client_secret='.$this->config->get('ya_pokupki_pw'));
+		return $this->gocurl('p', 'grant_type=authorization_code&code='.$this->request->get['code'].'&client_id='.$this->config->get('ya_pokupki_idapp').'&client_secret='.$this->config->get('ya_pokupki_pw'));
 	}
 
 	public function gocurl($type, $post)
@@ -317,7 +307,6 @@ class ControllerFeedYamodule extends Controller {
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);  
 		$data = json_decode($result);
-
 		if ($status == 200) {
 			if (!empty($data->access_token))
 			{

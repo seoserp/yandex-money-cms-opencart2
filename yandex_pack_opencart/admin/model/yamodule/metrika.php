@@ -8,7 +8,7 @@ Class ModelYamoduleMetrika extends Model
 	var $password;
 	var $number;
 	var $token;
-	public $url_api = 'http://api-metrika.yandex.ru/';
+	public $url_api = 'https://api-metrika.yandex.ru/management/v1/';
 	
 	public function initData($token, $number)
 	{
@@ -79,12 +79,12 @@ Class ModelYamoduleMetrika extends Model
 
 				if($this->Cget('ya_metrika_cart'))
 					$res['cart'] = $this->addCounterGoal(array('goal' => $data['YA_METRIKA_CART']));
-				else
+				elseif (isset($goals['YA_METRIKA_CART']))
 					$res['cart'] = $this->deleteCounterGoal($goals['YA_METRIKA_CART']->id);
 					
 				if($this->Cget('ya_metrika_order'))
 					$res['order'] = $this->addCounterGoal(array('goal' => $data['YA_METRIKA_ORDER']));
-				else
+				elseif (isset($goals['YA_METRIKA_ORDER']))
 					$res['order'] = $this->deleteCounterGoal($goals['YA_METRIKA_ORDER']->id);
 				
 				$this->session->data['metrika_status'][] = $this->success_alert('Данные метрики отправлены на сервер!');
@@ -124,7 +124,7 @@ Class ModelYamoduleMetrika extends Model
 
 	public function editCounter()
 	{
-		$params = array(
+		$params = array('counter'=>array(
 			'goals_remove' => 0,
 			'code_options' => array(
 				'clickmap' => $this->Cget('ya_metrika_clickmap'),
@@ -133,7 +133,7 @@ Class ModelYamoduleMetrika extends Model
 				'denial' => $this->Cget('ya_metrika_otkaz'),
 				'track_hash' => $this->Cget('ya_metrika_hash'),
 			)
-		);
+		));
 
 		if(count($params)){
 			return $this->SendResponse('counter/'.$this->number, array(), $params, 'PUT');
@@ -142,7 +142,7 @@ Class ModelYamoduleMetrika extends Model
 	
 	public function SendResponse($to, $headers, $params, $type, $pretty = 1)
 	{
-		$response = $this->post($this->url_api.$to.'.json?pretty='.$pretty.'&oauth_token='.$this->token, $headers, $params, $type);
+		$response = $this->post($this->url_api.$to.'?pretty=1&oauth_token='.$this->token, $headers, $params, $type);
 		$data = json_decode($response->body);
 		if($response->status_code == 200){
 			return $data;

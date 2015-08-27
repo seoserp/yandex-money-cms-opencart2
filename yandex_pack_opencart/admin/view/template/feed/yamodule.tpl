@@ -60,18 +60,6 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_login"><?php echo $pokupki_login; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_login" value="<?php echo $ya_pokupki_login; ?>" id="ya_pokupki_login" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_metrika_upw"><?php echo $pokupki_upw; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_upw" value="<?php echo $ya_pokupki_upw; ?>" id="ya_pokupki_upw" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_pokupki_idapp"><?php echo $pokupki_idapp; ?></label>
 										<div class="col-sm-8">
 											<input type="text" name="ya_pokupki_idapp" value="<?php echo $ya_pokupki_idapp; ?>" id="ya_pokupki_idapp" class="form-control"/>
@@ -88,7 +76,7 @@
 										<div class="col-sm-8">
 											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
 											<p class="help-block">
-												<a href="<?php echo $ya_pokupki_callback; ?>"><?php echo $pokupki_gtoken; ?></a>
+												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
 											</p>
 										</div>
 									</div>
@@ -124,7 +112,7 @@
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_metrika_callback" class="form-control"/>
+											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
 										</div>
 									</div>
 									<?php echo $data_carrier ?>
@@ -174,23 +162,11 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_metrika_uname"><?php echo $metrika_uname; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_metrika_uname" value="<?php echo $ya_metrika_uname; ?>" id="ya_metrika_uname" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_metrika_upw"><?php echo $metrika_upw; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_metrika_upw" value="<?php echo $ya_metrika_upw; ?>" id="ya_metrika_upw" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_metrika_o2auth"><?php echo $metrika_o2auth; ?></label>
 										<div class="col-sm-8">
 											<input type="text" name="ya_metrika_o2auth" value="<?php echo $ya_metrika_o2auth; ?>" disabled="disabled" id="ya_metrika_o2auth" class="form-control"/>
 											<p class="help-block">
-												<a href="<?php echo $ya_metrika_callback; ?>"><?php echo $metrika_gtoken; ?></a>
+												<a href="<?php echo $ya_metrika_callback_url; ?>"><?php echo $metrika_gtoken; ?></a>
 											</p>
 										</div>
 									</div>
