@@ -3,7 +3,9 @@
 $_['heading_title']				= 'Thank you for shopping with %s .... ';
 
 // Text
-$_['text_title'] = 'Яндекс.Деньги';
+$_['kassa_title'] = 'Яндекс.Касса (банковские карты, электронные деньги и другое)';
+$_['p2p_title'] = 'Яндекс.Деньги';
+
 $_['text_method'] = 'Метод оплаты';
 
 $_['text_method_ym'] = 'Яндекс.Деньги';
@@ -19,6 +21,8 @@ $_['text_method_sber']       = 'Оплата через Сбербанк: опл
 $_['text_method_alfa']       = 'Оплата через Альфа-Клик.';
 $_['text_method_ma']       = 'Оплата через MasterPass.';
 $_['text_method_pb']       = 'Оплата через Промсвязьбанк.';
+$_['text_method_qw']       = 'Оплата через QIWI Wallet.';
+$_['text_method_qp']       = 'Оплата через доверительный платеж (Куппи.ру).';
 
 $_['text_order'] = 'Заказ';
 $_['text_comment'] = 'Комментарий';

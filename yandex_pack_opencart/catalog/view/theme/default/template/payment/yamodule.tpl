@@ -1,10 +1,14 @@
-<?php if ($kassa_mode){ ?>
-	<style>
+<style>
 	input[name="paymentType"] {
 		margin:0px !important;
 		position:relative !important;
 	}
-	</style>
+	input[name="payment-type"] {
+		margin:0px !important;
+		position:relative !important;
+	}
+</style>
+<?php if ($kassa_mode){ ?>
 	<form method="POST" action="<?php echo $kassa_action; ?>">
 		<div class="buttons">
 			<h3><?php echo $method_label; ?></h3>	
@@ -62,6 +66,18 @@
 						<tr class="highlight">
 							<td><input type="radio" name="paymentType" value="PB" id="ym9"></td>
 							<td><label for="ym9"><?php echo $method_pb_text;?></label></td>
+						</tr>
+					<?php } ?>
+					<?php if ($method_qw ){?>
+						<tr class="highlight">
+							<td><input type="radio" name="paymentType" value="QW" id="ym10"></td>
+							<td><label for="ym10"><?php echo $method_qw_text;?></label></td>
+						</tr>
+					<?php } ?>
+					<?php if ($method_qp ){?>
+						<tr class="highlight">
+							<td><input type="radio" name="paymentType" value="QP" id="ym11"></td>
+							<td><label for="ym11"><?php echo $method_qp_text;?></label></td>
 						</tr>
 					<?php } ?>
 					

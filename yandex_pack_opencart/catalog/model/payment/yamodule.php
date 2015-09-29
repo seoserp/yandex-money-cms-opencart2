@@ -20,7 +20,7 @@ class ModelPaymentYamodule extends Model {
 		if ($status) {
 			$method_data = array(
 				'code'       => 'yamodule',
-				'title'      => $this->language->get('text_title'),
+				'title'      => $this->language->get(($this->config->get('ya_kassa_active'))?'kassa_title':'p2p_title'),
 				'terms'      => '',
 				'sort_order' => $this->config->get('yamodule_total_sort_order')
 			);

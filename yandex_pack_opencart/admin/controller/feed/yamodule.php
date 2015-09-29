@@ -28,6 +28,8 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_wm',
 		'ya_kassa_pb',
 		'ya_kassa_ma',
+		'ya_kassa_qw',
+		'ya_kassa_qp',
 		'ya_kassa_os'
 	);
 
@@ -148,10 +150,13 @@ class ControllerFeedYamodule extends Controller {
 		$headers[] = 'Content-Type: application/x-www-form-urlencoded';
 
 		$this->load->model('yamodule/cryptor');
+		$this->load->language('feed/yamodule');
+		
 		$array = array(
 			'url' => HTTP_CATALOG,
 			'cms' => 'opencart2',
 			'version' => VERSION,
+			'ver_mod' => $this->language->get('ya_version'),
 			'email' => $this->Sget('config_email'),
 			'shopid' => $this->Sget('ya_kassa_sid'),
 			'settings' => array(
@@ -516,6 +521,8 @@ class ControllerFeedYamodule extends Controller {
 		$data['kassa_pw'] = $this->language->get('kassa_pw');
 		$data['kassa_ma'] = $this->language->get('kassa_ma');
 		$data['kassa_pb'] = $this->language->get('kassa_pb');
+		$data['kassa_qw'] = $this->language->get('kassa_qw');
+		$data['kassa_qp'] = $this->language->get('kassa_qp');
 		$data['kassa_wm'] = $this->language->get('kassa_wm');
 		$data['kassa_mobile'] = $this->language->get('kassa_mobile');
 		$data['kassa_sber'] = $this->language->get('kassa_sber');
