@@ -9,8 +9,7 @@
 	}
 </style>
 <?php if ($kassa_mode){ ?>
-	<form method="POST" action="<?php echo $kassa_action; ?>">
-		<div class="buttons">
+	<form method="POST" action="<?php echo $kassa_action; ?>" id='paymentForm'>
 			<h3><?php echo $method_label; ?></h3>	
 			<table class="radio">
 				<tbody>
@@ -90,18 +89,15 @@
 			<input type="hidden" name="customerNumber" value="<?php echo $customerNumber; ?>" >
 			<input type="hidden" name="shopSuccessURL" value="<?php echo $shopSuccessURL; ?>" >
 			<input type="hidden" name="shopFailURL" value="<?php echo $shopFailURL; ?>" >
-			<input type="hidden" name="cms_name" value="ya_opencart2" >
-			<div class="buttons">
-				<div class="pull-right">
-					<input type="submit" value="<?php echo $button_confirm; ?>" class="btn btn-primary" />
-				</div>
-			</div>	   
-		</div>	
+			<input type="hidden" name="cms_name" value="ya_opencart2" >   
 	</form>
-<?php } ?>
-<?php  if ($p2p_mode) {  ?>
-	<form action="<?php echo $p2p_action; ?>" method="POST">
-	   <div class="buttons">
+	<div class="buttons">
+		<div class="pull-right">
+			<input type="button" id="button-confirm" value="<?php echo $button_confirm; ?>" class="btn btn-primary" />
+		</div>
+	</div>	
+<?php } else {  ?>
+	<form action="<?php echo $p2p_action; ?>" id='paymentForm' method="POST">
 		   <h3><?php echo $method_label; ?></h3>
 		   <table class="radio">
 			   <tbody>
@@ -115,11 +111,15 @@
 				</tr>
 				</tbody>
 			</table>
-	   </div>
-	   <div class="buttons">
-			<div class="pull-right">
-				<input type="submit" value="<?php echo $button_confirm; ?>" class="btn btn-primary" />
-			</div>
-		</div>
 	</form>
+	<div class="buttons">
+		<div class="pull-right">
+			<input type="button" id="button-confirm" value="<?php echo $button_confirm; ?>" class="btn btn-primary" />
+		</div>
+	</div>
 <?php } ?>
+<script type="text/javascript"><!--
+$('#button-confirm').on('click', function() {
+  $('#paymentForm').submit();
+});
+//--></script>

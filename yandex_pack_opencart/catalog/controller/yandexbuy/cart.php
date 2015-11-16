@@ -162,7 +162,29 @@ class ControllerYandexbuyCart extends Controller
 						'iso_code_3'     => '',
 						'address_format' => ''
 					);
-					
+					if (count($data->cart->items)){
+							$this->cart->clear();
+							$count_items = 0;
+							foreach ($data->cart->items as $item){
+								$opt = array();
+								$id_array = explode('c', $item->offerId);
+								$id_product = $id_array[0];
+								$product_info = $this->model_catalog_product->getProduct($id_product);
+								if (count($id_array) > 1){
+									unset($id_array[0]);
+									foreach ($this->model_catalog_product->getProductOptions($id_product) as $options)
+									{
+										foreach ($options['product_option_value'] as $option)
+										{
+											if (in_array($option['option_value_id'], $id_array))
+												$opt[$options['product_option_id']] = $option['product_option_value_id'];
+										}
+									}
+								}
+								$count_items += (int)$item->count;
+								$this->cart->add($id_product, $item->count, $opt);
+							}
+					}
 					$this->load->model('extension/extension');
 					$results = $this->model_extension_extension->getExtensions('shipping');
 					$k = 0;

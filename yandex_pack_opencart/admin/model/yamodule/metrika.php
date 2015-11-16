@@ -95,7 +95,7 @@ Class ModelYamoduleMetrika extends Model
 		else
 			$this->session->data['metrika_status'][] = $this->errors_alert('Проверьте настройки метрики. Получен ответ с ошибкой.');
 
-		return $res ? $res : $otvet;
+		return isset($res) ? $res : $otvet;
 	}
 
 	// Все цели счётчика
