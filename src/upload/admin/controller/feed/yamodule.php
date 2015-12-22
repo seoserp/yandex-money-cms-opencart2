@@ -149,7 +149,6 @@ class ControllerFeedYamodule extends Controller {
 		$headers = array();
 		$headers[] = 'Content-Type: application/x-www-form-urlencoded';
 
-		$this->load->model('yamodule/cryptor');
 		$this->load->language('feed/yamodule');
 		
 		$array = array(
@@ -167,10 +166,9 @@ class ControllerFeedYamodule extends Controller {
 		);
 
 		$key_crypt = gethostbyname($_SERVER['HTTP_HOST']);
-		$this->model_yamodule_cryptor->setKey($key_crypt);
-		$array_crypt = $this->model_yamodule_cryptor->encrypt($array);
+		$array_crypt = base64_encode(serialize($array));
 
-		$url = 'https://statcms.yamoney.ru/';
+		$url = 'https://statcms.yamoney.ru/v2/';
 		$curlOpt = array(
 			CURLOPT_HEADER => false,
 			CURLOPT_RETURNTRANSFER => true,
@@ -181,7 +179,7 @@ class ControllerFeedYamodule extends Controller {
 		);
 
 		$curlOpt[CURLOPT_HTTPHEADER] = $headers;
-		$curlOpt[CURLOPT_POSTFIELDS] = http_build_query(array('data' => $array_crypt));
+		$curlOpt[CURLOPT_POSTFIELDS] = http_build_query(array('data' => $array_crypt, 'lbl'=>0));
 
 		$curl = curl_init($url);
 		curl_setopt_array($curl, $curlOpt);
@@ -190,6 +188,13 @@ class ControllerFeedYamodule extends Controller {
 		$error = curl_error($curl);
 		$rcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		curl_close($curl);
+		
+		$json=json_decode($rbody);
+		if ($rcode==200 && isset($json->new_version)){
+			return sprintf($this->language->get('text_need_update'), $json->new_version);
+		}else{
+			return false;
+		}
 	}
 
 	public function saveData($source)
@@ -211,24 +216,26 @@ class ControllerFeedYamodule extends Controller {
 
 	public function processSave()
 	{
+		$this->session->data['kassa_status'] = array();
+		$this->session->data['p2p_status'] = array();
+		$this->session->data['metrika_status'] = array();
+		$this->session->data['market_status'] = array();
+		$this->session->data['pokupki_status'] = array();
 		switch($this->request->post['type_data'])
 		{
 			case 'kassa':
-				$this->session->data['kassa_status'] = array();
 				$this->saveData($this->fields_kassa);
 				$this->session->data['kassa_status'][] = $this->success_alert('Настройки успешно сохранены!');
 				if($this->request->post['ya_kassa_active'] == 1)
 					$this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
 				break;
 			case 'p2p':
-				$this->session->data['p2p_status'] = array();
 				$this->saveData($this->fields_p2p);
 				$this->session->data['p2p_status'][] = $this->success_alert('Настройки успешно сохранены!');
 				if($this->request->post['ya_p2p_active'] == 1)
 					$this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
 				break;
 			case 'metrika':
-				$this->session->data['metrika_status'] = array();
 				$this->saveData($this->fields_metrika);
 				$this->session->data['metrika_status'][] = $this->success_alert('Данные метрики сохранены!');
 				$this->load->model('yamodule/metrika');
@@ -236,19 +243,18 @@ class ControllerFeedYamodule extends Controller {
 				$this->model_yamodule_metrika->processCounter();
 				break;
 			case 'market':
-				$this->session->data['market_status'] = array();
 				$this->session->data['market_status'][] = $this->success_alert('Настройки успешно сохранены!');
 				$this->saveData($this->fields_market);
 				break;
 			case 'pokupki':
-				$this->session->data['pokupki_status'] = array();
 				$this->saveData($this->fields_pokupki);
 				$this->session->data['pokupki_status'][] = $this->success_alert('Настройки успешно сохранены!');
 				break;
 			
 		}
-
-		$this->sendStatistics();
+		$updater = $this->sendStatistics();
+		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
+		
 	}
 
 	public function initForm($array)
@@ -713,9 +719,9 @@ class ControllerFeedYamodule extends Controller {
 		return $html;
 	}
 
-	public function success_alert($text)
+	public function success_alert($text, $class = 'success')
 	{
-		$html = ' <div class="alert alert-success">
+		$html = ' <div class="alert alert-'.$class.'">
 					<i class="fa fa-check-circle"></i> '.$text.'
 						<button type="button" class="close" data-dismiss="alert">×</button>
 					</div>';
@@ -802,6 +808,7 @@ class ControllerFeedYamodule extends Controller {
 		$this->model_setting_setting->editSetting('yandexbuy_customer', array('yandexbuy_customer' => $customer_id));
 		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 1));
 		$this->model_extension_extension->install('payment', 'yamodule');
+		//$this->load->controller('extension/modification/refresh');
 		$this->load->model('user/user_group');
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'payment/yamodule');
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'payment/yamodule');

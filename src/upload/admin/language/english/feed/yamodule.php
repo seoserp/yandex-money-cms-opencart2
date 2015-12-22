@@ -4,6 +4,7 @@ $_['heading_title']      = 'Y.CMS от <a target="_blank" href="https://kassa.ya
 $_['heading_title_ya']      = 'Y.CMS от Яндекс.Кассы';
 $_['ya_version']      = '1.3.0';
 $_['text_license']      = '<p>Любое использование вами модуля Y.CMS означает полное и безоговорочное принятие вами условий <a target="_blank" href="https://money.yandex.ru/doc.xml?id=527052">лицензионного договора</a>. Если вы не принимаете условия указанного договора в полном объеме, то не имеете права использовать программу в каких-либо целях.</p>';
+$_['text_need_update']      = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
 // Text
 $_['p2p']          = 'Яндекс.Деньги';
@@ -125,7 +126,7 @@ $_['lbl_mws_crt']       = 'Сертификат';
 $_['lbl_mws_connect']       = 'Как получить сертификат';
 $_['txt_mws_connect']       = 'Скачайте <a href="%s">готовый запрос на сертификат</a> (файл в формате .csr).';
 $_['lbl_mws_doc']       = 'Данные для заполнения заявки';
-$_['txt_mws_doc']       = 'Скачайте <a target="_blank"  href="https://github.com/yandex-money/yandex-money-cms-opencart2/raw/master/docs/forma-mws.doc">заявку на сертификат</a>. Ее нужно заполнить, распечатать, поставить подпись и печать. Внизу страницы — таблица с данными для заявки, просто скопируйте их. Отправьте файл запроса вместе со сканом готовой заявки менеджеру Яндекс.Денег на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a>.';
+$_['txt_mws_doc']       = 'Скачайте <a target="_blank"  href="https://money.yandex.ru/i/html-letters/SSL_Cert_Form.doc">заявку на сертификат</a>. Ее нужно заполнить, распечатать, поставить подпись и печать. Внизу страницы — таблица с данными для заявки, просто скопируйте их. Отправьте файл запроса вместе со сканом готовой заявки менеджеру Яндекс.Денег на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a>.';
 $_['txt_mws_cer']       = 'Загрузите сертификат, который пришлет вам менеджер, наверху этой страницы.';
 
 $_['lbl_mws_cn']       = 'CN';

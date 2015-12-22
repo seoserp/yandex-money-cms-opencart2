@@ -355,9 +355,6 @@ class ControllerYandexbuyOrder extends Controller
 	
 	public static function log_save($logtext)
 	{
-		$real_log_file = './ya_logs/'.date('Y-m-d').'.log';
-		$h = fopen($real_log_file , 'ab');
-		fwrite($h, date('Y-m-d H:i:s ') . '[' . addslashes($_SERVER['REMOTE_ADDR']) . '] ' . $logtext . "\n");
-		fclose($h);
+		$this->log->write($logtext.PHP_EOL);
 	}
 }
