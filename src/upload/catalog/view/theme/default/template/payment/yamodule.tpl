@@ -84,8 +84,7 @@
 			</table>
 			<input type="hidden" name="shopid" value="<?php echo $shop_id;?>">
 			<input type="hidden" name="scid" value="<?php echo $scid;?>">
-			<input type="hidden" name="orderNumber" value="2-<?php echo $order_id;?>">
-			<input type="hidden" name="orderNumbers" value="<?php echo $order_id;?>">
+			<input type="hidden" name="orderNumber" value="<?php echo $order_id;?>">
 			<input type="hidden" name="sum" value="<?php echo $sum;?>" data-type="number" >
 			<input type="hidden" name="customerNumber" value="<?php echo $customerNumber; ?>" >
 			<input type="hidden" name="shopSuccessURL" value="<?php echo $shopSuccessURL; ?>" >

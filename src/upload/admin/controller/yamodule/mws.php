@@ -1,6 +1,9 @@
 <?php
 class ControllerYamoduleMws extends Controller {
 	private $error = array();
+	const PREFIX_DEBUG = "3-";
+   const ORDERNUMBER = "orderNumber";
+	
 	public function generate(){
 		$this->load->model('yamodule/mws');
 		$this->load->model('setting/setting');
@@ -126,8 +129,7 @@ class ControllerYamoduleMws extends Controller {
 			$this->model_yamodule_mws->PkeyPem = (isset($conf['yamodule_mws_pkey']))?$conf['yamodule_mws_pkey']:'';
 			$this->model_yamodule_mws->CertPem = (isset($conf['yamodule_mws_cert']))?$conf['yamodule_mws_cert']:'';
 			
-			$payment = $this->model_yamodule_mws->request('listOrders', array('orderNumber'=>'2-'.$order_id), false, false);
-			
+			$payment = $this->model_yamodule_mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
 			if (!isset($payment['invoiceId'])) $errors[]=$this->language->get('err_mws_listorder');
 			
 			if (!$errors && $this->request->server['REQUEST_METHOD'] == 'POST' && $is_act_return && isset($this->request->post['return_sum'])){

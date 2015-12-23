@@ -2,7 +2,11 @@
 class ControllerPaymentYamodule extends Controller
 {
 	const MONEY_URL = "https://money.yandex.ru";
-    const SP_MONEY_URL = "https://sp-money.yandex.ru";
+   const SP_MONEY_URL = "https://sp-money.yandex.ru";
+	
+   const PREFIX_DEBUG = "3-";
+   const ORDERNUMBER = "orderNumber";
+	
 	public $error;
 	public $errors;
 
@@ -21,7 +25,7 @@ class ControllerPaymentYamodule extends Controller
 		else
 			$data['kassa_action'] = 'https://money.yandex.ru/eshop.xml';
 
-		$data['order_id'] = $this->session->data['order_id'];
+		$data['order_id'] = self::PREFIX_DEBUG.$this->session->data['order_id'];
 		$data['p2p_mode'] = $this->config->get('ya_p2p_active');
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
 		$data['shop_id'] = $this->config->get('ya_kassa_sid');
@@ -337,9 +341,10 @@ class ControllerPaymentYamodule extends Controller
 		$this->model_yamodel_yamoney->password = $this->config->get('ya_kassa_pw');
 		$this->model_yamodel_yamoney->password2 = $this->config->get('ya_p2p_pw');
 		$this->model_yamodel_yamoney->shopid = $this->config->get('ya_kassa_sid');
-		$order_id = isset($data['orderNumbers']) ? (int)$data['orderNumbers'] : 0;
+		$order_id = isset($data[self::ORDERNUMBER]) ? (int) substr($data[self::ORDERNUMBER], strlen(self::PREFIX_DEBUG), strlen($data[self::ORDERNUMBER])) : 0;
 		if ($this->config->get('ya_kassa_active') && isset($data['action']) && !empty($data['action']))
 		{
+			$this->log_save('callback:  orderid='.$order_id);
 			if ($data['action'] == 'checkOrder')
 			{
 				if($this->config->get('ya_kassa_log'))
