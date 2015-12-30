@@ -93,6 +93,7 @@ class ControllerFeedYamarket extends Controller {
 			$data['picture'] = array();
 			if ($product['minimum'] > 1)
 					$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
+			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic)
 				$data['picture'][] = $this->model_tool_image->resize($pic['image'], 600, 600);
 
