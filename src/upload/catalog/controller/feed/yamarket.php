@@ -78,7 +78,7 @@ class ControllerFeedYamarket extends Controller {
 			$data = array();
 			$data['id'] = $product['product_id'];
 			$data['available'] = $available;
-			$data['url'] = str_replace('https://', 'http://', $this->url->link('product/product', 'product_id=' . $product['product_id']));
+			$data['url'] = str_replace('https://', 'http://', htmlspecialchars_decode($this->url->link('product/product', 'product_id=' . $product['product_id'])));
 			$data['price'] = $product['price'];
 			if ($product['special'] && $product['special'] < $product['price'])
 				$data['price'] = $product['special'];
