@@ -15,13 +15,14 @@ class ControllerFeedYamodule extends Controller {
 	public $fields_kassa = array(
 		'ya_kassa_active',
 		'ya_kassa_sid',
-		'ya_kassa_wallet',
+        'ya_kassa_scid',
+        'ya_kassa_pw',
+        'ya_kassa_test',
 		'ya_kassa_log',
-		'ya_kassa_test',
-		'ya_kassa_scid',
-		'ya_kassa_pw',
-		'ya_kassa_card',
-		'ya_kassa_terminal',
+		'ya_kassa_paymode',
+        'ya_kassa_ym',
+		'ya_kassa_cards',
+		'ya_kassa_cash',
 		'ya_kassa_mobile',
 		'ya_kassa_sber',
 		'ya_kassa_alfa',
@@ -160,6 +161,7 @@ class ControllerFeedYamodule extends Controller {
 			'shopid' => $this->Sget('ya_kassa_sid'),
 			'settings' => array(
 				'kassa' => (bool) $this->Sget('ya_kassa_active'),
+                'kassa_epl' => (bool) $this->Sget('ya_kassa_paymode'),
 				'p2p' => (bool) $this->Sget('ya_p2p_active'),
 				'metrika' =>(bool) $this->Sget('ya_metrika_active'),
 			)
@@ -538,6 +540,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['p2p_linkapp'] = $this->language->get('p2p_linkapp');
 		// kassa
 		$data['kassa_os'] = $this->language->get('kassa_os');
+		$data['kassa_paymode'] = $this->language->get('kassa_paymode');
 		$data['kassa_test'] = $this->language->get('kassa_test');
 		$data['kassa_sid'] = $this->language->get('kassa_sid');
 		$data['kassa_scid'] = $this->language->get('kassa_scid');
@@ -550,10 +553,10 @@ class ControllerFeedYamodule extends Controller {
 		$data['kassa_mobile'] = $this->language->get('kassa_mobile');
 		$data['kassa_sber'] = $this->language->get('kassa_sber');
 		$data['kassa_alfa'] = $this->language->get('kassa_alfa');
-		$data['kassa_wallet'] = $this->language->get('kassa_wallet');
+		$data['kassa_ym'] = $this->language->get('kassa_ym');
 		$data['kassa_method'] = $this->language->get('kassa_method');
-		$data['kassa_card'] = $this->language->get('kassa_card');
-		$data['kassa_terminal'] = $this->language->get('kassa_terminal');
+		$data['kassa_cards'] = $this->language->get('kassa_cards');
+		$data['kassa_cash'] = $this->language->get('kassa_cash');
 		$data['kassa_check'] = $this->language->get('kassa_check');
 		$data['kassa_fail'] = $this->language->get('kassa_fail');
 		$data['kassa_success'] = $this->language->get('kassa_success');
@@ -736,6 +739,7 @@ class ControllerFeedYamodule extends Controller {
 			'ya_p2p_log' => 1,
 			'ya_kassa_active' => 0,
 			'ya_kassa_log' => 1,
+			'ya_kassa_paymode' => 0,
 			'ya_kassa_test' => 1,
 			'ya_metrika_active' => 0,
 			'ya_metrika_webvizor' => 1,

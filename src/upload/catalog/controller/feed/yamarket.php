@@ -91,6 +91,7 @@ class ControllerFeedYamarket extends Controller {
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
 			$data['picture'] = array();
+			//TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
 					$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
 			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);

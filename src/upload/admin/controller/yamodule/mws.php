@@ -1,7 +1,7 @@
 <?php
 class ControllerYamoduleMws extends Controller {
 	private $error = array();
-	const PREFIX_DEBUG = "3-";
+	const PREFIX_DEBUG = "";
    const ORDERNUMBER = "orderNumber";
 	
 	public function generate(){

@@ -2,7 +2,7 @@
 <modification>
 	<name>Y.CMS</name>
 	<code>ycms.mws</code>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<author>Yandex.Money</author>
 	
 	<file path="admin/model/sale/order.php">
@@ -51,7 +51,7 @@
 			]]></add>
 		</operation>
 	</file>
-	<file path="catalog/view/theme/default/template/common/success.tpl">
+	<file path="catalog/view/theme/*/template/common/success.tpl">
 		<operation>
 			<search position="replace"><![CDATA[<?php echo $footer; ?>]]></search>
 			<add><![CDATA[
@@ -60,7 +60,7 @@
 			]]></add>
 		</operation>
 	</file>
-	<file path="catalog/view/theme/default/template/common/footer.tpl">
+	<file path="catalog/view/theme/*/template/common/footer.tpl">
 		<operation>
 			<search position="replace"><![CDATA[<footer>]]></search>
 			<add><![CDATA[

@@ -4,7 +4,7 @@ class ControllerPaymentYamodule extends Controller
 	const MONEY_URL = "https://money.yandex.ru";
    const SP_MONEY_URL = "https://sp-money.yandex.ru";
 	
-   const PREFIX_DEBUG = "3-";
+   const PREFIX_DEBUG = "";
    const ORDERNUMBER = "orderNumber";
 	
 	public $error;
@@ -30,36 +30,18 @@ class ControllerPaymentYamodule extends Controller
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
 		$data['shop_id'] = $this->config->get('ya_kassa_sid');
 		$data['scid'] = $this->config->get('ya_kassa_scid');
+		$data['kassa_paymode'] = $this->config->get('ya_kassa_paymode');
 		$data['customerNumber'] = $order_info['email'];
 		$data['shopSuccessURL'] = $this->url->link('checkout/success', '', 'SSL');
 		$data['shopFailURL'] = $this->url->link('checkout/failure', '', 'SSL');
 		$data['comment'] = $order_info['comment'];
 		$data['sum'] = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
-		$data['method_qp'] = $this->config->get('ya_kassa_qp');
-		$data['method_qw'] = $this->config->get('ya_kassa_qw');
-		$data['method_ma'] = $this->config->get('ya_kassa_ma');
-		$data['method_pb'] = $this->config->get('ya_kassa_pb');
-		$data['method_ym'] = $this->config->get('ya_kassa_wallet');
-		$data['method_cards'] = $this->config->get('ya_kassa_card');
-		$data['method_cash'] = $this->config->get('ya_kassa_terminal');
-		$data['method_mobile'] = $this->config->get('ya_kassa_mobile');
-		$data['method_wm'] = $this->config->get('ya_kassa_wm');
-		$data['method_sb'] = $this->config->get('ya_kassa_sber');
-		$data['method_alfa'] = $this->config->get('ya_kassa_alfa');
+		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','qp','qw') as $pName) {
+            $data['method_'.$pName] = $this->config->get('ya_kassa_'.$pName);
+            $data['method_'.$pName.'_text'] = $this->language->get('text_method_'.$pName);
+        }
 		$data['method_label'] =  $this->language->get('text_method');
-		$data['method_qp_text'] =  $this->language->get('text_method_qp');
-		$data['method_qw_text'] =  $this->language->get('text_method_qw');
-		$data['method_ma_text'] =  $this->language->get('text_method_ma');
-		$data['method_pb_text'] =  $this->language->get('text_method_pb');
-		$data['method_ym_text'] =  $this->language->get('text_method_ym');
-		$data['method_cards_text'] =  $this->language->get('text_method_cards');
-		$data['method_cash_text'] =  $this->language->get('text_method_cash');
-		$data['method_mobile_text'] =  $this->language->get('text_method_mobile');
-		$data['method_wm_text'] =  $this->language->get('text_method_wm');
-		$data['method_sber_text'] =  $this->language->get('text_method_sber');
-		$data['method_alfa_text'] =  $this->language->get('text_method_alfa');
 		$data['order_text'] =  $this->language->get('text_order');
-
 		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/yamodule.tpl')) {
 			return $this->load->view($this->config->get('config_template') . '/template/payment/yamodule.tpl', $data);
 		} else {

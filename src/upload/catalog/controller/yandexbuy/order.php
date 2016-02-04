@@ -355,6 +355,7 @@ class ControllerYandexbuyOrder extends Controller
 	
 	public static function log_save($logtext)
 	{
-		$this->log->write($logtext.PHP_EOL);
+		$log = new Log('ycms.market.log');
+		$log->write($logtext);
 	}
 }

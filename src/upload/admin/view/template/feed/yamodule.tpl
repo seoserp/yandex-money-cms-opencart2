@@ -290,16 +290,32 @@
 										</div>
 									</div>
 									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $kassa_paymode; ?></label>
+                                        <div class="col-sm-8">
+                                            <label class="radio-inline">
+                                                <input type="radio" <?php echo (!$ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="0"/> Выбор оплаты на стороне магазина</label>
+                                            <label class="radio-inline">
+                                                <input type="radio" <?php echo ($ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="1"/> Выбор оплаты на стороне Яндекс.Кассы</label>
+                                        </div>
+									</div>
+                                    <div class="form-group kassa-wo-select">
+                                        <label class="control-label col-sm-4"></label>
+                                        <div class="col-sm-8">
+                                            <b>Внимание! Этот режим должен быть включен и на стороне сервиса Яндекс.Касса.</b><br>
+                                            Доступные вам способы оплаты и тарифы фиксируются на стороне Яндекс.Кассы. Чтобы их поменять, напишите менеджеру Кассы на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a> или позвоните по телефону 8 800 250-66-99.
+                                        </div>
+                                    </div>
+                                    <div class="form-group kassa-w-select">
 										<label class="control-label col-sm-4"><?php echo $kassa_method; ?></label>
 										<div class="col-sm-8">
 											<div class="checkbox">
-												<label for="ya_kassa_wallet"><input type="checkbox" <?php echo ($ya_kassa_wallet ? ' checked="checked"' : ''); ?> name="ya_kassa_wallet" id="ya_kassa_wallet" class="" value="1"/> <?php echo $kassa_wallet; ?></label>
+												<label for="ya_kassa_ym"><input type="checkbox" <?php echo ($ya_kassa_ym ? ' checked="checked"' : ''); ?> name="ya_kassa_ym" id="ya_kassa_ym" class="" value="1"/> <?php echo $kassa_ym; ?></label>
 											</div>
 											<div class="checkbox">
-												<label for="ya_kassa_card"><input type="checkbox" <?php echo ($ya_kassa_card ? ' checked="checked"' : ''); ?> name="ya_kassa_card" id="ya_kassa_card" class="" value="1"/> <?php echo $kassa_card; ?></label>
+												<label for="ya_kassa_cards"><input type="checkbox" <?php echo ($ya_kassa_cards ? ' checked="checked"' : ''); ?> name="ya_kassa_cards" id="ya_kassa_cards" class="" value="1"/> <?php echo $kassa_cards; ?></label>
 											</div>
 											<div class="checkbox">
-												<label for="ya_kassa_terminal"><input type="checkbox" <?php echo ($ya_kassa_terminal ? ' checked="checked"' : ''); ?> name="ya_kassa_terminal" id="ya_kassa_terminal" class="" value="1"/> <?php echo $kassa_terminal; ?></label>
+												<label for="ya_kassa_cash"><input type="checkbox" <?php echo ($ya_kassa_cash ? ' checked="checked"' : ''); ?> name="ya_kassa_cash" id="ya_kassa_cash" class="" value="1"/> <?php echo $kassa_cash; ?></label>
 											</div>
 											<div class="checkbox">
 												<label for="ya_kassa_mobile"><input type="checkbox" <?php echo ($ya_kassa_mobile ? ' checked="checked"' : ''); ?> name="ya_kassa_mobile" id="ya_kassa_mobile" class="" value="1"/> <?php echo $kassa_mobile; ?></label>
@@ -832,9 +848,21 @@ $(document).ready(function(){
 			$(this).parent().removeClass("tree-selected");
 		}
 	});
-
+    // Show/hide payment methods for some modes
+    var $funcMode = function (){
+        if ($(":input[name=ya_kassa_paymode][type=radio]:checked").val() == '1') {
+            $(".kassa-wo-select").show();
+            $(".kassa-w-select").hide();
+        } else {
+            $(".kassa-w-select").show();
+            $(".kassa-wo-select").hide();
+        }
+    };
+    $funcMode.call();
+    $(":input[name=ya_kassa_paymode][type=radio]").click($funcMode);
+    //
 	var market_cat = JSON.parse('<?php echo json_encode($ya_market_categories); ?>');
-	console.log(market_cat);
+
 	for (i in market_cat)
 		$('#categoryBox input[value="'+ market_cat[i] +'"]').prop("checked", true).change();
 });
