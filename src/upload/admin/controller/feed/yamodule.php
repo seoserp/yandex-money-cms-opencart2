@@ -264,8 +264,8 @@ class ControllerFeedYamodule extends Controller {
 		foreach ($array as $a)
 			$data[$a] = $this->config->get($a);
 
-		$data['ya_kassa_check'] = HTTPS_CATALOG.'index.php?route=payment/yamodule/callback';
-		$data['ya_kassa_aviso'] = HTTPS_CATALOG.'index.php?route=payment/yamodule/callback';
+		$data['ya_kassa_check'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route=payment/yamodule/callback';
+		$data['ya_kassa_aviso'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route=payment/yamodule/callback';
 		$data['ya_pokupki_sapi'] = HTTPS_CATALOG.'yandexbuy';
 		if ($this->config->get('config_secure'))
 		{
@@ -541,6 +541,7 @@ class ControllerFeedYamodule extends Controller {
 		// kassa
 		$data['kassa_os'] = $this->language->get('kassa_os');
 		$data['kassa_paymode'] = $this->language->get('kassa_paymode');
+		$data['kassa_inform'] = $this->language->get('kassa_inform');
 		$data['kassa_test'] = $this->language->get('kassa_test');
 		$data['kassa_sid'] = $this->language->get('kassa_sid');
 		$data['kassa_scid'] = $this->language->get('kassa_scid');

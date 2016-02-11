@@ -301,9 +301,8 @@
                                     <div class="form-group kassa-wo-select">
                                         <label class="control-label col-sm-4"></label>
                                         <div class="col-sm-8">
-                                            <b>Внимание! Этот режим должен быть включен и на стороне сервиса Яндекс.Касса.</b><br>
-                                            Доступные вам способы оплаты и тарифы фиксируются на стороне Яндекс.Кассы. Чтобы их поменять, напишите менеджеру Кассы на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a> или позвоните по телефону 8 800 250-66-99.
-                                        </div>
+											<?php echo $kassa_inform?>
+										</div>
                                     </div>
                                     <div class="form-group kassa-w-select">
 										<label class="control-label col-sm-4"><?php echo $kassa_method; ?></label>
@@ -848,6 +847,11 @@ $(document).ready(function(){
 			$(this).parent().removeClass("tree-selected");
 		}
 	});
+	//
+	var market_cat = JSON.parse('<?php echo json_encode($ya_market_categories); ?>');
+	console.log(market_cat);
+	for (i in market_cat)
+		$('#categoryBox input[value="'+ market_cat[i] +'"]').prop("checked", true).change();
     // Show/hide payment methods for some modes
     var $funcMode = function (){
         if ($(":input[name=ya_kassa_paymode][type=radio]:checked").val() == '1') {
@@ -860,11 +864,6 @@ $(document).ready(function(){
     };
     $funcMode.call();
     $(":input[name=ya_kassa_paymode][type=radio]").click($funcMode);
-    //
-	var market_cat = JSON.parse('<?php echo json_encode($ya_market_categories); ?>');
-
-	for (i in market_cat)
-		$('#categoryBox input[value="'+ market_cat[i] +'"]').prop("checked", true).change();
 });
 </script>
 <script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter27746007 = new Ya.Metrika({ id:27746007 }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script>

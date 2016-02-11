@@ -93,7 +93,9 @@
 			<input type="hidden" name="customerNumber" value="<?php echo $customerNumber; ?>" >
 			<input type="hidden" name="shopSuccessURL" value="<?php echo $shopSuccessURL; ?>" >
 			<input type="hidden" name="shopFailURL" value="<?php echo $shopFailURL; ?>" >
-			<input type="hidden" name="cms_name" value="ya_opencart2" >   
+			<?php if ($phone){ ?> <input type="hidden" name="cps_phone" value="<?php echo $phone; ?>" > <?php } ?>
+			<?php if ($email){ ?> <input type="hidden" name="cps_email" value="<?php echo $email; ?>" >  <?php } ?>
+			<input type="hidden" name="cms_name" value="ya_opencart2" >
 	</form>
 	<div class="buttons">
 		<div class="pull-right">
@@ -123,7 +125,14 @@
 	</div>
 <?php } ?>
 <script type="text/javascript"><!--
-$('#button-confirm').on('click', function() {
-  $('#paymentForm').submit();
-});
-//--></script>
+	$('#button-confirm').on('click', function() {
+		$.ajax({
+			type: 'get',
+			url: 'index.php?route=payment/yamodule/confirm',
+			cache: false,
+			success: function() {
+				$('#paymentForm').submit();
+			}
+		});
+	});
+	//--></script>

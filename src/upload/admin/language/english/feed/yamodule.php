@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS от <a target="_blank" href="https://kassa.yandex.ru">Яндекс.Кассы</a>';
 $_['heading_title_ya']      = 'Y.CMS от Яндекс.Кассы';
-$_['ya_version']      = '1.4.0';
+$_['ya_version']      = '1.4.1';
 $_['text_license']      = '<p>Любое использование вами модуля Y.CMS означает полное и безоговорочное принятие вами условий <a target="_blank" href="https://money.yandex.ru/doc.xml?id=527052">лицензионного договора</a>. Если вы не принимаете условия указанного договора в полном объеме, то не имеете права использовать программу в каких-либо целях.</p>';
 $_['text_need_update']      = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
@@ -48,6 +48,7 @@ $_['text_success']       = 'Настройки модуля обновлены!'
 // kassa
 $_['kassa_test']       = 'Режим тестирования';
 $_['kassa_paymode']       = 'Режим оплаты';
+$_['kassa_inform']       = '<b>Внимание! Этот режим должен быть включен и на стороне сервиса Яндекс.Касса.</b><br>Чтобы активировать этот сценарий, напишите менеджеру Кассы на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a> или позвоните по телефону 8 800 250-66-99.';
 $_['kassa_sid']       = 'Идентификатор магазина (shopId)';
 $_['kassa_scid']       = 'Номер витрины (scid)';
 $_['kassa_pw']       = 'Пароль магазина (shopPassword)';

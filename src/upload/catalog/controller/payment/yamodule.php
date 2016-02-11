@@ -34,6 +34,8 @@ class ControllerPaymentYamodule extends Controller
 		$data['customerNumber'] = $order_info['email'];
 		$data['shopSuccessURL'] = $this->url->link('checkout/success', '', 'SSL');
 		$data['shopFailURL'] = $this->url->link('checkout/failure', '', 'SSL');
+		$data['email'] = $order_info['email'];
+		$data['phone'] = preg_replace("/[-+()]/",'',$order_info['telephone']);
 		$data['comment'] = $order_info['comment'];
 		$data['sum'] = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
 		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','qp','qw') as $pName) {
@@ -48,7 +50,12 @@ class ControllerPaymentYamodule extends Controller
 			return $this->load->view('default/template/payment/yamodule.tpl', $data);
 		}
 	}
-
+	public function confirm(){
+		if ($this->session->data['payment_method']['code'] == 'yamodule') {
+			$this->load->model('checkout/order');
+			$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('config_order_status_id'), '', true);
+		}
+	}
 	public static function log_save($logtext)
 	{
 		$error_log = new Log('error.log');
