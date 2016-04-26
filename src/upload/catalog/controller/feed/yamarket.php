@@ -51,30 +51,23 @@ class ControllerFeedYamarket extends Controller {
 		$data_product =array();
 		foreach ($products as $product)
 		{
-			// if($product['product_id'] != 30)
-				// continue;
+			if ($this->config->get('ya_market_available') && $product['quantity'] < 1)	continue;
 
-			if ($this->config->get('ya_market_available'))
-				if($product['quantity'] < 1)
-					continue;
-
-			$available = 'false';
+			$available = false;
 			if ($this->config->get('ya_market_set_available') == 1)
-				$available = 'true';
+				$available = true;
 			elseif ($this->config->get('ya_market_set_available') == 2)
 			{
-				if ($product['quantity'] > 0)
-					$available = 'true';
+				if ($product['quantity'] > 0) $available = true;
 			}
 			elseif ($this->config->get('ya_market_set_available') == 3)
 			{
-				$available = 'true';
-				if ($product['quantity'] == 0)
-					continue;
+				$available = true;
+				if ($product['quantity'] == 0) continue;
 			}
-			elseif ($this->config->get('ya_market_set_available') == 4)
-				$available = 'false';
-
+			elseif ($this->config->get('ya_market_set_available') == 4){
+				$available = false;
+			}
 			$data = array();
 			$data['id'] = $product['product_id'];
 			$data['available'] = $available;
@@ -90,13 +83,14 @@ class ControllerFeedYamarket extends Controller {
 			$data['pickup'] = ($this->config->get('ya_market_pickup') ? 'true' : 'false');
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
-			$data['picture'] = array();
 			//TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
-					$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
+				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
+			$data['picture'] = array();
 			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
-			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic)
-				$data['picture'][] = urlencode(htmlspecialchars_decode($this->model_tool_image->resize($pic['image'], 600, 600)));
+			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
+				if (count($data['picture'])<=9) $data['picture'][] = str_replace('&amp;','&',$this->model_tool_image->resize($pic['image'], 600, 600));
+			}
 
 			if ($this->config->get('ya_market_prostoy'))
 			{
@@ -123,7 +117,7 @@ class ControllerFeedYamarket extends Controller {
 							foreach ($attr['attribute'] as $val)
 								$data['param'][] = array('id' => $val['attribute_id'], 'name' => $val['name'], 'value' => $val['text']);
 				}
-				
+
 				if (!$this->makeOfferCombination($data, $product, $shop_currency, $offers_currency, $decimal_place, $this->model_yamodel_yamarket))
 				{
 					$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
@@ -136,7 +130,7 @@ class ControllerFeedYamarket extends Controller {
 		$this->response->addHeader('Content-Type: application/xml; charset=utf-8');
 		$this->response->setOutput($this->model_yamodel_yamarket->get_xml());
 	}
-	
+
 	public function makeOfferCombination($data, $product, $shop_currency, $offers_currency, $decimal_place, $object)
 	{
 		$colors = array();
@@ -174,12 +168,12 @@ class ControllerFeedYamarket extends Controller {
 				$data_temp['url'].= '#'.$option['product_option_value_id'];
 				$colors_array[] = $data_temp;
 			}
-		}	
+		}
 		else
 		{
 			$colors_array[] = $data;
 		}
-		
+
 		unset($data_temp);
 		unset($option);
 		foreach($colors_array as $i => $data)
@@ -205,7 +199,7 @@ class ControllerFeedYamarket extends Controller {
 					elseif ($option['price_prefix'] == '=') {
 						$data_temp['price'] = $option['price'];
 					}
-					
+
 					$data_temp = $this->setOptionedWeight($data_temp, $option);
 					if (count($colors))
 						$data_temp['url'].= '-'.$option['product_option_value_id'];
@@ -223,7 +217,7 @@ class ControllerFeedYamarket extends Controller {
 			}
 			else
 			{
-				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');				
+				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 				if ($data['price'] > 0) {
 					$object->add_offer($data['id'], $data, $data['available']);
 				}
@@ -231,7 +225,7 @@ class ControllerFeedYamarket extends Controller {
 
 		return true;
 	}
-	
+
 	protected function setOptionedWeight($product, $option) {
 		if (isset($option['weight']) && isset($option['weight_prefix'])) {
 			foreach ($product['param'] as $i=>$param) {

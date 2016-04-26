@@ -2,7 +2,7 @@
 
 Class ModelYamodelYamarket extends Model
 {
-	
+
 	var $from_charset = 'windows-1251';
 	var $shop = array('name' => '', 'company' => '', 'url' => '', 'platform' => 'ya_opencart');
 	var $currencies = array();
@@ -19,14 +19,14 @@ Class ModelYamodelYamarket extends Model
 
 		return $query->rows;
 	}
-	
+
 	public function getCurrencyByISO($id) {
 		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "currency
 									WHERE code = '" . $id . "'");
 
 		return $query->row;
 	}
-	
+
 	public function getProducts($allowed_categories, $vendor_required = true) {
 		$query = $this->db->query("SELECT p.*, pd.name, pd.description, m.name AS manufacturer, p2c.category_id, IFNULL(ps.price, p.price) AS price, ps.price AS special, wcd.unit AS weight_unit,
 									GROUP_CONCAT(DISTINCT CAST(pr.related_id AS CHAR) SEPARATOR ',') AS rel
@@ -44,10 +44,10 @@ Class ModelYamodelYamarket extends Model
 									GROUP BY p.product_id");
 		return $query->rows;
 	}
-	
+
 	public function getProductOptions($option_ids, $product_id) {
 		$lang = (int)$this->config->get('config_language_id');
-		
+
 		$query = $this->db->query("SELECT pov.*, od.name AS option_name, ovd.name
 			FROM " . DB_PREFIX . "product_option_value pov 
 			LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (pov.option_value_id = ovd.option_value_id)
@@ -56,7 +56,7 @@ Class ModelYamodelYamarket extends Model
 				AND ovd.language_id = '$lang'");
 		return $query->rows;
 	}
-	
+
 	public function getAttributes($attr_ids) {
 		if (!$attr_ids) return array();
 		$query = $this->db->query("SELECT a.attribute_id, ad.name
@@ -71,7 +71,7 @@ Class ModelYamodelYamarket extends Model
 		}
 		return $ret;
 	}
-	
+
 	public function getProductAttributes($product_id) {
 		$query = $this->db->query("SELECT pa.attribute_id, pa.text, ad.name
 			FROM " . DB_PREFIX . "product_attribute pa
@@ -186,15 +186,20 @@ Class ModelYamodelYamarket extends Model
 		foreach($data as $k => $v)
 		{
 			if (!in_array($k, $allowed)) unset($data[$k]);
-			if($k != 'picture' && $k != 'param' && $k != 'rec' )
-				$data[$k] = strip_tags($this->prepare_field($v));
+			if(!in_array($k, array('picture','param','rec','description')))	$data[$k] = strip_tags($this->prepare_field($v));
+			if ($k=='description') {
+				$data[$k] = preg_replace('|<[/]?[^>]+?>|', '', trim(html_entity_decode ($v, ENT_XML1)));
+				$iCut = strpos($data[$k],' ',160);
+				$iCut = ($iCut>175)?strpos($data[$k],' ',150):$iCut;
+				$data[$k] = substr($data[$k],0,$iCut);
+			}
 		}
 		$tmp = $data;
 		$data = array();
 		foreach($allowed as $key)
 			if (isset($tmp[$key]) && !empty($tmp[$key]))
-				$data[$key] = $tmp[$key]; # Порядок важен для Я.Маркета!!!
-		
+				$data[$key] = $tmp[$key];
+
 		$out = array('id' => $id, 'data' => $data, 'available' => ($available) ? 'true' : 'false');
 		if(!$this->config->get('ya_market_prostoy'))
 			$out['type'] = 'vendor.model';
@@ -203,7 +208,8 @@ Class ModelYamodelYamarket extends Model
 
 	function get_xml_header()
 	{
-		return '<?xml version="1.0" encoding="utf-8"?><!DOCTYPE yml_catalog SYSTEM "shops.dtd"><yml_catalog date="'.date('Y-m-d H:i').'">';
+		return '<?xml version="1.0" encoding="utf-8"?>'.
+		'<yml_catalog date="'.date('Y-m-d H:i').'">';
 	}
 
 	function get_xml_shop()
@@ -223,8 +229,8 @@ Class ModelYamodelYamarket extends Model
 			$s .= $this->convert_array_to_attr($category, 'category', $category_name);
 		}
 		$s .= '</categories>' . "\r\n";
-		if($this->config->get('ya_market_homecarrier'))
-			$s .= '<local_delivery_cost>'.$this->config->get('ya_market_localcoast').'</local_delivery_cost>' . "\r\n";
+
+		if($this->config->get('ya_market_homecarrier')) $s .= '<local_delivery_cost>'.$this->config->get('ya_market_localcoast').'</local_delivery_cost>' . "\r\n"; //TODO Р”РѕСЂР°Р±РѕС‚Р°С‚СЊ РЅР° РѕСЃРЅРѕРІР°РЅРёРё https://yandex.ru/support/partnermarket/elements/delivery-options.xml
 
 		$s .= '<offers>' . "\r\n";
 		foreach($this->offers as $offer)
