@@ -188,7 +188,8 @@ Class ModelYamodelYamarket extends Model
 			if (!in_array($k, $allowed)) unset($data[$k]);
 			if(!in_array($k, array('picture','param','rec','description')))	$data[$k] = strip_tags($this->prepare_field($v));
 			if ($k=='description') {
-				$data[$k] = preg_replace('|<[/]?[^>]+?>|', '', trim(html_entity_decode ($v, ENT_XML1)));
+				$data[$k] = preg_replace('|<[/]?[^>]+?>|', '', trim(html_entity_decode ($v)));
+				$data[$k] = preg_replace("/&#?[a-z0-9]+;/i", '', $data[$k]);
 				if (strlen($data[$k])>175) {
 					$iCut = strpos($data[$k], ' ', 160);
 					$iCut = ($iCut > 175) ? strpos($data[$k], ' ', 150) : $iCut;
