@@ -12,11 +12,6 @@
 		</div>
 	</div>
 	<div class="container-fluid">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $heading_title; ?></h3>
-			</div>
-			<div class="panel-body">
 				<?php if($err_token) { ?>
 				<div class="alert alert-danger">
 					<i class="fa fa-exclamation-circle"></i>
@@ -24,6 +19,12 @@
 					<button type="button" class="close" data-dismiss="alert">×</button>
 				</div>
 				<?php } ?>
+				<div class='row'>
+					<div class='col-sm-12'>
+						<p><?php echo $text_license; ?></p>
+						<p>Версия модуля <span id='ya_version'><?php echo $ya_version; ?></span></p>
+					</div>
+				</div>
 				<ul class="nav nav-tabs">
 					<li class=""><a href="#tab-kassa" data-toggle="tab"><?php echo $kassa; ?></a></li>
 					<li><a href="#tab-mws" data-toggle="tab"><?php echo $mws_starter; ?></a></li>
@@ -33,108 +34,392 @@
 					<li><a href="#tab-pokupki" data-toggle="tab"><?php echo $pokupki; ?></a></li>
 				</ul>
 				<div class="tab-content bootstrap">
-					<div class="tab-pane" id="tab-pokupki">
-						<?php foreach ($pokupki_status as $po) { echo $po; } ?>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $pokupki; ?></h3>
-							</div>
-							<div class="panel-body">
-							<?php echo $text_license; ?><br>
-								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="pokupki_form form-horizontal">
-									<input type="hidden" value="pokupki" name="type_data"/>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_stoken"><?php echo $pokupki_stoken; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_stoken" value="<?php echo $ya_pokupki_stoken; ?>" id="ya_pokupki_stoken" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_yapi"><?php echo $pokupki_yapi; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_yapi" value="<?php echo $ya_pokupki_yapi; ?>" id="ya_pokupki_yapi" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_number"><?php echo $pokupki_number; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_number" value="<?php echo $ya_pokupki_number; ?>" id="ya_pokupki_number" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_idapp"><?php echo $pokupki_idapp; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_idapp" value="<?php echo $ya_pokupki_idapp; ?>" id="ya_pokupki_idapp" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_pw"><?php echo $pokupki_pw; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_pw" value="<?php echo $ya_pokupki_pw; ?>" id="ya_pokupki_pw" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
-											<p class="help-block">
-												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
-											</p>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_idpickup"><?php echo $pokupki_idpickup; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_idpickup" value="<?php echo $ya_pokupki_idpickup; ?>" id="ya_pokupki_idpickup" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_sapi"><?php echo $pokupki_sapi; ?></label>
-										<div class="col-sm-8">
-											<input type="text" disabled="disabled" name="ya_pokupki_sapi" value="<?php echo $ya_pokupki_sapi; ?>" id="ya_pokupki_sapi" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="control-label col-sm-4"><?php echo $pokupki_method; ?></label>
-										<div class="col-sm-8">
-											<div class="checkbox">
-												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
+					<div class="tab-pane" id="tab-kassa">
+						<?php foreach ($kassa_status as $k) echo $k;?>
+							<div class="">
+								<!-- new view -->
+								<?php if($mod_status) { ?>
+								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="kassa_form form-horizontal">
+									<input type="hidden" value="kassa" name="type_data"/>
+								<div class='row'>
+									<div class='col-sm-12'>
+										<p><?php echo $kassa_text_connect; ?></p>
+										<div class='form-horizontal'>
+											<div class="form-group">
+												<label for="ya_kassamode" class="col-sm-3 control-label"></label>
+												<div class="col-sm-9">
+													<label class='checkbox'>
+														<input type="checkbox" name="ya_kassa_active" class="cls_ya_kassamode" value="1" <?php echo ($ya_kassa_active ? ' checked="checked"' : ''); ?>>
+														<?php echo $kassa_text_enable; ?>
+													</label>
+												</div>
+												<label for="ya_kassa_test" class="col-sm-3 control-label"></label>
+												<div class="col-sm-9">
+													<label class='radio-inline'>
+														<input type="radio" name="ya_kassa_test" class="cls_ya_workmode" value="1"
+															<?php echo (($ya_kassa_test) ? ' checked="checked"':''); ?>> <?php echo $kassa_text_testmode; ?>
+													</label>
+													<label class='radio-inline'>
+														<input type="radio" name="ya_kassa_test" class="cls_ya_workmode" value="0"
+															<?php echo ((!$ya_kassa_test)?' checked="checked"':''); ?>> <?php echo $kassa_text_realmode; ?>
+													</label>
+												</div>
 											</div>
-											<div class="checkbox">
-												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
+											<div class="form-group">
+												<label class="control-label col-sm-3">checkUrl/avisoUrl</label>
+												<div class='col-sm-8'>
+													<input class='form-control disabled' value='<?php echo $ya_kassa_check; ?>' disabled>
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php echo $kassa_text_help_cburl; ?></p>
+												</div>
 											</div>
-											<div class="checkbox">
-												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_pokupki_bank"><input type="checkbox" <?php echo ($ya_pokupki_bank ? ' checked="checked"' : ''); ?> name="ya_pokupki_bank" id="ya_pokupki_bank" class="" value="1"/> <?php echo $pokupki_set_4; ?></label>
+											<div class="form-group">
+												<label class="control-label col-sm-3">successUrl/failUrl</label>
+												<div class='col-sm-8'>
+													<input class='form-control disabled' value='<?php echo $kassa_text_dynamic; ?>' disabled>
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php echo $kassa_text_help_url; ?></p>
+												</div>
 											</div>
 										</div>
 									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
+								</div>
+								<!-- row -->
+								<div class='row'>
+									<div class='col-sm-12'><h4 class="form-heading"><?php echo $kassa_text_lk_head; ?></h4></div>
+									<div class='col-sm-12'>
+										<p><?php echo $kassa_text_get_setting; ?></p>
+											<div class="form-group">
+												<label for="ya_kassa_sid" class="col-sm-3 control-label">shop ID</label>
+												<div class="col-sm-9">
+													<input name="ya_kassa_sid" value="<?php echo $ya_kassa_sid; ?>" id="ya_kassa_sid" class="form-control">
+													<p class="help-block"><?php echo $kassa_text_sid; ?></p>
+												</div>
+												<label for="ya_kassa_scid" class="col-sm-3 control-label">Scid</label>
+												<div class="col-sm-9">
+													<input name="ya_kassa_scid" value="<?php echo $ya_kassa_scid; ?>" id="ya_kassa_scid" class="form-control">
+													<p class="help-block"><?php echo $kassa_text_scid; ?></p>
+												</div>
+												<label for="ya_kassa_pw" class="col-sm-3 control-label">shopPassword</label>
+												<div class="col-sm-9">
+													<input name="ya_kassa_pw" value="<?php echo $ya_kassa_pw; ?>" id="ya_kassa_pw" class="form-control">
+													<p class="help-block"><?php echo $kassa_text_pw; ?></p>
+												</div>
+											</div>
+									</div>
+								</div>
+								<!-- row -->
+								<div class='row'>
+									<div class='col-sm-12'><h4 class="form-heading"><?php echo $kassa_text_paymode_head; ?></h4></div>
+									<div class='col-md-12'>
+										<div class='form-horizontal'>
+											<div class="form-group">
+												<label for="ya_paymode" class="col-sm-3 control-label"><?php echo $kassa_text_paymode_label; ?></label>
+												<div class="col-sm-9">
+													<input type="radio"  <?php echo ($ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="1"> <?php echo $kassa_text_paymode_kassa; ?>
+												</div>
+												<div class="col-sm-9 col-sm-offset-3">
+													<input type="radio" <?php echo (!$ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="0"> <?php echo $kassa_text_paymode_shop; ?>
+													<p class="help-block"><?php echo $kassa_text_paymode_help; ?> </p>
+												</div>
+											</div>
 										</div>
 									</div>
-									<?php echo $data_carrier ?>
+								</div>
+								<!-- row -->
+								<div class='row kassa-w-select'>
+									<div class='col-sm-12'>
+										<div class='form-horizontal' role="form">
+											<div class="form-group">
+												<div class="col-sm-9 col-sm-offset-3">
+													<p><?php echo $kassa_text_pay_help; ?></p>
+													<div class="checkbox">
+														<label for="ya_kassa_ym"><input type="checkbox" <?php echo ($ya_kassa_ym ? ' checked="checked"' : ''); ?> name="ya_kassa_ym" id="ya_kassa_ym" class="" value="1"/> <?php echo $kassa_ym; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_cards"><input type="checkbox" <?php echo ($ya_kassa_cards ? ' checked="checked"' : ''); ?> name="ya_kassa_cards" id="ya_kassa_cards" class="" value="1"/> <?php echo $kassa_cards; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_cash"><input type="checkbox" <?php echo ($ya_kassa_cash ? ' checked="checked"' : ''); ?> name="ya_kassa_cash" id="ya_kassa_cash" class="" value="1"/> <?php echo $kassa_cash; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_mobile"><input type="checkbox" <?php echo ($ya_kassa_mobile ? ' checked="checked"' : ''); ?> name="ya_kassa_mobile" id="ya_kassa_mobile" class="" value="1"/> <?php echo $kassa_mobile; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_wm"><input type="checkbox" <?php echo ($ya_kassa_wm ? ' checked="checked"' : ''); ?> name="ya_kassa_wm" id="ya_kassa_wm" class="" value="1"/> <?php echo $kassa_wm; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_sber"><input type="checkbox" <?php echo ($ya_kassa_sber ? ' checked="checked"' : ''); ?> name="ya_kassa_sber" id="ya_kassa_sber" class="" value="1"/> <?php echo $kassa_sber; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_alfa"><input type="checkbox" <?php echo ($ya_kassa_alfa ? ' checked="checked"' : ''); ?> name="ya_kassa_alfa" id="ya_kassa_alfa" class="" value="1"/> <?php echo $kassa_alfa; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_ma"><input type="checkbox" <?php echo ($ya_kassa_ma ? ' checked="checked"' : ''); ?> name="ya_kassa_ma" id="ya_kassa_ma" class="" value="1"/> <?php echo $kassa_ma; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_pb"><input type="checkbox" <?php echo ($ya_kassa_pb ? ' checked="checked"' : ''); ?> name="ya_kassa_pb" id="ya_kassa_pb" class="" value="1"/> <?php echo $kassa_pb; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_qw"><input type="checkbox" <?php echo ($ya_kassa_qw ? ' checked="checked"' : ''); ?> name="ya_kassa_qw" id="ya_kassa_qw" class="" value="1"/> <?php echo $kassa_qw; ?></label>
+													</div>
+													<div class="checkbox">
+														<label for="ya_kassa_qp"><input type="checkbox" <?php echo ($ya_kassa_qp ? ' checked="checked"' : ''); ?> name="ya_kassa_qp" id="ya_kassa_qp" class="" value="1"/> <?php echo $kassa_qp; ?></label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!--<div class='row kassa-w-select'>
+									<div class='col-md-12'>
+										<p><a href='' target='_blank'> </a></p>
+										<div class='form-horizontal'>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Способ оплаты по умолчанию</label>
+												<div class='col-sm-8'>
+													<select name='ya_paymentDfl' class="form-control">
+														<option value='PC'>Кошелек в Яндекс.Деньгах</option>
+														<option value='AC'>Любая банковская карта </option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>-->
+								<!-- row -->
+								<div class='row'>
+									<div class='col-sm-12'>
+										<h4 class="form-heading"><?php echo $kassa_text_adv_head; ?></h4>
+									</div>
+									<div class='col-sm-12'>
+										<p><a href='' target='_blank'> </a></p>
+										<div class='form-horizontal'>
+											<div class="form-group">
+												<label for="ya_debugmode" class="col-sm-3 control-label"><?php echo $kassa_text_debug; ?></label>
+												<div class="col-sm-9">
+													<label class='radio-inline'>
+														<input type="radio" <?php echo (!$ya_kassa_log ? ' checked="checked"' : ''); ?> name="ya_kassa_log" value="0"> <?php echo $kassa_text_debug_dis; ?>
+													</label>
+													<label class='radio-inline'>
+														<input type="radio" <?php echo ($ya_kassa_log ? ' checked="checked"' : ''); ?> name="ya_kassa_log" value="1"> <?php echo $kassa_text_debug_en; ?>
+													</label>
+													<p class="help-block"><?php echo $kassa_text_debug_help; ?></p>
+												</div>
+												<label class="control-label col-sm-3"><?php echo $kassa_text_status; ?></label>
+												<div class='col-sm-8'>
+													<select name="ya_kassa_os" id="ya_kassa_os" class="form-control">
+														<?php foreach ($order_statuses as $order_status) { ?>
+														<?php if ($order_status['order_status_id'] == $ya_kassa_os) { ?>
+														<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+														<?php } else { ?>
+														<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+														<?php } ?>
+														<?php } ?>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
 								</form>
+								<?php }  else { ?>
+								<div class="alert alert-danger">
+									<i class="fa fa-exclamation-circle"></i>
+									<?php echo $mod_off; ?>
+									<button type="button" class="close" data-dismiss="alert">×</button>
+								</div>
+								<?php }?>
 							</div>
-							<div class="panel-footer clearfix">
-								<button type="button" onclick="$('.pokupki_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
-									<i class="process-icon-save"></i> <?php echo $pokupki_sv; ?>
+							<?php if($mod_status) { ?>
+							<div class="clearfix">
+								<button type="button" onclick="$('.kassa_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
+									<i class="process-icon-save"></i> <?php echo $kassa_sv; ?>
 								</button>
 							</div>
+							<?php }?>
+						</div>
+					<div class="tab-pane" id="tab-mws">
+						<div class="">
+							<div class="">
+								<h4><?php echo $lbl_mws_main; ?></h4>
+								<?php
+							if (count($mws_global_error)==0){
+								if (!$cert_loaded){ ?>
+								<p><?php echo $txt_mws_main; ?><p>
+								<form id='mws_form' class="mws_form form-horizontal" method='post' action='<?php echo $action; ?>'>
+									<div class="form-group">
+										<label class="col-sm-3 control-label" for="mws_download"><?php echo $lbl_mws_crt; ?></label>
+										<div class="col-sm-3">
+											<label id="mws_crt_load" class="btn btn-default"/><?php echo $btn_mws_crt_load; ?></label>
+										</div>
+										<div class="col-sm-6" id='mws_cert_status'>
+										</div>
+									</div>
+									<div class="form-group without-cert">
+										<label class="col-sm-3 control-label" for="mws_rule"><?php echo $lbl_mws_connect; ?></label>
+										<div class="col-sm-9">
+											<ol>
+												<li><?php echo $txt_mws_connect; ?>
+												<li><?php echo $txt_mws_doc; ?>
+												<li><?php echo $txt_mws_cer; ?>
+											</ol>
+										</div>
+									</div>
+
+									<div class="form-group without-cert">
+										<label class="col-sm-3 control-label" ><?php echo $lbl_mws_doc; ?></label>
+										<div class="col-sm-9">
+											<?php echo $tab_mws_before; ?>
+											<table style="width: 600px;" class="table table-bordered">
+												<tr>
+													<td>CN</td>
+													<td><?php echo $mws_cn; ?></td>
+												</tr>
+												<tr>
+													<td><?php echo $tab_row_sign; ?></td>
+													<td><textarea cols="55" disabled rows="13"><?php if (isset($mws_sign)) echo $mws_sign; ?></textarea></td>
+												</tr>
+												<tr>
+													<td><?php echo $tab_row_cause; ?></td>
+													<td><?php echo $tab_row_primary; ?></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									<?php } else { echo $success_mws_alert; }
+										}else{
+											foreach ($mws_global_error as $alert_text) { ?><div class='alert alert-danger'><?php echo $alert_text; ?></div><?php } ?>
+									<?php } ?>
+							</div>
+							</form>
+						</div>
+					</div>
+					<div class="tab-pane" id="tab-p2p">
+						<?php foreach ($p2p_status as $p) { echo $p; } ?>
+						<div class="">
+							<div class="">
+								<?php if($mod_status) { ?>
+								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="p2p_form form-horizontal">
+									<input type="hidden" value="p2p" name="type_data"/>
+									<div class='row'>
+										<div class='col-sm-12'>
+											<p><?php echo $p2p_text_connect; ?></p>
+											<div class='form-horizontal'>
+												<div class="form-group">
+													<div class="col-sm-9 col-sm-offset-3">
+														<label class='checkbox'>
+															<input type="checkbox" name="ya_p2p_active" class="cls_ya_kassamode" value="1" <?php echo ($ya_p2p_active ? ' checked="checked"' : ''); ?>>
+															<?php echo $p2p_text_enable; ?>
+														</label>
+													</div>
+												</div>
+											</div>
+											<div class='form-horizontal'>
+												<div class="form-group">
+													<label class="control-label col-sm-3">RedirectURL</label>
+													<div class='col-sm-8'>
+														<input class='form-control disabled' value='<?php echo $ya_p2p_linkapp; ?>' disabled>
+													</div>
+													<div class='col-sm-8 col-sm-offset-3'>
+														<?php echo $p2p_text_url_help; ?>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- row -->
+									<div class='row'>
+										<div class='col-sm-12'>
+											<h4 class="form-heading"><?php echo $p2p_text_setting_head; ?></h4>
+										</div>
+										<div class='col-sm-12'>
+												<div class="form-group">
+													<label for="ya_p2p_number" class="col-sm-3 control-label"><?php echo $p2p_text_account; ?></label>
+													<div class="col-sm-9">
+														<input name="ya_p2p_number" value="<?php echo $ya_p2p_number; ?>" id="ya_p2p_number" class="form-control">
+													</div>
+												</div>
+												<div class="form-group">
+													<label for="ya_p2p_idapp" class="col-sm-3 control-label"><?php echo $p2p_text_appId; ?></label>
+													<div class="col-sm-9">
+														<input name="ya_p2p_idapp" value="<?php echo $ya_p2p_idapp; ?>" id="ya_p2p_idapp" class="form-control">
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-sm-12"></div>
+													<label for="ya_p2p_pw" class="col-sm-3 control-label"><?php echo $p2p_text_appWord; ?></label>
+													<div class="col-sm-9">
+														<input name="ya_p2p_pw" value="<?php echo $ya_p2p_pw; ?>" id="ya_p2p_pw" class="form-control">
+													</div>
+													<div class="col-sm-9 col-sm-offset-3">
+														<?php echo $p2p_text_app_help; ?>
+													</div>
+												</div>
+										</div>
+									</div>
+									<!-- row -->
+									<div class='row'>
+										<div class='col-sm-12'>
+											<h4 class="form-heading"><?php echo $p2p_text_extra_head; ?></h4>
+										</div>
+										<div class='col-sm-12'>
+											<div class='form-horizontal'>
+												<div class="form-group">
+													<label for="ya_p2p_log" class="col-sm-3 control-label"><?php echo $p2p_text_debug; ?></label>
+													<div class="col-sm-9">
+														<label class='radio-inline'>
+															<input type="radio" <?php echo (!$ya_p2p_log ? ' checked="checked"' : ''); ?> name="ya_p2p_log" value="0"> <?php echo $p2p_text_off; ?>
+														</label>
+														<label class='radio-inline'>
+															<input type="radio" <?php echo ($ya_p2p_log ? ' checked="checked"' : ''); ?> name="ya_p2p_log" value="1"> <?php echo $p2p_text_on; ?>
+														</label>
+														<p class="help-block"><?php echo $p2p_text_debug_help; ?></p>
+													</div>
+												</div>
+												<div class="form-group">
+													<label class="control-label col-sm-3"><?php echo $p2p_text_status; ?></label>
+													<div class='col-sm-8'>
+														<select name="ya_p2p_os" id="ya_p2p_os" class="form-control">
+															<?php foreach ($order_statuses as $order_status) { ?>
+															<?php if ($order_status['order_status_id'] == $ya_p2p_os) { ?>
+															<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+															<?php } else { ?>
+															<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+															<?php } ?>
+															<?php } ?>
+														</select>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- -->
+								</form>
+								<?php } else { ?>
+								<div class="alert alert-danger">
+									<i class="fa fa-exclamation-circle"></i>
+									<?php echo $mod_off; ?>
+									<button type="button" class="close" data-dismiss="alert">×</button>
+								</div>
+								<?php }?>
+							</div>
+							<?php if($mod_status) { ?>
+							<div class="clearfix">
+								<button type="button" onclick="$('.p2p_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
+									<i class="process-icon-save"></i> <?php echo $p2p_sv; ?>
+								</button>
+							</div>
+							<?php } ?>
 						</div>
 					</div>
 					<div class="tab-pane" id="tab-metrika">
 						<?php foreach ($metrika_status as $me) { echo $me; } ?>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $metrika; ?></h3>
-							</div>
-							<div class="panel-body">
-							<?php echo $text_license; ?><br>
+						<div class="">
+							<div class="">
+								<?php echo $text_license; ?><br>
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="metrika_form form-horizontal">
 									<input type="hidden" value="metrika" name="type_data"/>
 									<div class="form-group">
@@ -212,271 +497,16 @@
 									</div>
 								</form>
 							</div>
-							<div class="panel-footer clearfix">
+							<div class="clearfix">
 								<button type="button" onclick="$('.metrika_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
 									<i class="process-icon-save"></i> <?php echo $metrika_sv; ?>
 								</button>
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane" id="tab-kassa">
-						<?php foreach ($kassa_status as $k) { echo $k; } ?>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $kassa; ?></h3>
-							</div>
-							<div class="panel-body">
-							<?php echo $text_license; ?><br>
-								<?php if($mod_status) { ?>
-								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="kassa_form form-horizontal">
-									<input type="hidden" value="kassa" name="type_data"/>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $active; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_kassa_active ? ' checked="checked"' : ''); ?> name="ya_kassa_active" value="1"/> <?php echo $active_on; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_kassa_active ? ' checked="checked"' : ''); ?> name="ya_kassa_active" value="0"/> <?php echo $active_off; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $kassa_test; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_kassa_test ? ' checked="checked"' : ''); ?> name="ya_kassa_test" value="1"/> <?php echo $active_on; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_kassa_test ? ' checked="checked"' : ''); ?> name="ya_kassa_test" value="0"/> <?php echo $active_off; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_os"><?php echo $kassa_os; ?></label>
-										<div class="col-sm-8">
-											<select name="ya_kassa_os" id="ya_kassa_os" class="form-control">
-											<?php foreach ($order_statuses as $order_status) { ?>
-												<?php if ($order_status['order_status_id'] == $ya_kassa_os) { ?>
-													<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-												<?php } else { ?>
-													<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-												<?php } ?>
-											<?php } ?>
-											</select>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_sid"><?php echo $kassa_sid; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_sid" value="<?php echo $ya_kassa_sid; ?>" id="ya_kassa_sid" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_scid"><?php echo $kassa_scid; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_scid" value="<?php echo $ya_kassa_scid; ?>" id="ya_kassa_scid" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_pw"><?php echo $kassa_pw; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_pw" value="<?php echo $ya_kassa_pw; ?>" id="ya_kassa_pw" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $log; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_kassa_log ? ' checked="checked"' : ''); ?> name="ya_kassa_log" value="1"/> <?php echo $active_on; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_kassa_log ? ' checked="checked"' : ''); ?> name="ya_kassa_log" value="0"/> <?php echo $active_off; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $kassa_paymode; ?></label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" <?php echo (!$ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="0"/> Выбор оплаты на стороне магазина</label>
-                                            <label class="radio-inline">
-                                                <input type="radio" <?php echo ($ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="1"/> Выбор оплаты на стороне Яндекс.Кассы</label>
-                                        </div>
-									</div>
-                                    <div class="form-group kassa-wo-select">
-                                        <label class="control-label col-sm-4"></label>
-                                        <div class="col-sm-8">
-											<?php echo $kassa_inform?>
-										</div>
-                                    </div>
-                                    <div class="form-group kassa-w-select">
-										<label class="control-label col-sm-4"><?php echo $kassa_method; ?></label>
-										<div class="col-sm-8">
-											<div class="checkbox">
-												<label for="ya_kassa_ym"><input type="checkbox" <?php echo ($ya_kassa_ym ? ' checked="checked"' : ''); ?> name="ya_kassa_ym" id="ya_kassa_ym" class="" value="1"/> <?php echo $kassa_ym; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_cards"><input type="checkbox" <?php echo ($ya_kassa_cards ? ' checked="checked"' : ''); ?> name="ya_kassa_cards" id="ya_kassa_cards" class="" value="1"/> <?php echo $kassa_cards; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_cash"><input type="checkbox" <?php echo ($ya_kassa_cash ? ' checked="checked"' : ''); ?> name="ya_kassa_cash" id="ya_kassa_cash" class="" value="1"/> <?php echo $kassa_cash; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_mobile"><input type="checkbox" <?php echo ($ya_kassa_mobile ? ' checked="checked"' : ''); ?> name="ya_kassa_mobile" id="ya_kassa_mobile" class="" value="1"/> <?php echo $kassa_mobile; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_wm"><input type="checkbox" <?php echo ($ya_kassa_wm ? ' checked="checked"' : ''); ?> name="ya_kassa_wm" id="ya_kassa_wm" class="" value="1"/> <?php echo $kassa_wm; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_sber"><input type="checkbox" <?php echo ($ya_kassa_sber ? ' checked="checked"' : ''); ?> name="ya_kassa_sber" id="ya_kassa_sber" class="" value="1"/> <?php echo $kassa_sber; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_alfa"><input type="checkbox" <?php echo ($ya_kassa_alfa ? ' checked="checked"' : ''); ?> name="ya_kassa_alfa" id="ya_kassa_alfa" class="" value="1"/> <?php echo $kassa_alfa; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_ma"><input type="checkbox" <?php echo ($ya_kassa_ma ? ' checked="checked"' : ''); ?> name="ya_kassa_ma" id="ya_kassa_ma" class="" value="1"/> <?php echo $kassa_ma; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_pb"><input type="checkbox" <?php echo ($ya_kassa_pb ? ' checked="checked"' : ''); ?> name="ya_kassa_pb" id="ya_kassa_pb" class="" value="1"/> <?php echo $kassa_pb; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_qw"><input type="checkbox" <?php echo ($ya_kassa_qw ? ' checked="checked"' : ''); ?> name="ya_kassa_qw" id="ya_kassa_qw" class="" value="1"/> <?php echo $kassa_qw; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_kassa_qp"><input type="checkbox" <?php echo ($ya_kassa_qp ? ' checked="checked"' : ''); ?> name="ya_kassa_qp" id="ya_kassa_qp" class="" value="1"/> <?php echo $kassa_qp; ?></label>
-											</div>
-											
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_check"><?php echo $kassa_check; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_check" value="<?php echo $ya_kassa_check; ?>" id="ya_kassa_check" disabled="disabled" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_aviso"><?php echo $kassa_aviso; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_aviso" value="<?php echo $ya_kassa_aviso; ?>" id="ya_kassa_aviso" disabled="disabled" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_fail"><?php echo $kassa_fail; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_fail" value="<?php echo $ya_kassa_fail; ?>" id="ya_kassa_fail" disabled="disabled" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_kassa_success"><?php echo $kassa_success; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_kassa_success" value="<?php echo $ya_kassa_success; ?>" id="ya_kassa_success" disabled="disabled" class="form-control"/>
-										</div>
-									</div>
-								</form>
-								<?php }  else { ?>
-								<div class="alert alert-danger">
-									<i class="fa fa-exclamation-circle"></i>
-									<?php echo $mod_off; ?>
-									<button type="button" class="close" data-dismiss="alert">×</button>
-								</div>
-								<?php }?>
-							</div>
-							<?php if($mod_status) { ?>
-							<div class="panel-footer clearfix">
-								<button type="button" onclick="$('.kassa_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
-									<i class="process-icon-save"></i> <?php echo $kassa_sv; ?>
-								</button>
-								
-							</div>
-							<?php } ?>
-						</div>
-					</div>
-					<div class="tab-pane" id="tab-p2p">
-						<?php foreach ($p2p_status as $p) { echo $p; } ?>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $p2p; ?></h3>
-							</div>
-							<div class="panel-body">
-							<?php echo $text_license; ?><br>
-								<?php if($mod_status) { ?>
-								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="p2p_form form-horizontal">
-									<input type="hidden" value="p2p" name="type_data"/>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $active; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_p2p_active ? ' checked="checked"' : ''); ?> name="ya_p2p_active" value="1"/> <?php echo $active_on; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_p2p_active ? ' checked="checked"' : ''); ?> name="ya_p2p_active" value="0"/> <?php echo $active_off; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_p2p_os"><?php echo $p2p_os; ?></label>
-										<div class="col-sm-8">
-											<select name="ya_p2p_os" id="ya_p2p_os" class="form-control">
-											<?php foreach ($order_statuses as $order_status) { ?>
-												<?php if ($order_status['order_status_id'] == $ya_p2p_os) { ?>
-													<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-												<?php } else { ?>
-													<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-												<?php } ?>
-											<?php } ?>
-											</select>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_p2p_number"><?php echo $p2p_number; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_p2p_number" value="<?php echo $ya_p2p_number; ?>" id="ya_p2p_number" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_p2p_idapp"><?php echo $p2p_idapp; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_p2p_idapp" value="<?php echo $ya_p2p_idapp; ?>" id="ya_p2p_idapp" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_p2p_pw"><?php echo $p2p_pw; ?></label>
-										<div class="col-sm-8">
-											<textarea name="ya_p2p_pw" id="ya_p2p_pw" class="form-control"><?php echo $ya_p2p_pw; ?></textarea>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $log; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_p2p_log ? ' checked="checked"' : ''); ?> name="ya_p2p_log" value="1"/> <?php echo $active_on; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_p2p_log ? ' checked="checked"' : ''); ?> name="ya_p2p_log" value="0"/> <?php echo $active_off; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_p2p_linkapp"><?php echo $p2p_linkapp; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_p2p_linkapp" disabled="disabled" value="<?php echo $ya_p2p_linkapp; ?>" id="ya_p2p_linkapp" class="form-control"/>
-										</div>
-									</div>
-								</form>
-								<?php } else { ?>
-								<div class="alert alert-danger">
-									<i class="fa fa-exclamation-circle"></i>
-									<?php echo $mod_off; ?>
-									<button type="button" class="close" data-dismiss="alert">×</button>
-								</div>
-								<?php }?>
-							</div>
-							<?php if($mod_status) { ?>
-							<div class="panel-footer clearfix">
-								<button type="button" onclick="$('.p2p_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
-									<i class="process-icon-save"></i> <?php echo $p2p_sv; ?>
-								</button>
-							</div>
-							<?php } ?>
-						</div>
-					</div>
 					<div class="tab-pane" id="tab-market">
 						<?php foreach ($market_status as $m) { echo $m; } ?>
 						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $market; ?></h3>
-							</div>
 							<div class="panel-body">							
 							<?php echo $text_license; ?><br>
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="market_form form-horizontal">
@@ -640,68 +670,98 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane" id="tab-mws">
+					<div class="tab-pane" id="tab-pokupki">
+						<?php foreach ($pokupki_status as $po) { echo $po; } ?>
 						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $mws_starter; ?></h3>
-							</div>
 							<div class="panel-body">
 								<?php echo $text_license; ?><br>
-								<h4><?php echo $lbl_mws_main; ?></h4>
-								<?php 
-							if (count($mws_global_error)==0){
-								if (!$cert_loaded){ ?>
-								<p><?php echo $txt_mws_main; ?><p>
-									<form id='mws_form' class="mws_form form-horizontal" method='post' action='<?php echo $action; ?>'>
-										<div class="form-group">
-											<label class="col-sm-3 control-label" for="mws_download"><?php echo $lbl_mws_crt; ?></label>
-											<div class="col-sm-3">
-												<label id="mws_crt_load" class="btn btn-default"/><?php echo $btn_mws_crt_load; ?></label>
+								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="pokupki_form form-horizontal">
+									<input type="hidden" value="pokupki" name="type_data"/>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_stoken"><?php echo $pokupki_stoken; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_stoken" value="<?php echo $ya_pokupki_stoken; ?>" id="ya_pokupki_stoken" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_yapi"><?php echo $pokupki_yapi; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_yapi" value="<?php echo $ya_pokupki_yapi; ?>" id="ya_pokupki_yapi" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_number"><?php echo $pokupki_number; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_number" value="<?php echo $ya_pokupki_number; ?>" id="ya_pokupki_number" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_idapp"><?php echo $pokupki_idapp; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_idapp" value="<?php echo $ya_pokupki_idapp; ?>" id="ya_pokupki_idapp" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_pw"><?php echo $pokupki_pw; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_pw" value="<?php echo $ya_pokupki_pw; ?>" id="ya_pokupki_pw" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
+											<p class="help-block">
+												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
+											</p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_idpickup"><?php echo $pokupki_idpickup; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_idpickup" value="<?php echo $ya_pokupki_idpickup; ?>" id="ya_pokupki_idpickup" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_sapi"><?php echo $pokupki_sapi; ?></label>
+										<div class="col-sm-8">
+											<input type="text" disabled="disabled" name="ya_pokupki_sapi" value="<?php echo $ya_pokupki_sapi; ?>" id="ya_pokupki_sapi" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="control-label col-sm-4"><?php echo $pokupki_method; ?></label>
+										<div class="col-sm-8">
+											<div class="checkbox">
+												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
 											</div>
-											<div class="col-sm-6" id='mws_cert_status'>
+											<div class="checkbox">
+												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_pokupki_bank"><input type="checkbox" <?php echo ($ya_pokupki_bank ? ' checked="checked"' : ''); ?> name="ya_pokupki_bank" id="ya_pokupki_bank" class="" value="1"/> <?php echo $pokupki_set_4; ?></label>
 											</div>
 										</div>
-										<div class="form-group without-cert">
-											<label class="col-sm-3 control-label" for="mws_rule"><?php echo $lbl_mws_connect; ?></label>
-											<div class="col-sm-9">
-												<ol>
-													<li><?php echo $txt_mws_connect; ?>
-													<li><?php echo $txt_mws_doc; ?>
-													<li><?php echo $txt_mws_cer; ?>
-												</ol>
-											</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
 										</div>
-										
-										<div class="form-group without-cert">
-											<label class="col-sm-3 control-label" ><?php echo $lbl_mws_doc; ?></label>
-											<div class="col-sm-9">
-												<?php echo $tab_mws_before; ?>
-												<table style="width: 600px;" class="table table-bordered">
-													 <tr>
-													<td>CN</td>
-													<td><?php echo $mws_cn; ?></td>
-													 </tr>
-													 <tr>
-													<td><?php echo $tab_row_sign; ?></td>
-													<td><textarea cols="55" disabled rows="13"><?php if (isset($mws_sign)) echo $mws_sign; ?></textarea></td>
-													 </tr>
-													 <tr>
-													<td><?php echo $tab_row_cause; ?></td>
-													<td><?php echo $tab_row_primary; ?></td>
-													 </tr>
-												</table>
-											</div>
-											</div>
-											<?php } else { echo $success_mws_alert; } 
-										}else{
-											foreach ($mws_global_error as $alert_text) { ?><div class='alert alert-danger'><?php echo $alert_text; ?></div><?php } ?>
-										<?php } ?>
-									</div>									
+									</div>
+									<?php echo $data_carrier ?>
 								</form>
+							</div>
+							<div class="panel-footer clearfix">
+								<button type="button" onclick="$('.pokupki_form').submit(); return false;" value="1" id="module_form_submit_btn_3" name="submitmarketModule" class="btn btn-default">
+									<i class="process-icon-save"></i> <?php echo $pokupki_sv; ?>
+								</button>
 							</div>
 						</div>
 					</div>
-		</div>
+				</div>
 	</div>
 </div>
 <?php echo $footer; ?>

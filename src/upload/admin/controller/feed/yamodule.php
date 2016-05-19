@@ -539,30 +539,18 @@ class ControllerFeedYamodule extends Controller {
 		$data['p2p_pw'] = $this->language->get('p2p_pw');
 		$data['p2p_linkapp'] = $this->language->get('p2p_linkapp');
 		// kassa
-		$data['kassa_os'] = $this->language->get('kassa_os');
-		$data['kassa_paymode'] = $this->language->get('kassa_paymode');
-		$data['kassa_inform'] = $this->language->get('kassa_inform');
-		$data['kassa_test'] = $this->language->get('kassa_test');
-		$data['kassa_sid'] = $this->language->get('kassa_sid');
-		$data['kassa_scid'] = $this->language->get('kassa_scid');
-		$data['kassa_pw'] = $this->language->get('kassa_pw');
-		$data['kassa_ma'] = $this->language->get('kassa_ma');
-		$data['kassa_pb'] = $this->language->get('kassa_pb');
-		$data['kassa_qw'] = $this->language->get('kassa_qw');
-		$data['kassa_qp'] = $this->language->get('kassa_qp');
-		$data['kassa_wm'] = $this->language->get('kassa_wm');
-		$data['kassa_mobile'] = $this->language->get('kassa_mobile');
-		$data['kassa_sber'] = $this->language->get('kassa_sber');
-		$data['kassa_alfa'] = $this->language->get('kassa_alfa');
-		$data['kassa_ym'] = $this->language->get('kassa_ym');
-		$data['kassa_method'] = $this->language->get('kassa_method');
-		$data['kassa_cards'] = $this->language->get('kassa_cards');
-		$data['kassa_cash'] = $this->language->get('kassa_cash');
-		$data['kassa_check'] = $this->language->get('kassa_check');
-		$data['kassa_fail'] = $this->language->get('kassa_fail');
-		$data['kassa_success'] = $this->language->get('kassa_success');
-		$data['kassa_aviso'] = $this->language->get('kassa_aviso');
-		$data['kassa_sv'] = $this->language->get('kassa_sv');
+		$arLang = array(
+			'kassa_ma','kassa_pb','kassa_qw','kassa_qp','kassa_wm','kassa_mobile','kassa_sber',
+			'kassa_alfa','kassa_ym','kassa_method','kassa_cards','kassa_cash',
+			'kassa_text_connect','kassa_text_enable','kassa_text_testmode', 'kassa_text_realmode','kassa_text_dynamic','kassa_text_help_url', 'kassa_text_help_cburl',
+			'kassa_text_status','kassa_text_debug_help','kassa_text_debug_dis','kassa_text_debug_en','kassa_text_debug','kassa_text_adv_head',
+			'kassa_text_pay_help','kassa_text_paymode_help','kassa_text_paymode_shop','kassa_text_paymode_kassa','kassa_text_paymode_label',
+			'kassa_text_paymode_head','kassa_text_pw','kassa_text_scid','kassa_text_sid','kassa_text_get_setting','kassa_text_lk_head','kassa_sv',
+			'p2p_text_connect','p2p_text_enable','p2p_text_url_help','p2p_text_setting_head','p2p_text_account','p2p_text_appId','p2p_text_appWord','p2p_text_app_help',
+			'p2p_text_extra_head','p2p_text_debug',	'p2p_text_off',	'p2p_text_on','p2p_text_debug_help','p2p_text_status'
+		);
+		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
+
 		//metrika
 		$data['metrika_gtoken'] = $this->language->get('metrika_gtoken');
 		$data['metrika_number'] = $this->language->get('metrika_number');
@@ -618,7 +606,11 @@ class ControllerFeedYamodule extends Controller {
 		$data['btn_mws_csr'] = $this->language->get('btn_mws_csr');
 		$data['btn_mws_doc'] = $this->language->get('btn_mws_doc');
 		$data['btn_mws_crt'] = $this->language->get('btn_mws_crt');
+
 		$data['btn_mws_crt_load'] = $this->language->get('btn_mws_crt_load');
+		// Common
+		$data['ya_version'] = $this->language->get('ya_version');
+		//
 		$data['token'] = $this->session->data['token'];
 		
 		$data['url_mws_gen'] = $this->url->link('yamodule/mws/generate', 'token=' . $this->session->data['token'], 'SSL');
@@ -736,12 +728,12 @@ class ControllerFeedYamodule extends Controller {
 	{
 		$fields = array(
 			'ya_p2p_active' => 0,
-			'ya_p2p_test' => 1,
-			'ya_p2p_log' => 1,
-			'ya_kassa_active' => 0,
-			'ya_kassa_log' => 1,
-			'ya_kassa_paymode' => 0,
-			'ya_kassa_test' => 1,
+			'ya_p2p_test' => 0,
+			'ya_p2p_log' => 0,
+			'ya_kassa_active' => 1,
+			'ya_kassa_log' => 0,
+			'ya_kassa_paymode' => 1,
+			'ya_kassa_test' => 0,
 			'ya_metrika_active' => 0,
 			'ya_metrika_webvizor' => 1,
 			'ya_metrika_otkaz' => 1,

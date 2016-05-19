@@ -2,8 +2,8 @@
 // Heading
 $_['heading_title']      = 'Y.CMS от <a target="_blank" href="https://kassa.yandex.ru">Яндекс.Кассы</a>';
 $_['heading_title_ya']      = 'Y.CMS от Яндекс.Кассы';
-$_['ya_version']      = '1.4.2';
-$_['text_license']      = '<p>Любое использование вами модуля Y.CMS означает полное и безоговорочное принятие вами условий <a target="_blank" href="https://money.yandex.ru/doc.xml?id=527052">лицензионного договора</a>. Если вы не принимаете условия указанного договора в полном объеме, то не имеете права использовать программу в каких-либо целях.</p>';
+$_['ya_version']      = '1.4.2.1';
+$_['text_license']      = "Работая с модулем, вы автоматически соглашаетесь с <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>условиями его использования</a>.";
 $_['text_need_update']      = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
 // Text
@@ -45,14 +45,32 @@ $_['market_sv']          = 'Сохранить';
 $_['market_gen']          = 'Генерировать';
 $_['market_prostoy']          = 'Упрощённый yml:';
 $_['text_success']       = 'Настройки модуля обновлены!';
+
 // kassa
-$_['kassa_test']       = 'Режим тестирования';
-$_['kassa_paymode']       = 'Сценарий оплаты';
-$_['kassa_inform']       = '<b>Внимание! Этот режим должен быть включен и на стороне сервиса Яндекс.Касса.</b><br>Чтобы активировать этот сценарий, напишите менеджеру Кассы на <a href="mailto:merchants@yamoney.ru">merchants@yamoney.ru</a> или позвоните по телефону 8 800 250-66-99.';
-$_['kassa_sid']       = 'Идентификатор магазина (shopId)';
-$_['kassa_scid']       = 'Номер витрины (scid)';
-$_['kassa_pw']       = 'Пароль магазина (shopPassword)';
-$_['kassa_method']       = 'Активные методы оплаты';
+$_['kassa_text_connect']       = "Для работы с приложением необходимо подключить магазин к <a target=\"_blank\" href=\"https://kassa.yandex.ru/\">Яндекс.Кассе</a>";
+$_['kassa_text_enable']       = 'Включить приём платежей через Кассу';
+$_['kassa_text_testmode']       = 'Тестовый режим';
+$_['kassa_text_realmode']       = 'Рабочий режим';
+$_['kassa_text_dynamic']       = 'Страницы с динамическими адресами';
+$_['kassa_text_help_cburl']       = 'Скопируйте эту ссылку в поля Check URL и Aviso URL в настройках личного кабинета Яндекс.Кассы';
+$_['kassa_text_help_url']       = 'Включите «Использовать страницы успеха и ошибки с динамическими адресами» в настройках личного кабинета Яндекс.Кассы';
+$_['kassa_text_status']       = "Статус заказа после оплаты";
+$_['kassa_text_debug_help']       = "Настройку нужно будет поменять, только если попросят специалисты Яндекс.Денег";
+$_['kassa_text_debug_dis']       = "Отключена";
+$_['kassa_text_debug_en']       = "Включена";
+$_['kassa_text_debug']       = "Запись отладочной информации";
+$_['kassa_text_adv_head']       = "Дополнительные настройки для администратора";
+$_['kassa_text_pay_help']       = "Отметьте способы оплаты, которые указаны в вашем договоре с Яндекс.Деньгами";
+$_['kassa_text_paymode_help']       = "<a href='https://tech.yandex.ru/money/doc/payment-solution/payment-form/payment-form-docpage/' target='_blank'>Подробнее о сценариях оплаты</a>";
+$_['kassa_text_paymode_shop']       = "Выбор способа оплаты на стороне магазина";
+$_['kassa_text_paymode_kassa']       = "Выбор способа оплаты на стороне Яндекс.Кассы";
+$_['kassa_text_paymode_label']       = "Сценарий оплаты";
+$_['kassa_text_paymode_head']       = "Настройка сценария оплаты";
+$_['kassa_text_pw']       = "Секретное слово";
+$_['kassa_text_scid']       = "Номер витрины магазина";
+$_['kassa_text_sid']       = "Идентификатор магазина";
+$_['kassa_text_get_setting']       = "Shop ID, scid, shopPassword можно посмотреть в <a href='https://money.yandex.ru/joinups' target='_blank'>личном кабинете</a> после подключения Яндекс.Кассы.";
+$_['kassa_text_lk_head']       = "Параметры из личного кабинета Яндекс.Кассы";
 
 $_['kassa_ym']       = 'Оплата из кошелька в Яндекс.Деньгах.';
 $_['kassa_wm']       = 'Оплата из кошелька в системе WebMoney.';
@@ -66,10 +84,6 @@ $_['kassa_pb']       = 'Оплата через Промсвязьбанк.';
 $_['kassa_qw']       = 'Оплата через QIWI Wallet.';
 $_['kassa_qp']       = 'Оплата через доверительный платеж (Куппи.ру).';
 
-$_['kassa_check']       = 'checkOrder';
-$_['kassa_fail']       = 'fail';
-$_['kassa_success']       = 'success';
-$_['kassa_aviso']       = 'paymentAviso';
 $_['kassa_sv']       = 'Сохранить';
 // pokupki
 $_['pokupki_gtoken']       = 'Получить токен для доступа к программе "Заказы на маркете"';
@@ -115,12 +129,20 @@ $_['metrika_callback']       = 'Ссылка для приложения';
 $_['pokupki_callback']       = 'Ссылка для приложения';
 // market
 $_['p2p_sv']       = 'Сохранить';
-$_['p2p_number']       = 'Номер Вашего кошелька в системе Яндекс.Деньги';
-$_['p2p_idapp']       = 'Id приложения.';
-$_['p2p_pw']       = 'Секретный ключ.';
-$_['p2p_linkapp']       = 'Cсылка для приема уведомлений.';
-$_['p2p_os']       = 'Выберите статус заказа';
-$_['kassa_os']       = 'Выберите статус заказа';
+$_['p2p_text_connect']          = "Для работы с модулем нужно <a href='https://money.yandex.ru/new' target='_blank'>открыть кошелек</a> на Яндексе и <a href='https://sp-money.yandex.ru/myservices/online.xml' target='_blank'>зарегистрировать приложение</a> на сайте Яндекс.Денег								";
+$_['p2p_text_enable']          = "Включить прием платежей в кошелек на Яндексе";
+$_['p2p_text_url_help']          = "Скопируйте эту ссылку в поле Redirect URL на <a href='https://sp-money.yandex.ru/myservices/online.xml' target='_blank'>странице регистрации приложения</a>";
+$_['p2p_text_setting_head']          = "Настройки приема платежей";
+$_['p2p_text_account']          = "Номер кошелька";
+$_['p2p_text_appId']          = "Id приложения";
+$_['p2p_text_appWord']          = "Секретное слово";
+$_['p2p_text_app_help']          = "ID и секретное слово вы получите после регистрации приложения на сайте Яндекс.Денег";
+$_['p2p_text_extra_head']          = "Дополнительные настройки для администратора";
+$_['p2p_text_debug']          = "Запись отладочной информации";
+$_['p2p_text_off']          = "Отключена";
+$_['p2p_text_on']          = "Включена";
+$_['p2p_text_debug_help']          = "Настройку нужно будет поменять, только если попросят специалисты Яндекс.Денег";
+$_['p2p_text_status']          = "Статус заказа после оплаты";
 // MWS
 $_['lbl_mws_main']       = 'Настройка взаимодействия по протоколу MWS (<a target="_blank" href="https://tech.yandex.ru/money/doc/payment-solution/payment-management/payment-management-about-docpage/">Merchant Web Services</a>)';
 $_['txt_mws_main']       = 'Для работы с MWS необходимо получить в Яндекс.Деньгах специальный сертификат и загрузить его в приложении.';
