@@ -42,7 +42,6 @@ class ControllerYandexbuyOrder extends Controller
 		else
 		{
 			$json = file_get_contents("php://input");
-			$this->log_save('pokupki order accept: '.$json);
 			if (!$json)
 			{
 				header('HTTP/1.0 404 Not Found');
@@ -102,7 +101,7 @@ class ControllerYandexbuyOrder extends Controller
 						$floor = isset($delivery->floor) ? ' Этаж: '.$delivery->floor : '';
 						$house = isset($delivery->house) ? ' Дом: '.$delivery->house : '';
 						$address1 = $street.$subway.$block.$floor.$house;
-						$order_data['customer_id'] = $this->customer->getId();
+						$order_data['customer_id'] = $customer_info['customer_id'];
 						$order_data['customer_group_id'] = $customer_info['customer_group_id'];
 						$order_data['firstname'] = $customer_info['firstname'];
 						$order_data['lastname'] = $customer_info['lastname'];
@@ -133,16 +132,22 @@ class ControllerYandexbuyOrder extends Controller
 						$order_data['payment_country'] = $data->order->delivery->address->country;
 						$order_data['payment_country_id'] = '';
 						$order_data['payment_address_format'] = '';
-						$order_data['payment_method'] = $data->order->paymentMethod;
+						$order_data['payment_method'] = ((isset($data->order->paymentMethod))?$data->order->paymentMethod:'');
 						$order_data['payment_address_2'] = '';
 						$order_data['payment_code'] = 'yamodule';
 						$order_data['language_id'] = $this->config->get('config_language_id');
-						$order_data['currency_id'] = $this->currency->getId();
-						$order_data['currency_code'] = $this->currency->getCode();
-						$order_data['currency_value'] = $this->currency->getValue($this->currency->getCode());
-						$order_data['ip'] = $this->request->server['REMOTE_ADDR'];
-						$order_data['forwarded_ip'] = $this->request->server['HTTP_X_FORWARDED_FOR'];
-						$order_data['user_agent'] = $this->request->server['HTTP_USER_AGENT'];
+						if (version_compare(VERSION, "2.2.0", '>=')){
+							$order_data['currency_id'] = $this->currency->getId("RUB");
+							$order_data['currency_code'] = $this->session->data['currency'];
+							$order_data['currency_value'] = $this->currency->getValue($this->session->data['currency']);
+						}else{
+							$order_data['currency_id'] = $this->currency->getId();
+							$order_data['currency_code'] = $this->currency->getCode();
+							$order_data['currency_value'] = $this->currency->getValue($this->currency->getCode());
+						}
+						$order_data['ip'] = '127.0.0.1';//$this->request->server['REMOTE_ADDR'];
+						$order_data['forwarded_ip'] = '127.0.0.1';//$this->request->server['HTTP_X_FORWARDED_FOR'];
+						$order_data['user_agent'] = 'Yandex';//$this->request->server['HTTP_USER_AGENT'];
 						$order_data['accept_language'] = '';
 						$order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
 						$order_data['store_id'] = $this->config->get('config_store_id');
@@ -159,7 +164,15 @@ class ControllerYandexbuyOrder extends Controller
 						$order_data['payment_company'] = '';
 						$this->load->model('extension/extension');
 						$sort_order = array();
+
+						$totals = array();
 						$total = 0;
+						// Because __call can not keep var references so we put them into an array.
+						$total_data = array(
+							'totals' => &$totals,
+							'taxes'  => &$taxes,
+							'total'  => &$total
+						);
 						$results = $this->model_extension_extension->getExtensions('total');
 						foreach ($results as $key => $value) {
 							$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
@@ -168,8 +181,11 @@ class ControllerYandexbuyOrder extends Controller
 						foreach ($results as $result) {
 							if ($this->config->get($result['code'] . '_status')) {
 								$this->load->model('total/' . $result['code']);
-
-								$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
+								if (version_compare(VERSION, "2.2.0", '>=')) {
+									$this->{'model_total_' . $result['code']}->getTotal($total_data);
+								}else{
+									$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
+								}
 							}
 						}
 						
@@ -205,13 +221,13 @@ class ControllerYandexbuyOrder extends Controller
 						}
 						
 						$id_order = $this->model_checkout_order->addOrder($order_data);
-						$this->model_checkout_order->addOrderHistory($id_order, 1, 'Создание заказа Yandex', false);
+						$this->model_checkout_order->addOrderHistory($id_order, 1, 'Заказ '.$data->order->id.' сформирован по запросу Яндекс.Маркета', false);
 						$this->session->data['order_id'] = $id_order;
 						$values_to_insert = array(
 							'id_order' => (int)$id_order,
 							'id_market_order' => (int)$data->order->id,
-							'ptype' => $data->order->paymentType,
-							'pmethod' => $data->order->paymentMethod,
+							'ptype' => ((isset($data->order->paymentType))?$data->order->paymentType:''),
+							'pmethod' => ((isset($data->order->paymentMethod))?$data->order->paymentMethod:''),
 							'home' => isset($data->order->delivery->address->house) ? $data->order->delivery->address->house : 0,
 							'outlet' => isset($data->order->delivery->outlet->id) ? $data->order->delivery->outlet->id : '',
 							'currency' => $data->order->currency
@@ -223,7 +239,7 @@ class ControllerYandexbuyOrder extends Controller
 								$request .= ' `'.$key.'` = "'.$this->db->escape($val).'",';
 
 						$this->db->query('INSERT INTO '.DB_PREFIX.'pokupki_orders SET '.trim($request, ','));
-
+						//$this->log_save(print_r($order_data, true));
 					}
 					else
 						$resultat = false;
@@ -270,20 +286,22 @@ class ControllerYandexbuyOrder extends Controller
 		{
 			header('HTTP/1.0 404 Not Found');
 			echo '<h1>Wrong token</h1>';
+			$this->log_save('Yandex.Market CPA: Wrong auth-token in setting module.');
 			exit;
 		}
 		else
 		{
 			$json = file_get_contents("php://input");
-			$this->log_save('pokupki order status: '.$json);
 			if (!$json)
 			{
 				header('HTTP/1.0 404 Not Found');
 				echo '<h1>No data posted</h1>';
+				$this->log_save('Yandex.Market CPA: Empty request from service.');
 				exit;
 			}
 			else
 			{
+				$this->language->load('yandexbuy/order');
 				$data = json_decode($json);
 				$shop_order = $this->getShopOrderId($data->order->id);
 				if ($shop_order['id_order'])
@@ -293,69 +311,73 @@ class ControllerYandexbuyOrder extends Controller
 					$this->load->model('checkout/order');
 					$order = $this->model_checkout_order->getOrder($shop_order['id_order']);
 
-					if ($data->order->status == 'UNPAID')
-						$this->model_checkout_order->addOrderHistory($shop_order['id_order'], 13, 'Yandex.Покупки', false);
-
-					if ($data->order->status == 'CANCELLED')
-						$this->model_checkout_order->addOrderHistory($shop_order['id_order'], 7, (isset($data->order->substatus) ? $data->order->substatus : null), false);
-
-					if ($data->order->status == 'PROCESSING')
-					{
-						$buyer = isset($data->order->buyer) ? $data->order->buyer : '';
-						$customer_info = $this->model_account_customer->getCustomerByEmail($buyer->email);
-						if (!$customer_info)
-						{
-							$delivery = isset($data->order->delivery->address) ? $data->order->delivery->address : new stdClass();
-							$street = isset($delivery->street) ? ' Улица: '.$delivery->street : 'Самовывоз';
-							$subway = isset($delivery->subway) ? ' Метро: '.$delivery->subway : '';
-							$block = isset($delivery->block) ? ' Корпус/Строение: '.$delivery->block : '';
-							$floor = isset($delivery->floor) ? ' Этаж: '.$delivery->floor : '';
-							$house = isset($delivery->house) ? ' Дом: '.$delivery->house : '';
-							$address1 = $street.$subway.$block.$floor.$house;
-							$user = array();
-							$user['firstname'] = $buyer->firstName;
-							$user['lastname'] = $buyer->lastName;
-							$user['email'] = $buyer->email;
-							$user['telephone'] = isset($buyer->phone) ? $buyer->phone : 999999;
-							$user['address_1'] = $address1;
-							$user['postcode'] = isset($delivery->postcode) ? $delivery->postcode : 000000;
-							$user['city'] = isset($delivery->city) ? $delivery->city : 'Город';
-							$user['country_id'] = '';
-							$user['fax'] = '';
-							$user['company'] = '';
-							$user['address_2'] = '';
-							$user['zone_id'] = '';
-							$user['password'] = rand(100000, 500000);
-							$customer_id = $this->model_account_customer->addCustomer($user);
-							$customer_info = $this->model_account_customer->getCustomer($customer_id);;
-						}
-
-						$order['customer_id'] = $customer_info['customer_id'];
-						$order = array_merge($order, $customer_info);
-						$order['payment_firstname'] = $customer_info['firstname'];
-						$order['payment_lastname'] = $customer_info['lastname'];
-						$order['firstname'] = $customer_info['firstname'];
-						$order['lastname'] = $customer_info['lastname'];
-						$order['shipping_firstname'] = $customer_info['firstname'];
-						$order['shipping_lastname'] = $customer_info['lastname'];
+					$buyer = isset($data->order->buyer) ? $data->order->buyer : '';
+					if ($buyer!='' && (isset($buyer->firstName) && isset($buyer->lastName))){
+						$order['payment_firstname'] = $buyer->firstName;
+						$order['payment_lastname'] = $buyer->lastName;
+						$order['firstname'] = $buyer->firstName;
+						$order['lastname'] = $buyer->lastName;
+						$order['shipping_firstname'] = $buyer->firstName;;
+						$order['shipping_lastname'] = $buyer->lastName;
 						$order['telephone'] = isset($buyer->phone) ? $buyer->phone : 999999;
 						$this->editOrder($shop_order['id_order'], $order);
-						$this->model_checkout_order->addOrderHistory($shop_order['id_order'], 2, 'Yandex.Покупки', false);
 					}
+					$text = "";
+					switch($data->order->status){
+						case "UNPAID":
+							$status = $this->config->get('ya_pokupki_status_unpaid');
+							break;
+						case "CANCELLED":
+							$status = $this->config->get('ya_pokupki_status_cancelled');
+							$text = isset($data->order->substatus) ? $data->order->substatus : '';
+							break;
+						case "PROCESSING":
+							$status = $this->config->get('ya_pokupki_status_processing');
+							$text = $this->language->get('text_marketcpa_toprocessing');
+							break;
+						case "DELIVERY":
+							$status = $this->config->get('ya_pokupki_status_delivery');
+							$text = $this->language->get('text_marketcpa_todelivery');
+							break;
+						default:
+							$status = $order['order_status_id'];
+							break;
+					}
+					if ($status==$order['order_status_id']) $this->log_save(sprintf('Yandex.Market CPA: Status order %s has changed on %s', $shop_order['id_order'], $data->order->status));
+					if ($status>0) $this->model_checkout_order->addOrderHistory($shop_order['id_order'], $status, sprintf($this->language->get('text_marketcpa_changeorder'), $data->order->status).$text, false);
+				}else{
+					$this->log_save(sprintf('Yandex.Market CPA: Order %s not found ', $shop_order['id_order']));
 				}
-				
 				die();
 			}
 		}
 	}
 	
 	public function editOrder($order_id, $data) {
-		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET invoice_prefix = '" . $this->db->escape($data['invoice_prefix']) . "', store_id = '" . (int)$data['store_id'] . "', store_name = '" . $this->db->escape($data['store_name']) . "', store_url = '" . $this->db->escape($data['store_url']) . "', customer_id = '" . (int)$data['customer_id'] . "', customer_group_id = '" . (int)$data['customer_group_id'] . "', firstname = '" . $this->db->escape($data['firstname']) . "', lastname = '" . $this->db->escape($data['lastname']) . "', email = '" . $this->db->escape($data['email']) . "', telephone = '" . $this->db->escape($data['telephone']) . "', fax = '" . $this->db->escape($data['fax']) . "', custom_field = '" . $this->db->escape(serialize($data['custom_field'])) . "', payment_firstname = '" . $this->db->escape($data['payment_firstname']) . "', payment_lastname = '" . $this->db->escape($data['payment_lastname']) . "', payment_company = '" . $this->db->escape($data['payment_company']) . "', payment_address_1 = '" . $this->db->escape($data['payment_address_1']) . "', payment_address_2 = '" . $this->db->escape($data['payment_address_2']) . "', payment_city = '" . $this->db->escape($data['payment_city']) . "', payment_postcode = '" . $this->db->escape($data['payment_postcode']) . "', payment_country = '" . $this->db->escape($data['payment_country']) . "', payment_country_id = '" . (int)$data['payment_country_id'] . "', payment_zone = '" . $this->db->escape($data['payment_zone']) . "', payment_zone_id = '" . (int)$data['payment_zone_id'] . "', payment_address_format = '" . $this->db->escape($data['payment_address_format']) . "', payment_custom_field = '" . $this->db->escape(serialize($data['payment_custom_field'])) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', payment_code = '" . $this->db->escape($data['payment_code']) . "', shipping_firstname = '" . $this->db->escape($data['shipping_firstname']) . "', shipping_lastname = '" . $this->db->escape($data['shipping_lastname']) . "', shipping_company = '" . $this->db->escape($data['shipping_company']) . "', shipping_address_1 = '" . $this->db->escape($data['shipping_address_1']) . "', shipping_address_2 = '" . $this->db->escape($data['shipping_address_2']) . "', shipping_city = '" . $this->db->escape($data['shipping_city']) . "', shipping_postcode = '" . $this->db->escape($data['shipping_postcode']) . "', shipping_country = '" . $this->db->escape($data['shipping_country']) . "', shipping_country_id = '" . (int)$data['shipping_country_id'] . "', shipping_zone = '" . $this->db->escape($data['shipping_zone']) . "', shipping_zone_id = '" . (int)$data['shipping_zone_id'] . "', shipping_address_format = '" . $this->db->escape($data['shipping_address_format']) . "', shipping_custom_field = '" . $this->db->escape(serialize($data['shipping_custom_field'])) . "', shipping_method = '" . $this->db->escape($data['shipping_method']) . "', shipping_code = '" . $this->db->escape($data['shipping_code']) . "', comment = '" . $this->db->escape($data['comment']) . "', total = '" . (float)$data['total'] . "', affiliate_id = '" . (int)$data['affiliate_id'] . "', commission = '" . (float)$data['commission'] . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET invoice_prefix = '" . $this->db->escape($data['invoice_prefix']) .
+			"', store_id = '" . (int)$data['store_id'] . "', store_name = '" . $this->db->escape($data['store_name']) .
+			"', store_url = '" . $this->db->escape($data['store_url']) .
+			"', customer_id = '" . (int)$data['customer_id'] .
+			"', customer_group_id = '" . (int)(isset($data['customer_group_id'])?$data['customer_group_id']:1) .
+			"', firstname = '" . $this->db->escape($data['firstname']) .
+			"', lastname = '" . $this->db->escape($data['lastname']) .
+			"', email = '" . $this->db->escape($data['email']) .
+			"', telephone = '" . $this->db->escape($data['telephone']) .
+			"', fax = '" . $this->db->escape($data['fax']) .
+			"', custom_field = '" . $this->db->escape(serialize($data['custom_field'])) .
+			"', payment_firstname = '" . $this->db->escape($data['payment_firstname']) .
+			"', payment_lastname = '" . $this->db->escape($data['payment_lastname']) .
+			"', payment_company = '" . $this->db->escape($data['payment_company']) .
+			"', payment_address_1 = '" . $this->db->escape($data['payment_address_1']) .
+			"', payment_address_2 = '" . $this->db->escape($data['payment_address_2']) .
+			"', payment_city = '" . $this->db->escape($data['payment_city']) .
+			"', payment_postcode = '" . $this->db->escape($data['payment_postcode']) .
+			"', payment_country = '" . $this->db->escape($data['payment_country']) . "', payment_country_id = '" . (int)$data['payment_country_id'] . "', payment_zone = '" . $this->db->escape($data['payment_zone']) . "', payment_zone_id = '" . (int)$data['payment_zone_id'] . "', payment_address_format = '" . $this->db->escape($data['payment_address_format']) . "', payment_custom_field = '" . $this->db->escape(serialize($data['payment_custom_field'])) . "', payment_method = '" . $this->db->escape($data['payment_method']) . "', payment_code = '" . $this->db->escape($data['payment_code']) . "', shipping_firstname = '" . $this->db->escape($data['shipping_firstname']) . "', shipping_lastname = '" . $this->db->escape($data['shipping_lastname']) . "', shipping_company = '" . $this->db->escape($data['shipping_company']) . "', shipping_address_1 = '" . $this->db->escape($data['shipping_address_1']) . "', shipping_address_2 = '" . $this->db->escape($data['shipping_address_2']) . "', shipping_city = '" . $this->db->escape($data['shipping_city']) . "', shipping_postcode = '" . $this->db->escape($data['shipping_postcode']) . "', shipping_country = '" . $this->db->escape($data['shipping_country']) . "', shipping_country_id = '" . (int)$data['shipping_country_id'] . "', shipping_zone = '" . $this->db->escape($data['shipping_zone']) . "', shipping_zone_id = '" . (int)$data['shipping_zone_id'] . "', shipping_address_format = '" . $this->db->escape($data['shipping_address_format']) . "', shipping_custom_field = '" . $this->db->escape(serialize($data['shipping_custom_field'])) . "', shipping_method = '" . $this->db->escape($data['shipping_method']) . "', shipping_code = '" . $this->db->escape($data['shipping_code']) . "', comment = '" . $this->db->escape($data['comment']) . "', total = '" . (float)$data['total'] . "', affiliate_id = '" . (int)$data['affiliate_id'] . "', commission = '" . (float)$data['commission'] . "', date_modified = NOW() WHERE order_id = '" . (int)$order_id . "'");
 	}
 	
 	public static function log_save($logtext)
 	{
-		$log = new Log('ycms.market.log');
+		$log = new Log('error.log');
 		$log->write($logtext);
 	}
 }

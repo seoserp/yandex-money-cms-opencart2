@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS от <a target="_blank" href="https://kassa.yandex.ru">Яндекс.Кассы</a>';
 $_['heading_title_ya']      = 'Y.CMS от Яндекс.Кассы';
-$_['ya_version']      = '1.4.2.1';
+$_['ya_version']      = '1.5.0';
 $_['text_license']      = "Работая с модулем, вы автоматически соглашаетесь с <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>условиями его использования</a>.";
 $_['text_need_update']      = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
@@ -44,20 +44,20 @@ $_['market_unch_all']          = 'Убрать все отметки';
 $_['market_sv']          = 'Сохранить';
 $_['market_gen']          = 'Генерировать';
 $_['market_prostoy']          = 'Упрощённый yml:';
-$_['text_success']       = 'Настройки модуля обновлены!';
-
+$_['text_success']       = 'Настройки сохранены';
+//success_alert
 // kassa
 $_['kassa_text_connect']       = "Для работы с приложением необходимо подключить магазин к <a target=\"_blank\" href=\"https://kassa.yandex.ru/\">Яндекс.Кассе</a>";
 $_['kassa_text_enable']       = 'Включить приём платежей через Кассу';
 $_['kassa_text_testmode']       = 'Тестовый режим';
 $_['kassa_text_realmode']       = 'Рабочий режим';
 $_['kassa_text_dynamic']       = 'Страницы с динамическими адресами';
-$_['kassa_text_help_cburl']       = 'Скопируйте эту ссылку в поля Check URL и Aviso URL в настройках личного кабинета Яндекс.Кассы';
-$_['kassa_text_help_url']       = 'Включите «Использовать страницы успеха и ошибки с динамическими адресами» в настройках личного кабинета Яндекс.Кассы';
+$_['kassa_text_help_cburl']       = 'Скопируйте эту ссылку в поля Check URL и Aviso URL в <a target="_blank" href="https://kassa.yandex.ru/my">настройках личного кабинета Яндекс.Кассы</a>';
+$_['kassa_text_help_url']       = 'Включите «Использовать страницы успеха и ошибки с динамическими адресами» в <a target="_blank" href="https://kassa.yandex.ru/my">настройках личного кабинета Яндекс.Кассы</a>';
 $_['kassa_text_status']       = "Статус заказа после оплаты";
 $_['kassa_text_debug_help']       = "Настройку нужно будет поменять, только если попросят специалисты Яндекс.Денег";
-$_['kassa_text_debug_dis']       = "Отключена";
-$_['kassa_text_debug_en']       = "Включена";
+$_['kassa_text_debug_dis']       = "Отключить";
+$_['kassa_text_debug_en']       = "Включить";
 $_['kassa_text_debug']       = "Запись отладочной информации";
 $_['kassa_text_adv_head']       = "Дополнительные настройки для администратора";
 $_['kassa_text_pay_help']       = "Отметьте способы оплаты, которые указаны в вашем договоре с Яндекс.Деньгами";
@@ -71,6 +71,16 @@ $_['kassa_text_scid']       = "Номер витрины магазина";
 $_['kassa_text_sid']       = "Идентификатор магазина";
 $_['kassa_text_get_setting']       = "Shop ID, scid, shopPassword можно посмотреть в <a href='https://money.yandex.ru/joinups' target='_blank'>личном кабинете</a> после подключения Яндекс.Кассы.";
 $_['kassa_text_lk_head']       = "Параметры из личного кабинета Яндекс.Кассы";
+
+$_['kassa_text_inv']       = "Вставление счетов по электронной почте";
+$_['kassa_text_invhelp']       = "Шаблон письма";
+$_['kassa_text_inv_subj']       = "Тема";
+$_['kassa_text_inv_subjhelp']       = "Номер заказа (значение %order_id%) подставится автоматически";
+$_['kassa_text_inv_logo']       = "Добавить к письму логотип магазина";
+$_['kassa_text_inv_logohelp']       = "";
+$_['kassa_text_inv_text']       = "Дополнительный текст";
+$_['kassa_text_inv_texthelp']       = "Этот текст появится в письме после суммы и кнопки «Заплатить»: напишите здесь важную для покупателя информацию или оставьте поле пустым";
+$_['kassa_text_inv_pattern']       = "";
 
 $_['kassa_ym']       = 'Оплата из кошелька в Яндекс.Деньгах.';
 $_['kassa_wm']       = 'Оплата из кошелька в системе WebMoney.';
@@ -101,7 +111,17 @@ $_['pokupki_set_1']       = 'Предоплата - Оплата при офор
 $_['pokupki_set_2']       = 'Предоплата - Напрямую магазину (только для Украины)';
 $_['pokupki_set_3']       = 'Постоплата - Наличный расчёт при получении товара';
 $_['pokupki_set_4']       = 'Постоплата - Оплата банковской картой при получении заказа';
+
+$_['pokupki_text_status_pickup']       = 'Заказ доставлен в пункт самовывоза';
+$_['pokupki_text_status_cancelled']       = 'Заказ отменен';
+$_['pokupki_text_status_delivery']       = 'Заказ передан в доставку';
+$_['pokupki_text_status_processing']       = 'Заказ находится в обработке';
+$_['pokupki_text_status_unpaid']       = 'Заказ оформлен, но еще не оплачен';
+$_['pokupki_text_status_delivered']       = 'Заказ получен покупателем';
+$_['pokupki_text_status']       = 'Статусы для отправки в Яндекс.Маркет';
+
 $_['pokupki_sv']       = 'Сохранить';
+
 $_['pokupki_upw']       = 'Пароль пользователя в системе Яндекс.Маркет';
 $_['market_color_option'] = 'Опции, отвечающие за цвет:';
 $_['market_size_option']  = 'Опции, отвечающие за  размер:';
@@ -131,7 +151,7 @@ $_['pokupki_callback']       = 'Ссылка для приложения';
 $_['p2p_sv']       = 'Сохранить';
 $_['p2p_text_connect']          = "Для работы с модулем нужно <a href='https://money.yandex.ru/new' target='_blank'>открыть кошелек</a> на Яндексе и <a href='https://sp-money.yandex.ru/myservices/online.xml' target='_blank'>зарегистрировать приложение</a> на сайте Яндекс.Денег								";
 $_['p2p_text_enable']          = "Включить прием платежей в кошелек на Яндексе";
-$_['p2p_text_url_help']          = "Скопируйте эту ссылку в поле Redirect URL на <a href='https://sp-money.yandex.ru/myservices/online.xml' target='_blank'>странице регистрации приложения</a>";
+$_['p2p_text_url_help']          = "Скопируйте эту ссылку в поле Redirect URI на <a href='https://sp-money.yandex.ru/myservices/new.xml' target='_blank'>странице регистрации приложения</a>";
 $_['p2p_text_setting_head']          = "Настройки приема платежей";
 $_['p2p_text_account']          = "Номер кошелька";
 $_['p2p_text_appId']          = "Id приложения";

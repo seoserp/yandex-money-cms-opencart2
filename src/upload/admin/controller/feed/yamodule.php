@@ -31,7 +31,11 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_ma',
 		'ya_kassa_qw',
 		'ya_kassa_qp',
-		'ya_kassa_os'
+		'ya_kassa_os',
+		'ya_kassa_inv',
+		'ya_kassa_inv_logo',
+		'ya_kassa_inv_message',
+		'ya_kassa_inv_subject'
 	);
 
 	public $fields_metrika = array(
@@ -80,12 +84,24 @@ class ControllerFeedYamodule extends Controller {
 		'ya_pokupki_sprepaid',
 		'ya_pokupki_cash',
 		'ya_pokupki_bank',
-		'ya_pokupki_carrier'
+		'ya_pokupki_carrier',
+		'ya_pokupki_status_pickup',
+		'ya_pokupki_status_cancelled',
+		'ya_pokupki_status_delivery',
+		'ya_pokupki_status_delivered',
+		'ya_pokupki_status_processing',
+		'ya_pokupki_status_unpaid'
 	);
 
 	public function initErrors()
 	{
 		$data = array();
+		$status = array();
+		foreach(array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val){
+			$status[] = $this->config->get('ya_pokupki_status_'.$val);
+		}
+		$status = array_unique($status);
+
 		if ($this->config->get('ya_pokupki_stoken') == '')
 			$data['pokupki_status'][] = $this->errors_alert('Токен не заполнен!');
 		if ($this->config->get('ya_pokupki_yapi') == '')
@@ -98,6 +114,8 @@ class ControllerFeedYamodule extends Controller {
 			$data['pokupki_status'][] = $this->errors_alert('Пароль приложения не заполнен');
 		if ($this->config->get('ya_pokupki_gtoken') == '')
 			$data['pokupki_status'][] = $this->errors_alert('Токен yandex не получен!');
+		if (count($status)!=6)
+			$data['pokupki_status'][] = $this->errors_alert('Статусы для передачи в Яндекс.Маркет должны быть уникальными');
 
 		if ($this->config->get('ya_market_shopname') == '')
 			$data['market_status'][] = $this->errors_alert('Не введено название магазина');
@@ -126,16 +144,15 @@ class ControllerFeedYamodule extends Controller {
 			$data['kassa_status'][] = $this->errors_alert('SCID Не заполнен');
 
 		if (empty($data['market_status']))
-			$data['market_status'][] = $this->success_alert('Все необходимые настроки заполнены!');
+			$data['market_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
 		if (empty($data['kassa_status']))
-			$data['kassa_status'][] = $this->success_alert('Все необходимые настроки заполнены!');
+			$data['kassa_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
 		if (empty($data['p2p_status']))
-			$data['p2p_status'][] = $this->success_alert('Все необходимые настроки заполнены!');
+			$data['p2p_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
 		if (empty($data['metrika_status']))
-			$data['metrika_status'][] = $this->success_alert('Все необходимые настроки заполнены!');
+			$data['metrika_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
 		if (empty($data['pokupki_status']))
-			$data['pokupki_status'][] = $this->success_alert('Все необходимые настроки заполнены!');
-
+			$data['pokupki_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
 		return $data;
 	}
 
@@ -223,34 +240,41 @@ class ControllerFeedYamodule extends Controller {
 		$this->session->data['metrika_status'] = array();
 		$this->session->data['market_status'] = array();
 		$this->session->data['pokupki_status'] = array();
+		$this->load->language('feed/yamodule');
+
 		switch($this->request->post['type_data'])
 		{
 			case 'kassa':
 				$this->saveData($this->fields_kassa);
-				$this->session->data['kassa_status'][] = $this->success_alert('Настройки успешно сохранены!');
-				if($this->request->post['ya_kassa_active'] == 1)
+				$this->session->data['kassa_status'][] = $this->success_alert($this->language->get('text_success'));
+				if($this->request->post['ya_kassa_active'] == 1){
+					$testUrl = $this->url->link('payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
+					$this->session->data['kassa_status'][] = '<div class="alert"><a  class="btn btn-success" target="_blank" href="'.$testUrl.'">Проверить работу модуля</a></div>';
 					$this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
+				}
 				break;
 			case 'p2p':
 				$this->saveData($this->fields_p2p);
-				$this->session->data['p2p_status'][] = $this->success_alert('Настройки успешно сохранены!');
+				$this->session->data['p2p_status'][] = $this->success_alert($this->language->get('text_success'));
 				if($this->request->post['ya_p2p_active'] == 1)
 					$this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
 				break;
 			case 'metrika':
 				$this->saveData($this->fields_metrika);
-				$this->session->data['metrika_status'][] = $this->success_alert('Данные метрики сохранены!');
+				$this->session->data['metrika_status'][] = $this->success_alert($this->language->get('text_success'));
 				$this->load->model('yamodule/metrika');
-				$this->model_yamodule_metrika->initData($this->config->get('ya_metrika_o2auth'), ($this->request->post['ya_metrika_number'] != $this->config->get('ya_metrika_number') ? $this->request->post['ya_metrika_number'] : $this->config->get('ya_metrika_number')));
-				$this->model_yamodule_metrika->processCounter();
+				$yaMetrika_token = $this->config->get('ya_metrika_o2auth');
+				$yaMetrika_number = ($this->request->post['ya_metrika_number'] != $this->config->get('ya_metrika_number') ? $this->request->post['ya_metrika_number'] : $this->config->get('ya_metrika_number'));
+				$this->model_yamodule_metrika->processCounter($yaMetrika_number, $yaMetrika_token);
 				break;
 			case 'market':
-				$this->session->data['market_status'][] = $this->success_alert('Настройки успешно сохранены!');
+				$this->session->data['market_status'][] = $this->success_alert($this->language->get('text_success'));
 				$this->saveData($this->fields_market);
 				break;
 			case 'pokupki':
 				$this->saveData($this->fields_pokupki);
-				$this->session->data['pokupki_status'][] = $this->success_alert('Настройки успешно сохранены!');
+				$this->session->data['pokupki_status'][] = $this->success_alert($this->language->get('text_success'));
+
 				break;
 			
 		}
@@ -258,7 +282,6 @@ class ControllerFeedYamodule extends Controller {
 		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
 		
 	}
-
 	public function initForm($array)
 	{
 		foreach ($array as $a)
@@ -476,68 +499,6 @@ class ControllerFeedYamodule extends Controller {
 		else
 			$data['err_token'] = '';
 
-		// pokupki
-		$data['pokupki_gtoken'] = $this->language->get('pokupki_gtoken');
-		$data['pokupki_stoken'] = $this->language->get('pokupki_stoken');
-		$data['pokupki_yapi'] = $this->language->get('pokupki_yapi');
-		$data['pokupki_number'] = $this->language->get('pokupki_number');
-		$data['pokupki_login'] = $this->language->get('pokupki_login');
-		$data['pokupki_pw'] = $this->language->get('pokupki_pw');
-		$data['pokupki_idapp'] = $this->language->get('pokupki_idapp');
-		$data['pokupki_token'] = $this->language->get('pokupki_token');
-		$data['pokupki_idpickup'] = $this->language->get('pokupki_idpickup');
-		$data['pokupki_method'] = $this->language->get('pokupki_method');
-		$data['pokupki_sapi'] = $this->language->get('pokupki_sapi');
-		$data['pokupki_set_1'] = $this->language->get('pokupki_set_1');
-		$data['pokupki_set_2'] = $this->language->get('pokupki_set_2');
-		$data['pokupki_set_3'] = $this->language->get('pokupki_set_3');
-		$data['pokupki_set_4'] = $this->language->get('pokupki_set_4');
-		$data['pokupki_sv'] = $this->language->get('pokupki_sv');
-		$data['pokupki_upw'] = $this->language->get('pokupki_upw');
-		$data['pokupki_callback'] = $this->language->get('pokupki_callback');
-		//market
-		$data['market_color_option'] = $this->language->get('market_color_option');
-		$data['market_size_option'] = $this->language->get('market_size_option');
-		$data['market_size_unit'] = $this->language->get('market_size_unit');
-		$data['text_select_all'] = $this->language->get('text_select_all');
-		$data['text_unselect_all'] = $this->language->get('text_unselect_all');
-		$data['text_no'] = $this->language->get('text_no');
-		$data['market_set'] = $this->language->get('market_set');
-		$data['market_set_1'] = $this->language->get('market_set_1');
-		$data['market_set_2'] = $this->language->get('market_set_2');
-		$data['market_set_3'] = $this->language->get('market_set_3');
-		$data['market_set_4'] = $this->language->get('market_set_4');
-		$data['market_set_5'] = $this->language->get('market_set_5');
-		$data['market_set_6'] = $this->language->get('market_set_6');
-		$data['market_set_7'] = $this->language->get('market_set_7');
-		$data['market_set_8'] = $this->language->get('market_set_8');
-		$data['market_set_9'] = $this->language->get('market_set_9');
-		$data['market_lnk_yml'] = $this->language->get('market_lnk_yml');
-		$data['market_cat'] = $this->language->get('market_cat');
-		$data['market_out'] = $this->language->get('market_out');
-		$data['market_out_sel'] = $this->language->get('market_out_sel');
-		$data['market_out_all'] = $this->language->get('market_out_all');
-		$data['market_dostup'] = $this->language->get('market_dostup');
-		$data['market_dostup_1'] = $this->language->get('market_dostup_1');
-		$data['market_dostup_2'] = $this->language->get('market_dostup_2');
-		$data['market_dostup_3'] = $this->language->get('market_dostup_3');
-		$data['market_dostup_4'] = $this->language->get('market_dostup_4');
-		$data['market_s_name'] = $this->language->get('market_s_name');
-		$data['market_d_cost'] = $this->language->get('market_d_cost');
-		$data['market_sv_all'] = $this->language->get('market_sv_all');
-		$data['market_rv_all'] = $this->language->get('market_rv_all');
-		$data['market_ch_all'] = $this->language->get('market_ch_all');
-		$data['market_unch_all'] = $this->language->get('market_unch_all');
-		$data['market_prostoy'] = $this->language->get('market_prostoy');
-		$data['market_sv'] = $this->language->get('market_sv');
-		$data['market_gen'] = $this->language->get('market_gen');
-		// p2p
-		$data['p2p_os'] = $this->language->get('p2p_os');
-		$data['p2p_sv'] = $this->language->get('p2p_sv');
-		$data['p2p_number'] = $this->language->get('p2p_number');
-		$data['p2p_idapp'] = $this->language->get('p2p_idapp');
-		$data['p2p_pw'] = $this->language->get('p2p_pw');
-		$data['p2p_linkapp'] = $this->language->get('p2p_linkapp');
 		// kassa
 		$arLang = array(
 			'kassa_ma','kassa_pb','kassa_qw','kassa_qp','kassa_wm','kassa_mobile','kassa_sber',
@@ -546,70 +507,41 @@ class ControllerFeedYamodule extends Controller {
 			'kassa_text_status','kassa_text_debug_help','kassa_text_debug_dis','kassa_text_debug_en','kassa_text_debug','kassa_text_adv_head',
 			'kassa_text_pay_help','kassa_text_paymode_help','kassa_text_paymode_shop','kassa_text_paymode_kassa','kassa_text_paymode_label',
 			'kassa_text_paymode_head','kassa_text_pw','kassa_text_scid','kassa_text_sid','kassa_text_get_setting','kassa_text_lk_head','kassa_sv',
+			'kassa_text_inv', 'kassa_text_invhelp', 'kassa_text_inv_subj','kassa_text_inv_subjhelp','kassa_text_inv_logo','kassa_text_inv_logohelp',
+			'kassa_text_inv_text', 'kassa_text_inv_texthelp','kassa_text_inv_pattern',
 			'p2p_text_connect','p2p_text_enable','p2p_text_url_help','p2p_text_setting_head','p2p_text_account','p2p_text_appId','p2p_text_appWord','p2p_text_app_help',
-			'p2p_text_extra_head','p2p_text_debug',	'p2p_text_off',	'p2p_text_on','p2p_text_debug_help','p2p_text_status'
+			'p2p_text_extra_head','p2p_text_debug',	'p2p_text_off',	'p2p_text_on','p2p_text_debug_help','p2p_text_status',
+			'metrika_gtoken','metrika_number','metrika_idapp','metrika_o2auth','metrika_pw','metrika_uname','metrika_upw','metrika_set','metrika_celi','metrika_callback',
+			'metrika_sv','metrika_set_1','metrika_set_2','metrika_set_3','metrika_set_4','metrika_set_5','celi_cart','celi_order',
+			'pokupki_gtoken','pokupki_stoken','pokupki_yapi','pokupki_number','pokupki_login','pokupki_pw','pokupki_idapp','pokupki_token',
+			'pokupki_idpickup','pokupki_method','pokupki_sapi','pokupki_set_1','pokupki_set_2','pokupki_set_3','pokupki_set_4','pokupki_sv','pokupki_upw',
+			'pokupki_callback','market_color_option','market_size_option','market_size_unit','text_select_all','text_unselect_all','text_no','market_set',
+			'market_set_1','market_set_2','market_set_3','market_set_4','market_set_5','market_set_6','market_set_7','market_set_8','market_set_9','market_lnk_yml',
+			'market_cat','market_out','market_out_sel','market_out_all','market_dostup','market_dostup_1','market_dostup_2','market_dostup_3','market_dostup_4',
+			'market_s_name','market_d_cost','market_sv_all','market_rv_all','market_ch_all','market_unch_all','market_prostoy','market_sv','market_gen','p2p_os',
+			'p2p_sv','p2p_number','p2p_idapp','p2p_pw','p2p_linkapp','lbl_mws_main','txt_mws_main','lbl_mws_alert','lbl_mws_cn','lbl_mws_orgname','lbl_mws_email',
+			'lbl_mws_connect','lbl_mws_crt','lbl_mws_doc','txt_mws_doc','txt_mws_cer','tab_mws_before','tab_row_sign','tab_row_cause','tab_row_primary','btn_mws_gen',
+			'btn_mws_csr','btn_mws_doc','btn_mws_crt','btn_mws_crt_load','ya_version','text_license','market','kassa','metrika','pokupki','p2p','active','active_on',
+			'active_off','log','mod_off','button_cancel','text_installed','button_save','button_cancel','pokupki_text_status'
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
+		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
 
-		//metrika
-		$data['metrika_gtoken'] = $this->language->get('metrika_gtoken');
-		$data['metrika_number'] = $this->language->get('metrika_number');
-		$data['metrika_idapp'] = $this->language->get('metrika_idapp');
-		$data['metrika_o2auth'] = $this->language->get('metrika_o2auth');
-		$data['metrika_pw'] = $this->language->get('metrika_pw');
-		$data['metrika_uname'] = $this->language->get('metrika_uname');
-		$data['metrika_upw'] = $this->language->get('metrika_upw');
-		$data['metrika_set'] = $this->language->get('metrika_set');
-		$data['metrika_celi'] = $this->language->get('metrika_celi');
-		$data['metrika_callback'] = $this->language->get('metrika_callback');
-		$data['metrika_sv'] = $this->language->get('metrika_sv');
-		$data['metrika_set_1'] = $this->language->get('metrika_set_1');
-		$data['metrika_set_2'] = $this->language->get('metrika_set_2');
-		$data['metrika_set_3'] = $this->language->get('metrika_set_3');
-		$data['metrika_set_4'] = $this->language->get('metrika_set_4');
-		$data['metrika_set_5'] = $this->language->get('metrika_set_5');
-		$data['celi_cart'] = $this->language->get('celi_cart');
-		$data['celi_order'] = $this->language->get('celi_order');
 		//MWS
 		$data['mws_global_error']= array();
 		if (!extension_loaded ('openssl')) $data['mws_global_error'][]= $this->language->get('ext_mws_openssl');
 		if (!$this->Sget('ya_kassa_active')) $data['mws_global_error'][]= $this->language->get('err_mws_kassa');
 		if (!$this->Sget('ya_kassa_sid')) $data['mws_global_error'][]= $this->language->get('err_mws_shopid');
 		//if (count($data['mws_global_error'])==0) $this->load->controller('yamodule/mws/generate');
-		
-		$data['lbl_mws_main'] = $this->language->get('lbl_mws_main');
-		$data['txt_mws_main'] = $this->language->get('txt_mws_main');
-		$data['lbl_mws_alert'] = $this->language->get('lbl_mws_alert');
-		
-		$data['lbl_mws_cn'] = $this->language->get('lbl_mws_cn');
-		$data['lbl_mws_orgname'] = $this->language->get('lbl_mws_orgname');
-		$data['lbl_mws_email'] = $this->language->get('lbl_mws_email');
-		$data['lbl_mws_connect'] = $this->language->get('lbl_mws_connect');
+
 		$data['txt_mws_connect'] = sprintf($this->language->get('txt_mws_connect'),$this->url->link('yamodule/mws/csr', 'token=' . $this->session->data['token'], 'SSL'));
-		
-		$data['lbl_mws_crt'] = $this->language->get('lbl_mws_crt');
-		$data['lbl_mws_doc'] = $this->language->get('lbl_mws_doc');
-		$data['txt_mws_doc'] = $this->language->get('txt_mws_doc');
-		$data['txt_mws_cer'] = $this->language->get('txt_mws_cer');
 		$data['success_mws_alert'] = sprintf($this->language->get('success_mws_alert'), $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL'), $this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		
-		$data['tab_mws_before'] = $this->language->get('tab_mws_before');
-		$data['tab_row_sign'] = $this->language->get('tab_row_sign');
-		$data['tab_row_cause'] = $this->language->get('tab_row_cause');
-		$data['tab_row_primary'] = $this->language->get('tab_row_primary');
-				
 		$data['mws_orgname'] = HTTP_CATALOG;
 		$data['mws_cn'] = '/business/oc2/yacms-'.$this->Sget('ya_kassa_sid');
 		$data['mws_email'] = $this->Sget('config_email');
 		
-		$data['btn_mws_gen'] = $this->language->get('btn_mws_gen');
-		$data['btn_mws_csr'] = $this->language->get('btn_mws_csr');
-		$data['btn_mws_doc'] = $this->language->get('btn_mws_doc');
-		$data['btn_mws_crt'] = $this->language->get('btn_mws_crt');
 
-		$data['btn_mws_crt_load'] = $this->language->get('btn_mws_crt_load');
-		// Common
-		$data['ya_version'] = $this->language->get('ya_version');
 		//
 		$data['token'] = $this->session->data['token'];
 		
@@ -625,8 +557,6 @@ class ControllerFeedYamodule extends Controller {
 		}
 		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']))?true:false;
 		//
-		$data['button_save'] = $this->language->get('button_save');
-		$data['button_cancel'] = $this->language->get('button_cancel');
 		//
 		$results = $this->model_catalog_option->getOptions(array('sort' => 'name'));
 		$data['options'] = $results;
@@ -635,17 +565,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['ya_market_color_options'] = array();
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 		$data['heading_title'] = $this->language->get('heading_title_ya').' ('.$this->language->get('ya_version').')';
-		$data['text_license'] = $this->language->get('text_license');
-		$data['market'] = $this->language->get('market');
-		$data['kassa'] = $this->language->get('kassa');
-		$data['metrika'] = $this->language->get('metrika');
-		$data['pokupki'] = $this->language->get('pokupki');
-		$data['p2p'] = $this->language->get('p2p');
-		$data['active'] = $this->language->get('active');
-		$data['active_on'] = $this->language->get('active_on');
-		$data['active_off'] = $this->language->get('active_off');
-		$data['log'] = $this->language->get('log');
-		$data['mod_off'] = $this->language->get('mod_off');
+
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
@@ -679,8 +599,6 @@ class ControllerFeedYamodule extends Controller {
 		$currencies = $this->model_localisation_currency->getCurrencies();
 		$allowed_currencies = array_flip(array('RUR', 'RUB', 'BYR', 'KZT', 'UAH'));
 		$data['currencies'] = array_intersect_key($currencies, $allowed_currencies);
-		$data['button_cancel'] = $this->language->get('button_cancel');
-		$data['text_installed'] = $this->language->get('text_installed');
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
@@ -702,8 +620,8 @@ class ControllerFeedYamodule extends Controller {
 			$data['p2p_status'] = array_merge($data['p2p_status'], $this->session->data['p2p_status']);
 		if (isset($this->session->data['pokupki_status']) && !empty($this->session->data['pokupki_status']))
 			$data['pokupki_status'] = array_merge($data['pokupki_status'], $this->session->data['pokupki_status']);
-		
-		$this->response->setOutput($this->load->view('feed/yamodule.tpl', $data));
+		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
+		$this->response->setOutput($this->load->view('feed/yamodule'.$end_tpl, $data));
 	}
 
 	public function errors_alert($text)
@@ -734,6 +652,8 @@ class ControllerFeedYamodule extends Controller {
 			'ya_kassa_log' => 0,
 			'ya_kassa_paymode' => 1,
 			'ya_kassa_test' => 0,
+			'ya_kassa_inv_logo' => 0,
+			'ya_kassa_inv' => 0,
 			'ya_metrika_active' => 0,
 			'ya_metrika_webvizor' => 1,
 			'ya_metrika_otkaz' => 1,
@@ -759,7 +679,13 @@ class ControllerFeedYamodule extends Controller {
 			'ya_pokupki_yandex' => 1,
 			'ya_pokupki_sprepaid' => 1,
 			'ya_pokupki_cash' => 1,
-			'ya_pokupki_bank' => 1
+			'ya_pokupki_bank' => 1,
+			'ya_pokupki_status_pickup' => 16, //
+			'ya_pokupki_status_cancelled' => 7, //
+			'ya_pokupki_status_delivery' => 3, //
+			'ya_pokupki_status_processing' => 2,
+			'ya_pokupki_status_unpaid' => 3,
+			'ya_pokupki_status_delivered' => 15 //
 		);
 
 		$q = $this->db->query("CREATE TABLE IF NOT EXISTS `".DB_PREFIX."pokupki_orders` (
@@ -771,6 +697,21 @@ class ControllerFeedYamodule extends Controller {
 		  `pmethod` varchar(100) NOT NULL,
 		  `outlet` varchar(100) NOT NULL,
 		  PRIMARY KEY (`id_order`,`id_market_order`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+
+		$q = $this->db->query("CREATE TABLE IF NOT EXISTS `".DB_PREFIX."mws_return` (
+		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `invoice_id` text NOT NULL,
+		  `amount` varchar(10) NOT NULL,
+		  `status` int(11) NOT NULL,
+		  `techMessage` text NOT NULL,
+		  `error` int(11) NOT NULL,
+		  `cause` text NOT NULL,
+		  `clientOrderId` text NOT NULL,
+		  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		  `response` text NOT NULL,
+		  `request` text NOT NULL,
+		  PRIMARY KEY  (`id`)
 		) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 
 		$this->load->model('setting/setting');
@@ -813,6 +754,30 @@ class ControllerFeedYamodule extends Controller {
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'feed/yamodule');
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'yamodule/mws');
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'yamodule/mws');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'payment/test');
+	}
+
+	public function changestatus(){
+		$json = array();
+		$order_id = (int)$this->request->get['order_id'];
+
+		$this->load->model('sale/order');
+		$this->load->model('setting/setting');
+		$order_info = $this->model_sale_order->getOrder($order_id);
+		//
+		if ($order_info['customer_id'] == $this->config->get('yandexbuy_customer')){
+			$order_status_id = $this->request->post['order_status_id'];
+			$comment = $this->request->post['comment'];
+			//$notify = $this->request->post['notify'];
+			//$append = $this->request->post['append'];
+			//$override = (bool) $this->request->post['override'];
+
+			$this->load->model('yamodule/pokupki');
+			$json = $this->model_yamodule_pokupki->sendOrder($order_id, $order_status_id, $comment);
+		}
+		//
+		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
+		$this->response->setOutput(json_encode($json));
 	}
 
 	public function addCustomer($data) {
@@ -836,6 +801,7 @@ class ControllerFeedYamodule extends Controller {
 
 	public function uninstall()
 	{
+		$this->load->model('setting/setting');
 		$cu = $this->getCustomer($this->config->get('yandexbuy_customer'));
 		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 0));
 		$this->load->model('extension/extension');

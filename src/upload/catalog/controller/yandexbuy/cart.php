@@ -62,7 +62,7 @@ class ControllerYandexbuyCart extends Controller
 	{
 		$sign = $this->config->get('ya_pokupki_stoken');
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
-		if (strtoupper($sign) != strtoupper($key))
+		if (strtoupper($sign) !== strtoupper($key))
 		{
 			header('HTTP/1.0 404 Not Found');
 			echo '<h1>Wrong token</h1>';
@@ -118,7 +118,6 @@ class ControllerYandexbuyCart extends Controller
 									$price_option += $value['price'];
 								elseif ($value['price_prefix'] == '-')
 									$price_option -= $value['price'];
-
 							}
 							
 							if (!$add)
@@ -216,7 +215,6 @@ class ControllerYandexbuyCart extends Controller
 								if($type == 'PICKUP')
 								{
 									$this->load->model('yamodel/pokupki');
-									$this->model_yamodel_pokupki->makeData();
 									$outlets = $this->model_yamodel_pokupki->getOutlets();
 									$carriers[$k] = array_merge($carriers[$k], $outlets['json']);
 								}

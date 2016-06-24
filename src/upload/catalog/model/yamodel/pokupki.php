@@ -31,34 +31,24 @@ Class ModelYamodelPokupki extends Model
 					});
 					</script>
 			';
-
 		return $data;
 	}
 
 	public function getOrderProducts($order_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
-
 		return $query->rows;
-	}
-
-	public function makeData()
-	{
-		$this->app_id = $this->config->get('ya_pokupki_idapp');
-		$this->url = $this->config->get('ya_pokupki_yapi');
-		$this->number = $this->config->get('ya_pokupki_number');
-		$this->login = $this->config->get('ya_pokupki_login');
-		$this->app_pw = $this->config->get('ya_pokupki_upw');
-		$this->ya_token = $this->config->get('ya_pokupki_gtoken');
 	}
 
 	public function getOrders()
 	{
-		return $data = $this->SendResponse('/campaigns/'.$this->number.'/orders', array(), array(), 'GET');
+		$number = $this->config->get('ya_pokupki_number');
+		return $data = $this->SendResponse('/campaigns/'.$number.'/orders', array(), array(), 'GET');
 	}
 
 	public function getOutlets()
 	{
-		$data = $this->SendResponse('/campaigns/'.$this->number.'/outlets', array(), array(), 'GET');
+		$number = $this->config->get('ya_pokupki_number');
+		$data = $this->SendResponse('/campaigns/'.$number.'/outlets', array(), array(), 'GET');
 		$array = array('outlets' => array());
 		foreach($data->outlets as $o)
 			$array['outlets'][] = array('id' => (int)$o->shopOutletId);
@@ -72,7 +62,8 @@ Class ModelYamodelPokupki extends Model
 
 	public function getOrder($id)
 	{
-		$data = $this->SendResponse('/campaigns/'.$this->number.'/orders/'.$id, array(), array(), 'GET');
+		$number = $this->config->get('ya_pokupki_number');
+		$data = $this->SendResponse('/campaigns/'.$number.'/orders/'.$id, array(), array(), 'GET');
 		return $data;
 	}
 
@@ -83,16 +74,20 @@ Class ModelYamodelPokupki extends Model
 				'status' => $state,
 			)
 		);
+		$number = $this->config->get('ya_pokupki_number');
+		if($state == 'CANCELLED') $params['order']['substatus'] = 'SHOP_FAILED';
 
-		if($state == 'CANCELLED')
-			$params['order']['substatus'] = 'SHOP_FAILED';
-
-		return $data = $this->SendResponse('/campaigns/'.$this->number.'/orders/'.$id.'/status', array(), $params, 'PUT');
+		return $data = $this->SendResponse('/campaigns/'.$number.'/orders/'.$id.'/status', array(), $params, 'PUT');
 	}
 
 	public function SendResponse($to, $headers, $params, $type)
 	{
-		$response = $this->post($this->url.$to.'.json?oauth_token='.$this->ya_token.'&oauth_client_id='.$this->app_id.'&oauth_login='.$this->login, $headers, $params, $type);
+		$app_id = $this->config->get('ya_pokupki_idapp');
+		$url = 'https://api.partner.market.yandex.ru/v2';//$this->config->get('ya_pokupki_yapi');
+		//$login = $this->config->get('ya_pokupki_login');
+		//$app_pw = $this->config->get('ya_pokupki_upw');
+		$ya_token = $this->config->get('ya_pokupki_gtoken');
+		$response = $this->post($url.$to.'.json?oauth_token='.$ya_token.'&oauth_client_id='.$app_id, $headers, $params, $type);
 		$data = json_decode($response->body);
 		if(isset($data->error))
 			$this->log_save($response->body);
