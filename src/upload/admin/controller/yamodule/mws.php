@@ -58,7 +58,13 @@ class ControllerYamoduleMws extends Controller {
 		$conf = $this->model_setting_setting->getSetting("yamodule_mws");
 		echo $conf['yamodule_mws_csr'];
 	}
-	
+
+	private function log_save($logtext){
+		$error_log = new Log('error.log');
+		$error_log->write($logtext.PHP_EOL);
+		$error_log = null;
+	}
+
 	public function index() {
 		$this->load->model('sale/order');
 		$this->load->model('setting/setting');
@@ -131,7 +137,12 @@ class ControllerYamoduleMws extends Controller {
 			$mws->CertPem = (isset($conf['yamodule_mws_cert']))?$conf['yamodule_mws_cert']:'';
 			
 			$payment = $mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
-			if (!isset($payment['invoiceId'])) $errors[]=$this->language->get('err_mws_listorder');
+			if (!isset($payment['invoiceId'])) {
+				$errors[]=$this->language->get('err_mws_listorder');
+				//
+				//$this->log_save($mws->txt_request);
+				//$this->log_save($mws->txt_request);
+			}
 			
 			if (!$errors && $this->request->server['REQUEST_METHOD'] == 'POST' && $is_act_return && isset($this->request->post['return_sum'])){
 				$amount = str_replace(',','.',$this->request->post['return_sum']);

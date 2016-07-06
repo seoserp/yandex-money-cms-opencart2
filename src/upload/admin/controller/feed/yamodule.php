@@ -247,7 +247,7 @@ class ControllerFeedYamodule extends Controller {
 			case 'kassa':
 				$this->saveData($this->fields_kassa);
 				$this->session->data['kassa_status'][] = $this->success_alert($this->language->get('text_success'));
-				if($this->request->post['ya_kassa_active'] == 1){
+				if(isset($this->request->post['ya_kassa_active']) && $this->request->post['ya_kassa_active'] == 1){
 					$testUrl = $this->url->link('payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
 					$this->session->data['kassa_status'][] = '<div class="alert"><a  class="btn btn-success" target="_blank" href="'.$testUrl.'">Проверить работу модуля</a></div>';
 					$this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
