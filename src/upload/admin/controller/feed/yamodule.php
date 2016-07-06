@@ -256,7 +256,7 @@ class ControllerFeedYamodule extends Controller {
 			case 'p2p':
 				$this->saveData($this->fields_p2p);
 				$this->session->data['p2p_status'][] = $this->success_alert($this->language->get('text_success'));
-				if($this->request->post['ya_p2p_active'] == 1)
+				if(isset($this->request->post['ya_p2p_active']) && $this->request->post['ya_p2p_active'] == 1)
 					$this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
 				break;
 			case 'metrika':
