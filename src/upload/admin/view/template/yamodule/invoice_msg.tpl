@@ -127,21 +127,18 @@
                                     <tbody>
                                     <tr>
                                         <td style="padding-bottom:16px;">
-                                            <!-- -->
+
                                             <table border="0" cellspacing="1" align="center"  width = "80%">
                                                 <tr>
                                                     <td align="center">
-                                                            <div>
-                                                                <a href="<?php echo $link; ?>">
-                                                                   <img width="176" height="81" src="cid:yandex_buttons.png" border="0" alt="Заплатить через Яндекс">
-                                                                </a>
-                                                            </div>
-                                                        <!--</form>-->
+                                                        <div>
+                                                            <a href="<?php echo $link; ?>">
+                                                                <img width="176" height="81" src="cid:yandex_buttons.png" border="0" alt="Заплатить через Яндекс">
+                                                            </a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </table>
-
-                                            <!-- -->
                                         </td>
                                     </tr>
                                     </tbody>
@@ -159,28 +156,6 @@
                                                 </a>
                                             </font>
                                             </span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <table style="border-collapse:collapse;margin-left:auto;margin-right:auto;" cellpadding="0" cellspacing="0" width="100%" height="auto">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <table width="610" align="center" cellpadding="0" cellspacing="0" height="auto" style="border-collapse:collapse;">
-                                    <tbody>
-                                    <tr>
-                                        <td style="padding-top:20px;padding-bottom:5px;padding-left:25px;padding-right:25px;">
-                                            <!--<font color="#999999" size="2" face="Arial">
-                                                Если у вас возникли проблемы с платежом, обратитесь в
-                                                <a href="" target="_blank" style="font-weight:normal;text-decoration:none;cursor:pointer;">
-                                                    <font color="#666699" size="2" face="Arial">службу поддержки магазина</font>
-                                                </a>.
-                                            </font>-->
                                         </td>
                                     </tr>
                                     </tbody>

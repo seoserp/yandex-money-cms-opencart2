@@ -31,6 +31,7 @@ class ControllerPaymentYamodule extends Controller
 		$data['shop_id'] = $this->config->get('ya_kassa_sid');
 		$data['scid'] = $this->config->get('ya_kassa_scid');
 		$data['kassa_paymode'] = $this->config->get('ya_kassa_paymode');
+		$data['kassa_paylogo'] = $this->config->get('ya_kassa_paylogo');
 		$data['customerNumber'] = $order_info['email'];
 		$data['shopSuccessURL'] = $this->url->link('checkout/success', '', 'SSL');
 		$data['shopFailURL'] = $this->url->link('checkout/failure', '', 'SSL');
@@ -55,7 +56,8 @@ class ControllerPaymentYamodule extends Controller
 	public function confirm(){
 		if ($this->session->data['payment_method']['code'] == 'yamodule') {
 			$this->load->model('checkout/order');
-			$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('config_order_status_id'), '', true);
+			if ($this->config->get('ya_kassa_create_order')=='1') $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('config_order_status_id'), '', true);
+			if ($this->config->get('ya_kassa_cart_reset')=='1') $this->cart->clear();
 		}
 	}
 	public static function log_save($logtext)

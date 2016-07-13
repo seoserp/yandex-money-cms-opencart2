@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS от <a target="_blank" href="https://kassa.yandex.ru">Яндекс.Кассы</a>';
 $_['heading_title_ya']      = 'Y.CMS от Яндекс.Кассы';
-$_['ya_version']      = '1.5.0';
+$_['ya_version']      = '1.5.1';
 $_['text_license']      = "Работая с модулем, вы автоматически соглашаетесь с <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>условиями его использования</a>.";
 $_['text_need_update']      = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
@@ -66,6 +66,17 @@ $_['kassa_text_paymode_shop']       = "Выбор способа оплаты н
 $_['kassa_text_paymode_kassa']       = "Выбор способа оплаты на стороне Яндекс.Кассы";
 $_['kassa_text_paymode_label']       = "Сценарий оплаты";
 $_['kassa_text_paymode_head']       = "Настройка сценария оплаты";
+
+$_['kassa_text_paylogo_help']       = "";
+$_['kassa_paylogo_text']       = "Использовать кнопку \"Оплатить через Яндекс\"";
+
+$_['kassa_text_cart_reset']       = "Действия в момент перехода к оплате";
+$_['kassa_cart_reset_text']       = "Сбросить содержимое корзины";
+
+$_['kassa_text_create_order']       = "";
+$_['kassa_create_order_text']       = "Создать заказ до оплаты";
+
+
 $_['kassa_text_pw']       = "Секретное слово";
 $_['kassa_text_scid']       = "Номер витрины магазина";
 $_['kassa_text_sid']       = "Идентификатор магазина";

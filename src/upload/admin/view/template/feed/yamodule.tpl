@@ -173,22 +173,24 @@
 										</div>
 									</div>
 								</div>
-								<!--<div class='row kassa-w-select'>
+								<!-- -->
+								<div class='row kassa-wo-select'>
 									<div class='col-md-12'>
-										<p><a href='' target='_blank'> </a></p>
 										<div class='form-horizontal'>
 											<div class="form-group">
-												<label class="control-label col-sm-3">Способ оплаты по умолчанию</label>
-												<div class='col-sm-8'>
-													<select name='ya_paymentDfl' class="form-control">
-														<option value='PC'>Кошелек в Яндекс.Деньгах</option>
-														<option value='AC'>Любая банковская карта </option>
-													</select>
+												<div class="col-sm-9 col-sm-offset-3">
+													<p><?php echo $kassa_text_paylogo_help; ?></p>
+													<div class="checkbox">
+														<label for="ya_kassa_yandexlogo">
+															<input type="checkbox" <?php echo ($ya_kassa_paylogo ? ' checked="checked"' : ''); ?> name="ya_kassa_paylogo" id="ya_kassa_paylogo" class="" value="1"/>
+															<?php echo $kassa_paylogo_text; ?>
+														</label>
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>-->
+								</div>
 								<!-- row -->
 								<div class='row'>
 									<div class='col-sm-12'>
@@ -208,15 +210,36 @@
 													</label>
 													<p class="help-block"><?php echo $kassa_text_debug_help; ?></p>
 												</div>
+												<!-- -->
+												<label class="control-label col-sm-3"><?php echo $kassa_text_cart_reset; ?></label>
+												<div class='col-sm-8'>
+													<div class="checkbox">
+														<label for="ya_kassa_cart_reset">
+															<input type="checkbox" <?php echo ($ya_kassa_cart_reset ? ' checked="checked"' : ''); ?> name="ya_kassa_cart_reset" id="ya_kassa_cart_reset" class="" value="1"/>
+															<?php echo $kassa_cart_reset_text; ?>
+														</label>
+													</div>
+												</div>
+												<label class="control-label col-sm-3"><?php echo $kassa_text_create_order; ?></label>
+												<div class='col-sm-8'>
+													<div class="checkbox">
+														<label for="ya_kassa_create_order">
+															<input type="checkbox" <?php echo ($ya_kassa_create_order ? ' checked="checked"' : ''); ?> name="ya_kassa_create_order" id="ya_kassa_create_order" class="" value="1"/>
+															<?php echo $kassa_create_order_text; ?>
+														</label>
+													</div>
+													<p></p>
+												</div>
+												<!-- -->
 												<label class="control-label col-sm-3"><?php echo $kassa_text_status; ?></label>
 												<div class='col-sm-8'>
 													<select name="ya_kassa_os" id="ya_kassa_os" class="form-control">
 														<?php foreach ($order_statuses as $order_status) { ?>
-														<?php if ($order_status['order_status_id'] == $ya_kassa_os) { ?>
-														<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-														<?php } else { ?>
-														<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-														<?php } ?>
+															<?php if ($order_status['order_status_id'] == $ya_kassa_os) { ?>
+																<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+															<?php } else { ?>
+																<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+															<?php } ?>
 														<?php } ?>
 													</select>
 												</div>
