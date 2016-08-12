@@ -68,13 +68,13 @@ $_['kassa_text_paymode_label']       = "Сценарий оплаты";
 $_['kassa_text_paymode_head']       = "Настройка сценария оплаты";
 
 $_['kassa_text_paylogo_help']       = "";
-$_['kassa_paylogo_text']       = "Использовать кнопку \"Оплатить через Яндекс\"";
+$_['kassa_paylogo_text']       = "Назвать кнопку оплаты «Заплатить через Яндекс»";
 
-$_['kassa_text_cart_reset']       = "Действия в момент перехода к оплате";
-$_['kassa_cart_reset_text']       = "Сбросить содержимое корзины";
+$_['kassa_text_cart_reset']       = "Когда покупатель переходит к оплате";
+$_['kassa_cart_reset_text']       = "Удалить товары из корзины";
 
 $_['kassa_text_create_order']       = "";
-$_['kassa_create_order_text']       = "Создать заказ до оплаты";
+$_['kassa_create_order_text']       = "Создать неоплаченный заказ в панели управления";
 
 
 $_['kassa_text_pw']       = "Секретное слово";

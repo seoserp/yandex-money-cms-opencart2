@@ -124,61 +124,7 @@
 													<input type="radio" <?php echo (!$ya_kassa_paymode ? ' checked="checked"' : ''); ?> name="ya_kassa_paymode" value="0"> <?php echo $kassa_text_paymode_shop; ?>
 													<p class="help-block"><?php echo $kassa_text_paymode_help; ?> </p>
 												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<!-- row -->
-								<div class='row kassa-w-select'>
-									<div class='col-sm-12'>
-										<div class='form-horizontal' role="form">
-											<div class="form-group">
-												<div class="col-sm-9 col-sm-offset-3">
-													<p><?php echo $kassa_text_pay_help; ?></p>
-													<div class="checkbox">
-														<label for="ya_kassa_ym"><input type="checkbox" <?php echo ($ya_kassa_ym ? ' checked="checked"' : ''); ?> name="ya_kassa_ym" id="ya_kassa_ym" class="" value="1"/> <?php echo $kassa_ym; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_cards"><input type="checkbox" <?php echo ($ya_kassa_cards ? ' checked="checked"' : ''); ?> name="ya_kassa_cards" id="ya_kassa_cards" class="" value="1"/> <?php echo $kassa_cards; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_cash"><input type="checkbox" <?php echo ($ya_kassa_cash ? ' checked="checked"' : ''); ?> name="ya_kassa_cash" id="ya_kassa_cash" class="" value="1"/> <?php echo $kassa_cash; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_mobile"><input type="checkbox" <?php echo ($ya_kassa_mobile ? ' checked="checked"' : ''); ?> name="ya_kassa_mobile" id="ya_kassa_mobile" class="" value="1"/> <?php echo $kassa_mobile; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_wm"><input type="checkbox" <?php echo ($ya_kassa_wm ? ' checked="checked"' : ''); ?> name="ya_kassa_wm" id="ya_kassa_wm" class="" value="1"/> <?php echo $kassa_wm; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_sber"><input type="checkbox" <?php echo ($ya_kassa_sber ? ' checked="checked"' : ''); ?> name="ya_kassa_sber" id="ya_kassa_sber" class="" value="1"/> <?php echo $kassa_sber; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_alfa"><input type="checkbox" <?php echo ($ya_kassa_alfa ? ' checked="checked"' : ''); ?> name="ya_kassa_alfa" id="ya_kassa_alfa" class="" value="1"/> <?php echo $kassa_alfa; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_ma"><input type="checkbox" <?php echo ($ya_kassa_ma ? ' checked="checked"' : ''); ?> name="ya_kassa_ma" id="ya_kassa_ma" class="" value="1"/> <?php echo $kassa_ma; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_pb"><input type="checkbox" <?php echo ($ya_kassa_pb ? ' checked="checked"' : ''); ?> name="ya_kassa_pb" id="ya_kassa_pb" class="" value="1"/> <?php echo $kassa_pb; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_qw"><input type="checkbox" <?php echo ($ya_kassa_qw ? ' checked="checked"' : ''); ?> name="ya_kassa_qw" id="ya_kassa_qw" class="" value="1"/> <?php echo $kassa_qw; ?></label>
-													</div>
-													<div class="checkbox">
-														<label for="ya_kassa_qp"><input type="checkbox" <?php echo ($ya_kassa_qp ? ' checked="checked"' : ''); ?> name="ya_kassa_qp" id="ya_kassa_qp" class="" value="1"/> <?php echo $kassa_qp; ?></label>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<!-- -->
-								<div class='row kassa-wo-select'>
-									<div class='col-md-12'>
-										<div class='form-horizontal'>
-											<div class="form-group">
-												<div class="col-sm-9 col-sm-offset-3">
+												<div class="col-sm-9 col-sm-offset-3 kassa-wo-select">
 													<p><?php echo $kassa_text_paylogo_help; ?></p>
 													<div class="checkbox">
 														<label for="ya_kassa_yandexlogo">
@@ -186,6 +132,42 @@
 															<?php echo $kassa_paylogo_text; ?>
 														</label>
 													</div>
+												</div>
+												<div class="col-sm-9 col-sm-offset-3  kassa-w-select">
+														<p><?php echo $kassa_text_pay_help; ?></p>
+														<div class="checkbox">
+															<label for="ya_kassa_ym"><input type="checkbox" <?php echo ($ya_kassa_ym ? ' checked="checked"' : ''); ?> name="ya_kassa_ym" id="ya_kassa_ym" class="" value="1"/> <?php echo $kassa_ym; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_cards"><input type="checkbox" <?php echo ($ya_kassa_cards ? ' checked="checked"' : ''); ?> name="ya_kassa_cards" id="ya_kassa_cards" class="" value="1"/> <?php echo $kassa_cards; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_cash"><input type="checkbox" <?php echo ($ya_kassa_cash ? ' checked="checked"' : ''); ?> name="ya_kassa_cash" id="ya_kassa_cash" class="" value="1"/> <?php echo $kassa_cash; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_mobile"><input type="checkbox" <?php echo ($ya_kassa_mobile ? ' checked="checked"' : ''); ?> name="ya_kassa_mobile" id="ya_kassa_mobile" class="" value="1"/> <?php echo $kassa_mobile; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_wm"><input type="checkbox" <?php echo ($ya_kassa_wm ? ' checked="checked"' : ''); ?> name="ya_kassa_wm" id="ya_kassa_wm" class="" value="1"/> <?php echo $kassa_wm; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_sber"><input type="checkbox" <?php echo ($ya_kassa_sber ? ' checked="checked"' : ''); ?> name="ya_kassa_sber" id="ya_kassa_sber" class="" value="1"/> <?php echo $kassa_sber; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_alfa"><input type="checkbox" <?php echo ($ya_kassa_alfa ? ' checked="checked"' : ''); ?> name="ya_kassa_alfa" id="ya_kassa_alfa" class="" value="1"/> <?php echo $kassa_alfa; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_ma"><input type="checkbox" <?php echo ($ya_kassa_ma ? ' checked="checked"' : ''); ?> name="ya_kassa_ma" id="ya_kassa_ma" class="" value="1"/> <?php echo $kassa_ma; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_pb"><input type="checkbox" <?php echo ($ya_kassa_pb ? ' checked="checked"' : ''); ?> name="ya_kassa_pb" id="ya_kassa_pb" class="" value="1"/> <?php echo $kassa_pb; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_qw"><input type="checkbox" <?php echo ($ya_kassa_qw ? ' checked="checked"' : ''); ?> name="ya_kassa_qw" id="ya_kassa_qw" class="" value="1"/> <?php echo $kassa_qw; ?></label>
+														</div>
+														<div class="checkbox">
+															<label for="ya_kassa_qp"><input type="checkbox" <?php echo ($ya_kassa_qp ? ' checked="checked"' : ''); ?> name="ya_kassa_qp" id="ya_kassa_qp" class="" value="1"/> <?php echo $kassa_qp; ?></label>
+														</div>
 												</div>
 											</div>
 										</div>

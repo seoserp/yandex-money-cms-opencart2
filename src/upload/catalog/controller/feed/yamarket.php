@@ -315,7 +315,7 @@ class YandexMarket{
 
 	function set_shop($name, $company, $url){
 		$this->shop['name'] = $this->prepare_field($name);
-		$this->shop['name'] = substr($this->shop['name'], 0, 20);
+		$this->shop['name'] = mb_substr(mb_convert_encoding($this->shop['name'], "UTF-8"), 0, 20);
 		$this->shop['company'] = $this->prepare_field($company);
 		$this->shop['url'] = $this->prepare_field($url);
 	}
