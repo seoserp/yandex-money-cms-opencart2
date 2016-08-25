@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
-	<name>Y.CMS</name>
+	<name>Y.CMS for Opencart 2.3.x</name>
 	<code>ycms.mws</code>
-	<version>1.0.4</version>
+	<version>2.0.0</version>
 	<author>Yandex.Money</author>
 
 	<file path="admin/model/sale/order.php">
@@ -36,7 +36,7 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 		<operation>
 			<search position="replace"><![CDATA['view'          => $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),]]></search>
 			<add><![CDATA[
-			'mws'		=> $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
+			'mws'		=> $this->url->link('tool/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
 			'payment_code'		=> isset($result['payment_code'])?$result['payment_code']:'',
 			'view'	=> $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
 			]]></add>
@@ -45,13 +45,13 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 			<search position="replace"><![CDATA[$data['button_add'] = $this->language->get('button_add');]]></search>
 			<add><![CDATA[$data['button_add'] = $this->language->get('button_add');
 			$data['button_invoice_kassa'] = $this->language->get('button_invoice_kassa');
-			$data['invoice_kassa'] = $this->url->link('payment/yamodule/invoice', 'token=' . $this->session->data['token'], true);
+			$data['invoice_kassa'] = $this->url->link('extension/payment/yamodule/invoice', 'token=' . $this->session->data['token'], true);
 			]]></add>
 		</operation>
 	</file>
 	<file path="admin/view/template/sale/order_list.tpl">
 		<operation>
-			<search position="replace"><![CDATA[<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a></div>]]></search>
+			<search position="replace"><![CDATA[<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>]]></search>
 			<add><![CDATA[<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
 			        <a href="<?php echo $invoice_kassa; ?>" data-toggle="tooltip" title="<?php echo $button_invoice_kassa; ?>" class="btn btn-warning"><i class="fa fa-envelope"></i></a></div>]]></add>
 		</operation>
@@ -87,8 +87,8 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 		<operation>
 			<search position="replace"><![CDATA[if (isset($this->session->data['order_id'])) {]]></search>
 			<add><![CDATA[ if (isset($this->session->data['order_id'])) {
-			$this->load->model('yamodel/pokupki');
-			$data['script_order'] = $this->model_yamodel_pokupki->getscript($this->session->data['order_id']);
+			$this->load->model('extension/yamodel/pokupki');
+			$data['script_order'] = $this->model_extension_yamodel_pokupki->getscript($this->session->data['order_id']);
 			]]></add>
 		</operation>
 	</file>
@@ -151,7 +151,7 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 			<add><![CDATA[$('#button-history').on('click', function() {
 			//
 			$.ajax({
-				url: 'index.php?route=feed/yamodule/changestatus&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=extension/feed/yamodule/changestatus&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&append=' + ($('input[name=\'append\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()),
