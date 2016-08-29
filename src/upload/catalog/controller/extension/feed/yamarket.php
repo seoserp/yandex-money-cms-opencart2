@@ -14,13 +14,20 @@ class ControllerExtensionFeedYamarket extends Controller {
 
 		$categories = $this->model_extension_yamodel_yamarket->getCategories();
 		$allow_cat_array = $this->config->get('ya_market_categories');
-		$ids_cat = implode(',', $allow_cat_array);
-		if($this->config->get('ya_market_catall')) $ids_cat = '';
+        if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
+            $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
+        } else {
+            throw new Exception("Need select categories");
+        }
 		$products = $this->model_extension_yamodel_yamarket->getProducts($ids_cat, true);
 		$currencies = $this->model_localisation_currency->getCurrencies();
 		$offers_currency = 'RUB';
 		$currency_default = $this->model_extension_yamodel_yamarket->getCurrencyByISO($offers_currency);
+        if (!isset($currency_default['value'])) throw new Exception("Not exist RUB");
+
 		$decimal_place = $this->currency->getDecimalPlace($offers_currency);
+        if (empty($decimal_place) || $decimal_place==0) throw new Exception("Need set decimal places for RUB");
+
 		$shop_currency = $this->config->get('config_currency');
 		$currencies = array_intersect_key($currencies, array_flip(array('RUR', 'RUB', 'USD', 'EUR', 'UAH')));
 		$yamarket = new YandexMarket($this->config);
@@ -33,9 +40,10 @@ class ControllerExtensionFeedYamarket extends Controller {
 		$data = array();
 		if ($this->config->get('ya_market_allcurrencies')){
 			foreach ($currencies as $currency)
-				if ($currency['status'] == 1)
-					$yamarket->add_currency($currency['code'], ((float)$currency_default['value']/(float)$currency['value']));
-		}
+				if ($currency['status'] == 1){
+                    $yamarket->add_currency($currency['code'], ((float)$currency_default['value']/(float)$currency['value']));
+                }
+        }
 		else
 			$yamarket->add_currency($currency_default['code'], ((float)$currency_default['value']));
 
@@ -52,7 +60,6 @@ class ControllerExtensionFeedYamarket extends Controller {
 		foreach ($products as $product)
 		{
 			if ($this->config->get('ya_market_available') && $product['quantity'] < 1)	continue;
-
 			$available = false;
 			if ($this->config->get('ya_market_set_available') == 1)
 				$available = true;
@@ -79,10 +86,24 @@ class ControllerExtensionFeedYamarket extends Controller {
 			$data['categoryId'] = $product['category_id'];
 			$data['vendor'] = $product['manufacturer'];
 			$data['vendorCode'] = $product['model'];
+
+            //TODO Добавить зависимость delivery, pickup, store от кол-ва товара на складе
 			$data['delivery'] = ($this->config->get('ya_market_delivery') ? 'true' : 'false');
 			$data['pickup'] = ($this->config->get('ya_market_pickup') ? 'true' : 'false');
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
+
+            //TODO Добавить установку delivery-options в зависимости от склада и складского статуса товара
+            if($product['quantity'] < 1){
+                $stock_id = $product['stock_status_id'];
+                $delivery_cost = 0;
+                $delivery_days = 0;
+                $data['delivery-options'][] = array(
+                    'cost' => $delivery_cost,
+                    'days' => $delivery_days
+                );
+            }
+
 			//TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
 				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
@@ -91,7 +112,6 @@ class ControllerExtensionFeedYamarket extends Controller {
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
 				if (count($data['picture'])<=9) $data['picture'][] = str_replace('&amp;','&',$this->model_tool_image->resize($pic['image'], 600, 600));
 			}
-
 			if ($this->config->get('ya_market_prostoy'))
 			{
 				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
@@ -117,6 +137,8 @@ class ControllerExtensionFeedYamarket extends Controller {
 							foreach ($attr['attribute'] as $val)
 								$data['param'][] = array('id' => $val['attribute_id'], 'name' => $val['name'], 'value' => $val['text']);
 				}
+                //TODO Добавить определение срока/стоимость доставки для индивидульных товаров
+                // по статусу Out_of_Stock по каждому из stock_status_id товара
 
 				if (!$this->makeOfferCombination($data, $product, $shop_currency, $offers_currency, $decimal_place, $yamarket))
 				{
@@ -280,7 +302,11 @@ class YandexMarket{
 					$s .= '<param name="'.$this->prepare_field($v['name']).'">'.$this->prepare_field($v['value']).'</param>';
 					$s .= "\r\n";
 				}
-			}
+			}elseif($tag == 'delivery-options'){
+                foreach ($val as $v){
+                    $s .= '<delivery-options> <option cost="'.$v['cost'].'" days="'.$v['days'].'"></delivery-options>'."\r\n";
+                }
+            }
 			else
 			{
 				$s .= '<'.$tag.'>'.$val.'</'.$tag.'>';
@@ -346,7 +372,12 @@ class YandexMarket{
 
 	function add_offer($id, $data, $available = true)
 	{
-		$allowed = array('url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery', 'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes', 'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin');
+		$allowed = array(
+		    'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
+            'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
+            'delivery-options',
+            'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
+        );
 		$param = array();
 		// $data['model'] = $data['id'].'_tovar';
 		// $data['vendor'] = $data['id'].'_tovar';
@@ -355,7 +386,8 @@ class YandexMarket{
 		foreach($data as $k => $v)
 		{
 			if (!in_array($k, $allowed)) unset($data[$k]);
-			if(!in_array($k, array('picture','param','rec','description')))	$data[$k] = strip_tags($this->prepare_field($v));
+			if(!in_array($k, array('picture','param','rec','description','delivery-options')))
+			    $data[$k] = strip_tags($this->prepare_field($v));
 			if ($k=='description') {
 				$data[$k] = preg_replace('|<[/]?[^>]+?>|', '', trim(html_entity_decode ($v)));
 				$data[$k] = preg_replace("/&#?[a-z0-9]+;/i", '', $data[$k]);
@@ -402,7 +434,17 @@ class YandexMarket{
 		}
 		$s .= '</categories>' . "\r\n";
 
-		if($this->config->get('ya_market_homecarrier')) $s .= '<local_delivery_cost>'.$this->config->get('ya_market_localcoast').'</local_delivery_cost>' . "\r\n"; //TODO Доработать на основании https://yandex.ru/support/partnermarket/elements/delivery-options.xml
+		    $localShippingCost = explode (';', $this->config->get('ya_market_localcoast'));
+            $localShippingDays = explode (';', $this->config->get('ya_market_localdays'));
+            if (count($localShippingCost) != count ($localShippingDays)) throw new Exception("'Стоимость доставки в домашнем регионе' и/или 'Срок доставки в домашнем регионе' заполнены с ошибкой");
+            $s .= '<delivery-options>';
+            foreach ($localShippingCost as $key=>$value){
+                $s .= '<option 
+                            cost="'.$value.'" 
+                            days="'.$localShippingDays[$key].'"/>';
+            }
+            $s .=  '</delivery-options>' . "\r\n";
+
 
 		$s .= '<offers>' . "\r\n";
 		foreach($this->offers as $offer)

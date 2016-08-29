@@ -603,12 +603,52 @@
 											<input type="text" name="ya_market_shopname" value="<?php echo $ya_market_shopname; ?>" id="ya_market_shopname" class="form-control"/>
 										</div>
 									</div>
+									<!-- -->
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>" id="ya_market_localcoast" class="form-control"/>
+											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
+												   id="ya_market_localcoast" class="form-control"/>
 										</div>
 									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
+												   id="ya_market_localdays" class="form-control"/>
+										</div>
+									</div>
+									<!--
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php //echo $market_d_stocks; ?></label>
+										<div class="col-sm-8">
+											<table>
+												<tr>
+													<th>Статус</th>
+													<th>Срок доставки</th>
+													<th>Стоимость доставки </th>
+												</tr>
+												<?php
+												//TODO Дописать выгрузку статусов stock_status
+												?>
+												<tr>
+													<td>
+														<?php echo ""; ?> Статус 1
+													</td>
+													<td>
+														<input type="text" name="ya_market_stock_days_1" value="" class="form-control"/>
+													</td>
+													<td>
+														<input type="text" name="ya_market_stock_cost_1" value="" class="form-control"/>
+													</td>
+												</tr>
+												<?php
+												//TODO Дописать выгрузку статусов stock_status
+												?>
+											</table>
+										</div>
+									</div>
+									 -->
 									<div class="form-group">
 										<label class="col-sm-4 control-label"><?php echo $market_color_option; ?></label>
 										<div class="col-sm-8">
@@ -682,9 +722,6 @@
 										<div class="col-sm-8">
 											<div class="checkbox">
 												<label for="ya_market_available"><input type="checkbox" <?php echo ($ya_market_available? ' checked="checked"' : ''); ?> name="ya_market_available" id="ya_market_available" class="" value="1"/> <?php echo $market_set_1; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_homecarrier"><input type="checkbox" <?php echo ($ya_market_homecarrier ? ' checked="checked"' : ''); ?> name="ya_market_homecarrier" id="ya_market_homecarrier" class="" value="1"/> <?php echo $market_set_2; ?></label>
 											</div>
 											<div class="checkbox">
 												<label for="ya_market_combination"><input type="checkbox" <?php echo ($ya_market_combination ? ' checked="checked"' : ''); ?> name="ya_market_combination" id="ya_market_combination" class="" value="1"/> <?php echo $market_set_3; ?></label>

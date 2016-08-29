@@ -62,8 +62,8 @@ class ControllerExtensionFeedYamodule extends Controller {
 		'ya_market_set_available',
 		'ya_market_shopname',
 		'ya_market_localcoast',
+		'ya_market_localdays',
 		'ya_market_available',
-		'ya_market_homecarrier',
 		'ya_market_combination',
 		'ya_market_features',
 		'ya_market_dimensions',
@@ -124,6 +124,8 @@ class ControllerExtensionFeedYamodule extends Controller {
 			$data['market_status'][] = $this->errors_alert('Не введено название магазина');
 		if ($this->config->get('ya_market_localcoast') == '')
 			$data['market_status'][] = $this->errors_alert('Введите стоимость доставки в домашнем регионе');
+        if ($this->config->get('ya_market_localdays') == '')
+			$data['market_status'][] = $this->errors_alert('Введите срок доставки в домашнем регионе');
 
 		if ($this->config->get('ya_metrika_number') == '')
 			$data['metrika_status'][] = $this->errors_alert('Не заполнен номер счётчика');
@@ -524,7 +526,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 			'pokupki_callback','market_color_option','market_size_option','market_size_unit','text_select_all','text_unselect_all','text_no','market_set',
 			'market_set_1','market_set_2','market_set_3','market_set_4','market_set_5','market_set_6','market_set_7','market_set_8','market_set_9','market_lnk_yml',
 			'market_cat','market_out','market_out_sel','market_out_all','market_dostup','market_dostup_1','market_dostup_2','market_dostup_3','market_dostup_4',
-			'market_s_name','market_d_cost','market_sv_all','market_rv_all','market_ch_all','market_unch_all','market_prostoy','market_sv','market_gen','p2p_os',
+			'market_s_name','market_d_cost','market_d_days','market_sv_all','market_rv_all','market_ch_all','market_unch_all','market_prostoy','market_sv','market_gen','p2p_os',
 			'p2p_sv','p2p_number','p2p_idapp','p2p_pw','p2p_linkapp','lbl_mws_main','txt_mws_main','lbl_mws_alert','lbl_mws_cn','lbl_mws_orgname','lbl_mws_email',
 			'lbl_mws_connect','lbl_mws_crt','lbl_mws_doc','txt_mws_doc','txt_mws_cer','tab_mws_before','tab_row_sign','tab_row_cause','tab_row_primary','btn_mws_gen',
 			'btn_mws_csr','btn_mws_doc','btn_mws_crt','btn_mws_crt_load','ya_version','text_license','market','kassa','metrika','pokupki','p2p','active','active_on',
@@ -677,7 +679,6 @@ class ControllerExtensionFeedYamodule extends Controller {
 			'ya_market_prostoy' => 0,
 			'ya_market_set_available' => 2,
 			'ya_market_available' => 1,
-			'ya_market_homecarrier' => 1,
 			'ya_market_combination' => 1,
 			'ya_market_features' => 1,
 			'ya_market_dimensions' => 1,
