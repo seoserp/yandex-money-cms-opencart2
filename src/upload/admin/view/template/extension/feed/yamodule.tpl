@@ -94,17 +94,17 @@
 											<div class="form-group">
 												<label for="ya_kassa_sid" class="col-sm-3 control-label">Shop ID</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_sid" value="<?php echo $ya_kassa_sid; ?>" id="ya_kassa_sid" class="form-control">
+													<input name="ya_kassa_sid" value="<?php echo trim($ya_kassa_sid); ?>" id="ya_kassa_sid" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_sid; ?></p>
 												</div>
 												<label for="ya_kassa_scid" class="col-sm-3 control-label">scid</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_scid" value="<?php echo $ya_kassa_scid; ?>" id="ya_kassa_scid" class="form-control">
+													<input name="ya_kassa_scid" value="<?php echo trim($ya_kassa_scid); ?>" id="ya_kassa_scid" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_scid; ?></p>
 												</div>
 												<label for="ya_kassa_pw" class="col-sm-3 control-label">ShopPassword</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_pw" value="<?php echo $ya_kassa_pw; ?>" id="ya_kassa_pw" class="form-control">
+													<input name="ya_kassa_pw" value="<?php echo trim($ya_kassa_pw); ?>" id="ya_kassa_pw" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_pw; ?></p>
 												</div>
 											</div>
@@ -394,20 +394,20 @@
 												<div class="form-group">
 													<label for="ya_p2p_number" class="col-sm-3 control-label"><?php echo $p2p_text_account; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_number" value="<?php echo $ya_p2p_number; ?>" id="ya_p2p_number" class="form-control">
+														<input name="ya_p2p_number" value="<?php echo trim($ya_p2p_number); ?>" id="ya_p2p_number" class="form-control">
 													</div>
 												</div>
 												<div class="form-group">
 													<label for="ya_p2p_idapp" class="col-sm-3 control-label"><?php echo $p2p_text_appId; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_idapp" value="<?php echo $ya_p2p_idapp; ?>" id="ya_p2p_idapp" class="form-control">
+														<input name="ya_p2p_idapp" value="<?php echo trim($ya_p2p_idapp); ?>" id="ya_p2p_idapp" class="form-control">
 													</div>
 												</div>
 												<div class="form-group">
 													<div class="col-sm-12"></div>
 													<label for="ya_p2p_pw" class="col-sm-3 control-label"><?php echo $p2p_text_appWord; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_pw" value="<?php echo $ya_p2p_pw; ?>" id="ya_p2p_pw" class="form-control">
+														<input name="ya_p2p_pw" value="<?php echo trim($ya_p2p_pw); ?>" id="ya_p2p_pw" class="form-control">
 													</div>
 													<div class="col-sm-9 col-sm-offset-3">
 														<?php echo $p2p_text_app_help; ?>
