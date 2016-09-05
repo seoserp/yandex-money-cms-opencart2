@@ -43,6 +43,11 @@ class ControllerExtensionPaymentYamodule extends Controller
             $data['method_'.$pName] = $this->config->get('ya_kassa_'.$pName);
             $data['method_'.$pName.'_text'] = $this->language->get('text_method_'.$pName);
         }
+        if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
+            $data['imageurl'] = $this->config->get('config_ssl') . 'image/';
+        } else {
+            $data['imageurl'] = $this->config->get('config_url') . 'image/';
+        }
 		$data['method_label'] =  $this->language->get('text_method');
 		$data['order_text'] =  $this->language->get('text_order');
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
