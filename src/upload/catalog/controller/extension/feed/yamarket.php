@@ -93,20 +93,19 @@ class ControllerExtensionFeedYamarket extends Controller {
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
 
-            //TODO Добавить установку delivery-options в зависимости от склада и складского статуса товара
             if($product['quantity'] < 1){
                 $stock_id = $product['stock_status_id'];
-                $delivery_cost = 0;
-                $delivery_days = 0;
+                $delivery_cost = $this->config->get('ya_market_stock_cost');
+                $delivery_days = $this->config->get('ya_market_stock_days');
                 $data['delivery-options'][] = array(
-                    'cost' => $delivery_cost,
-                    'days' => $delivery_days
+                    'cost' => $delivery_cost[$stock_id],
+                    'days' => $delivery_days[$stock_id]
                 );
             }
 
 			//TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
-				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
+			    $data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
 			$data['picture'] = array();
 			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
@@ -137,8 +136,6 @@ class ControllerExtensionFeedYamarket extends Controller {
 							foreach ($attr['attribute'] as $val)
 								$data['param'][] = array('id' => $val['attribute_id'], 'name' => $val['name'], 'value' => $val['text']);
 				}
-                //TODO Добавить определение срока/стоимость доставки для индивидульных товаров
-                // по статусу Out_of_Stock по каждому из stock_status_id товара
 
 				if (!$this->makeOfferCombination($data, $product, $shop_currency, $offers_currency, $decimal_place, $yamarket))
 				{
@@ -293,24 +290,26 @@ class YandexMarket{
 			{
 				foreach ($val as $v){
 					$s .= '<'.$tag.'>'.$v.'</'.$tag.'>';
-					$s .= "\r\n";
+					$s .= PHP_EOL;
 				}
 			}
 			elseif($tag == 'param')
 			{
 				foreach ($val as $v){
 					$s .= '<param name="'.$this->prepare_field($v['name']).'">'.$this->prepare_field($v['value']).'</param>';
-					$s .= "\r\n";
+					$s .= PHP_EOL;
 				}
 			}elseif($tag == 'delivery-options'){
                 foreach ($val as $v){
-                    $s .= '<delivery-options> <option cost="'.$v['cost'].'" days="'.$v['days'].'"></delivery-options>'."\r\n";
+                    $s .= '<delivery-options>'.PHP_EOL.
+                        '<option cost="'.$v['cost'].'" days="'.$v['days'].'"/>'.PHP_EOL.
+                        '</delivery-options>'.PHP_EOL;
                 }
             }
 			else
 			{
 				$s .= '<'.$tag.'>'.$val.'</'.$tag.'>';
-				$s .= "\r\n";
+				$s .= PHP_EOL;
 			}
 		}
 
@@ -324,7 +323,7 @@ class YandexMarket{
 			$s .= $attrname . '="'.$attrval.'" ';
 
 		$s .= ($tagvalue!='') ? '>'.$tagvalue.'</'.$tagname.'>' : '/>';
-		$s .= "\r\n";
+		$s .= PHP_EOL;
 		return $s;
 	}
 
@@ -418,42 +417,40 @@ class YandexMarket{
 
 	function get_xml_shop()
 	{
-		$s = '<shop>' . "\r\n";
+		$s = '<shop>' . PHP_EOL;
 		$s .= $this->convert_array_to_tag($this->shop);
-		$s .= '<currencies>' . "\r\n";
+		$s .= '<currencies>' . PHP_EOL;
 		foreach($this->currencies as $currency)
 			$s .= $this->convert_array_to_attr($currency, 'currency');
 
-		$s .= '</currencies>' . "\r\n";
-		$s .= '<categories>' . "\r\n";
+		$s .= '</currencies>' . PHP_EOL;
+		$s .= '<categories>' . PHP_EOL;
 		foreach($this->categories as $category)
 		{
 			$category_name = $category['name'];
 			unset($category['name']);
 			$s .= $this->convert_array_to_attr($category, 'category', $category_name);
 		}
-		$s .= '</categories>' . "\r\n";
+		$s .= '</categories>' . PHP_EOL;
 
 		    $localShippingCost = explode (';', $this->config->get('ya_market_localcoast'));
             $localShippingDays = explode (';', $this->config->get('ya_market_localdays'));
             if (count($localShippingCost) != count ($localShippingDays)) throw new Exception("'Стоимость доставки в домашнем регионе' и/или 'Срок доставки в домашнем регионе' заполнены с ошибкой");
-            $s .= '<delivery-options>';
+            $s .= '<delivery-options>'. PHP_EOL;
             foreach ($localShippingCost as $key=>$value){
-                $s .= '<option 
-                            cost="'.$value.'" 
-                            days="'.$localShippingDays[$key].'"/>';
+                $s .= '<option cost="'.$value.'" days="'.$localShippingDays[$key].'"/>'. PHP_EOL;
             }
-            $s .=  '</delivery-options>' . "\r\n";
+            $s .=  '</delivery-options>' . PHP_EOL;
 
 
-		$s .= '<offers>' . "\r\n";
+		$s .= '<offers>' . PHP_EOL;
 		foreach($this->offers as $offer)
 		{
 			$data = $offer['data'];
 			unset($offer['data']);
 			$s .= $this->convert_array_to_attr($offer, 'offer', $this->convert_array_to_tag($data));
 		}
-		$s .= '</offers>' . "\r\n";
+		$s .= '</offers>' . PHP_EOL;
 		$s .= '</shop>';
 		return $s;
 	}

@@ -35,7 +35,7 @@ class ControllerExtensionYandexbuyOrder extends Controller
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.0 403 Forbidden');
 			echo '<h1>Wrong token</h1>';
 			exit;
 		}
@@ -180,11 +180,11 @@ class ControllerExtensionYandexbuyOrder extends Controller
 						array_multisort($sort_order, SORT_ASC, $results);
 						foreach ($results as $result) {
 							if ($this->config->get($result['code'] . '_status')) {
-								$this->load->model('total/' . $result['code']);
+								$this->load->model('extension/total/' . $result['code']);
 								if (version_compare(VERSION, "2.2.0", '>=')) {
-									$this->{'model_total_' . $result['code']}->getTotal($total_data);
+									$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
 								}else{
-									$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
+									$this->{'model_extension_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
 								}
 							}
 						}
@@ -284,7 +284,7 @@ class ControllerExtensionYandexbuyOrder extends Controller
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.0 403 Forbidden');
 			echo '<h1>Wrong token</h1>';
 			$this->log_save('Yandex.Market CPA: Wrong auth-token in setting module.');
 			exit;

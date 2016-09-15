@@ -64,7 +64,7 @@ class ControllerExtensionYandexbuyCart extends Controller
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) !== strtoupper($key))
 		{
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.0 403 Forbidden');
 			echo '<h1>Wrong token</h1>';
 			exit;
 		}
@@ -190,12 +190,13 @@ class ControllerExtensionYandexbuyCart extends Controller
 					}
 					$this->load->model('extension/extension');
 					$results = $this->model_extension_extension->getExtensions('shipping');
+
 					$k = 0;
 					foreach ($results as $result)
 					{
 						if ($this->config->get($result['code'] . '_status')) {
-							$this->load->model('shipping/'.$result['code']);
-							$quote = $this->{'model_shipping_'.$result['code']}->getQuote($address_array);
+							$this->load->model('extension/shipping/'.$result['code']);
+							$quote = $this->{'model_extension_shipping_'.$result['code']}->getQuote($address_array);
 							$id = $result['code'];
 							$types = $this->config->get('ya_pokupki_carrier');
 							$type = isset($types[$id]) ? $types[$id] : 'POST';
@@ -223,12 +224,12 @@ class ControllerExtensionYandexbuyCart extends Controller
 							}
 						}
 					}
-					
+                    //var_dump($results); die();
 					if ($this->config->get('ya_pokupki_yandex'))
 						$payments[] = 'YANDEX';
 
-					if ($this->config->get('ya_pokupki_sprepaid'))
-						$payments[] = 'SHOP_PREPAID';
+					//if ($this->config->get('ya_pokupki_sprepaid'))
+						//$payments[] = 'SHOP_PREPAID';
 
 					if ($this->config->get('ya_pokupki_cash'))
 						$payments[] = 'CASH_ON_DELIVERY';

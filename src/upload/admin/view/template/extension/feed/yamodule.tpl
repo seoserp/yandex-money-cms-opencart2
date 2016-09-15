@@ -567,6 +567,12 @@
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="market_form form-horizontal">
 									<input type="hidden" value="market" name="type_data"/>
 									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_shopname"><?php echo $market_s_name; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_market_shopname" value="<?php echo $ya_market_shopname; ?>" id="ya_market_shopname" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
 										<label class="col-sm-4 control-label"><?php echo $market_prostoy; ?></label>
 										<div class="col-sm-8">
 											<label class="radio-inline">
@@ -575,148 +581,7 @@
 												<input type="radio" <?php echo (!$ya_market_prostoy ? ' checked="checked"' : ''); ?> name="ya_market_prostoy" value="0"/> <?php echo $active_off; ?></label>
 										</div>
 									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $market_out; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="1"/> <?php echo $market_out_all; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="0"/> <?php echo $market_out_sel; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $market_dostup; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_set_available == 1 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="1"/> <?php echo $market_dostup_1; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_set_available == 2 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="2"/> <?php echo $market_dostup_2; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_set_available == 3 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="3"/> <?php echo $market_dostup_3; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_set_available == 4 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="4"/> <?php echo $market_dostup_4; ?></label>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_shopname"><?php echo $market_s_name; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_shopname" value="<?php echo $ya_market_shopname; ?>" id="ya_market_shopname" class="form-control"/>
-										</div>
-									</div>
-									<!-- -->
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
-												   id="ya_market_localcoast" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
-												   id="ya_market_localdays" class="form-control"/>
-										</div>
-									</div>
-									<!--
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php //echo $market_d_stocks; ?></label>
-										<div class="col-sm-8">
-											<table>
-												<tr>
-													<th>Статус</th>
-													<th>Срок доставки</th>
-													<th>Стоимость доставки </th>
-												</tr>
-												<?php
-												//TODO Дописать выгрузку статусов stock_status
-												?>
-												<tr>
-													<td>
-														<?php echo ""; ?> Статус 1
-													</td>
-													<td>
-														<input type="text" name="ya_market_stock_days_1" value="" class="form-control"/>
-													</td>
-													<td>
-														<input type="text" name="ya_market_stock_cost_1" value="" class="form-control"/>
-													</td>
-												</tr>
-												<?php
-												//TODO Дописать выгрузку статусов stock_status
-												?>
-											</table>
-										</div>
-									</div>
-									 -->
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $market_color_option; ?></label>
-										<div class="col-sm-8">
-											<div class="scrollbox" style="height: 100px; overflow-x: auto; width: 100%;">
-												<?php $class = 'odd'; ?>
-												<?php foreach ($options as $option) { ?>
-												<?php $class = ($class == 'even' ? 'odd' : 'even'); ?>
-												<div class="<?php echo $class; ?>">
-													<?php if (in_array($option['option_id'], $ya_market_color_options)) { ?>
-													<input type="checkbox" name="ya_market_color_options[]" value="<?php echo $option['option_id']; ?>" checked="checked" />
-													<?php echo $option['name']; ?>
-													<?php } else { ?>
-													<input type="checkbox" name="ya_market_color_options[]" value="<?php echo $option['option_id']; ?>" />
-													<?php echo $option['name']; ?>
-													<?php } ?>
-												</div>
-												<?php } ?>
-											</div>
-											<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $market_size_option; ?><br/><?php echo $market_size_unit; ?></label>
-										<div class="col-sm-8">
-											<div class="scrollbox" style="height: 160px; overflow-x: auto; width: 100%;">
-												<?php $class = 'odd'; ?>
-												<?php foreach ($options as $option) { ?>
-												<?php $class = ($class == 'even' ? 'odd' : 'even'); ?>
-												<div class="<?php echo $class; ?>">
-													<?php if (in_array($option['option_id'], $ya_market_size_options)) { ?>
-													<input type="checkbox" name="ya_market_size_options[]" value="<?php echo $option['option_id']; ?>" checked="checked" />
-													<?php echo $option['name']; ?>
-													<?php } else { ?>
-													<input type="checkbox" name="ya_market_size_options[]" value="<?php echo $option['option_id']; ?>" />
-													<?php echo $option['name']; ?>
-													<?php } ?>
-												</div>
-												<?php } ?>
-											</div>
-											<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="control-label col-sm-4"><?php echo $market_cat; ?></label>
-										<div class="col-sm-8">
-											<div class="panel panel-default">
-												<div class="tree-panel-heading tree-panel-heading-controls clearfix">
-													<div class="tree-actions pull-right">
-														<a onclick="hidecatall($('#categoryBox')); return false;" id="collapse-all-categoryBox" class="btn btn-default">
-															<i class="icon-collapse-alt"></i><?php echo $market_sv_all; ?>
-														</a>
-														<a onclick="showcatall($('#categoryBox')); return false;" id="expand-all-categoryBox" class="btn btn-default">
-															<i class="icon-expand-alt"></i><?php echo $market_rv_all; ?>
-														</a>
-														<a onclick="checkAllAssociatedCategories($('#categoryBox')); return false;" id="check-all-categoryBox" class="btn btn-default">
-															<i class="icon-check-sign"></i><?php echo $market_ch_all; ?>
-														</a>
-														<a onclick="uncheckAllAssociatedCategories($('#categoryBox')); return false;" id="uncheck-all-categoryBox" class="btn btn-default">
-															<i class="icon-check-empty"></i><?php echo $market_unch_all; ?>
-														</a>
-													</div>
-												</div>		
-												<ul id="categoryBox" class="tree">
-													<?php echo $market_cat_tree; ?>
-												</ul>
-											</div>
-										</div>
-									</div>
+
 									<div class="form-group">
 										<label class="control-label col-sm-4"><?php echo $market_set; ?></label>
 										<div class="col-sm-8">
@@ -746,6 +611,143 @@
 											</div>
 										</div>
 									</div>
+
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $market_dostup; ?></label>
+										<div class="col-sm-8">
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_set_available == 1 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="1"/> <?php echo $market_dostup_1; ?></label>
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_set_available == 2 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="2"/> <?php echo $market_dostup_2; ?></label>
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_set_available == 3 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="3"/> <?php echo $market_dostup_3; ?></label>
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_set_available == 4 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="4"/> <?php echo $market_dostup_4; ?></label>
+										</div>
+									</div>
+
+									<!-- -->
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
+												   id="ya_market_localcoast" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
+												   id="ya_market_localdays" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php //echo $market_d_stocks; ?></label>
+										<div class="col-sm-8">
+											<table class="table">
+												<tr>
+													<th>Статус товара на складе</th>
+													<th>Срок доставки</th>
+													<th>Стоимость доставки </th>
+												</tr>
+												<?php
+												foreach ($stockstatuses as $stock) {?>
+													<tr>
+														<td>
+															<?php echo $stock['name']; ?>
+														</td>
+														<td>
+															<input type="text" name="ya_market_stock_days[<?php echo $stock['id']; ?>]" value="<?php echo $ya_market_stock_days[$stock['id']]; ?>" class="form-control"/>
+														</td>
+														<td>
+															<input type="text" name="ya_market_stock_cost[<?php echo $stock['id']; ?>]" value="<?php echo $ya_market_stock_cost[$stock['id']]; ?>" class="form-control"/>
+														</td>
+													</tr>
+												<?php } ?>
+											</table>
+										</div>
+									</div>
+									<!-- -->
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $market_color_option; ?></label>
+										<div class="col-sm-8">
+											<div class="scrollbox" style="height: 100px; overflow-x: auto; width: 100%;">
+												<?php $class = 'odd'; ?>
+												<?php foreach ($options as $option) { ?>
+													<?php $class = ($class == 'even' ? 'odd' : 'even'); ?>
+													<div class="<?php echo $class; ?>">
+														<?php if (in_array($option['option_id'], $ya_market_color_options)) { ?>
+															<input type="checkbox" name="ya_market_color_options[]" value="<?php echo $option['option_id']; ?>" checked="checked" />
+															<?php echo $option['name']; ?>
+														<?php } else { ?>
+															<input type="checkbox" name="ya_market_color_options[]" value="<?php echo $option['option_id']; ?>" />
+															<?php echo $option['name']; ?>
+														<?php } ?>
+													</div>
+												<?php } ?>
+											</div>
+											<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $market_size_option; ?><br/><?php echo $market_size_unit; ?></label>
+										<div class="col-sm-8">
+											<div class="scrollbox" style="height: 160px; overflow-x: auto; width: 100%;">
+												<?php $class = 'odd'; ?>
+												<?php foreach ($options as $option) { ?>
+													<?php $class = ($class == 'even' ? 'odd' : 'even'); ?>
+													<div class="<?php echo $class; ?>">
+														<?php if (in_array($option['option_id'], $ya_market_size_options)) { ?>
+															<input type="checkbox" name="ya_market_size_options[]" value="<?php echo $option['option_id']; ?>" checked="checked" />
+															<?php echo $option['name']; ?>
+														<?php } else { ?>
+															<input type="checkbox" name="ya_market_size_options[]" value="<?php echo $option['option_id']; ?>" />
+															<?php echo $option['name']; ?>
+														<?php } ?>
+													</div>
+												<?php } ?>
+											</div>
+											<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
+										</div>
+									</div>
+									<!---->
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $market_out; ?></label>
+										<div class="col-sm-8">
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="1"/> <?php echo $market_out_all; ?></label>
+											<label class="radio-inline">
+												<input type="radio" <?php echo (!$ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="0"/> <?php echo $market_out_sel; ?></label>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-sm-4"><?php echo $market_cat; ?></label>
+										<div class="col-sm-8">
+											<div class="panel panel-default">
+												<div class="tree-panel-heading tree-panel-heading-controls clearfix">
+													<div class="tree-actions pull-right">
+														<a onclick="hidecatall($('#categoryBox')); return false;" id="collapse-all-categoryBox" class="btn btn-default">
+															<i class="icon-collapse-alt"></i><?php echo $market_sv_all; ?>
+														</a>
+														<a onclick="showcatall($('#categoryBox')); return false;" id="expand-all-categoryBox" class="btn btn-default">
+															<i class="icon-expand-alt"></i><?php echo $market_rv_all; ?>
+														</a>
+														<a onclick="checkAllAssociatedCategories($('#categoryBox')); return false;" id="check-all-categoryBox" class="btn btn-default">
+															<i class="icon-check-sign"></i><?php echo $market_ch_all; ?>
+														</a>
+														<a onclick="uncheckAllAssociatedCategories($('#categoryBox')); return false;" id="uncheck-all-categoryBox" class="btn btn-default">
+															<i class="icon-check-empty"></i><?php echo $market_unch_all; ?>
+														</a>
+													</div>
+												</div>		
+												<ul id="categoryBox" class="tree">
+													<?php echo $market_cat_tree; ?>
+												</ul>
+											</div>
+										</div>
+									</div>
+
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_market_dynamic"><?php echo $market_lnk_yml; ?></label>
 										<div class="col-sm-8">
@@ -769,16 +771,12 @@
 								<?php echo $text_license; ?><br>
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="pokupki_form form-horizontal">
 									<input type="hidden" value="pokupki" name="type_data"/>
+									<input type="hidden" name="ya_pokupki_yapi" value="https://api.partner.market.yandex.ru/v2/" id="ya_pokupki_yapi"/>
+
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_pokupki_stoken"><?php echo $pokupki_stoken; ?></label>
 										<div class="col-sm-8">
 											<input type="text" name="ya_pokupki_stoken" value="<?php echo $ya_pokupki_stoken; ?>" id="ya_pokupki_stoken" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_yapi"><?php echo $pokupki_yapi; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_yapi" value="https://api.partner.market.yandex.ru/v2/" id="ya_pokupki_yapi" disabled="disabled" class="form-control disable"/>
 										</div>
 									</div>
 									<div class="form-group">
@@ -800,12 +798,9 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
+										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
-											<p class="help-block">
-												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
-											</p>
+											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
 										</div>
 									</div>
 									<div class="form-group">
@@ -826,9 +821,9 @@
 											<div class="checkbox">
 												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
 											</div>
-											<div class="checkbox">
+											<!--<div class="checkbox">
 												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
-											</div>
+											</div>-->
 											<div class="checkbox">
 												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
 											</div>
@@ -861,13 +856,17 @@
 											</div>
 										</div>
 									</div>
-									<!-- -->
+
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
+										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
+											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
+											<p class="help-block">
+												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
+											</p>
 										</div>
 									</div>
+									<!-- -->
 									<?php echo $data_carrier ?>
 								</form>
 							</div>

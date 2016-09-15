@@ -63,6 +63,8 @@ class ControllerExtensionFeedYamodule extends Controller {
 		'ya_market_shopname',
 		'ya_market_localcoast',
 		'ya_market_localdays',
+        'ya_market_stock_days',
+        'ya_market_stock_cost',
 		'ya_market_available',
 		'ya_market_combination',
 		'ya_market_features',
@@ -416,18 +418,18 @@ class ControllerExtensionFeedYamodule extends Controller {
 
 	public function carrierList()
 	{
-		$types = array('POST', 'PICKUP', 'DELIVERY');
+		$types = array('POST' => "Доставка почтой", 'PICKUP' => "Самовывоз", 'DELIVERY' => "Доставка курьером");
 		$this->load->model('extension/extension');
 		$extensions = $this->model_extension_extension->getInstalled('shipping');
 		foreach ($extensions as $key => $value) {
-			if (!file_exists(DIR_APPLICATION . 'controller/shipping/' . $value . '.php')) {
+			if (!file_exists(DIR_APPLICATION . 'controller/extension/shipping/' . $value . '.php')) {
 				$this->model_extension_extension->uninstall('shipping', $value);
 
 				unset($extensions[$key]);
 			}
 		}
 		$data['extensions'] = array();
-		$files = glob(DIR_APPLICATION . 'controller/shipping/*.php');
+		$files = glob(DIR_APPLICATION . 'controller/extension/shipping/*.php');
 		if ($files)
 		{
 			foreach ($files as $file)
@@ -435,7 +437,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 				$extension = basename($file, '.php');
 				if (in_array($extension, $extensions))
 				{
-					$this->load->language('shipping/' . $extension);
+					$this->load->language('extension/shipping/' . $extension);
 					$data['extensions'][] = array(
 						'name'       => $this->language->get('heading_title'),
 						'sort_order' => $this->config->get($extension . '_sort_order'),
@@ -453,8 +455,8 @@ class ControllerExtensionFeedYamodule extends Controller {
 							<label class="col-sm-4 control-label" for="ya_pokupki_carrier">'.$row['name'].'</label>
 							<div class="col-sm-8">
 								<select name="ya_pokupki_carrier['.$row['ext'].']" id="ya_pokupki carrier" class="form-control">';
-									foreach ($types as $t)
-										$html .= '<option value="'.$t.'" '.((isset($save_data[$row['ext']]) && $save_data[$row['ext']] == $t) ? 'selected="selected"' : '').'>'.$t.'</option>';
+									foreach ($types as $t => $t_name)
+										$html .= '<option value="'.$t.'" '.((isset($save_data[$row['ext']]) && $save_data[$row['ext']] == $t) ? 'selected="selected"' : '').'>'.$t_name.'</option>';
 							$html .= '</select>
 							</div>
 						</div>';
@@ -534,6 +536,8 @@ class ControllerExtensionFeedYamodule extends Controller {
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
+        $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
+        $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
 
 		//MWS
 		$data['mws_global_error']= array();
@@ -548,8 +552,15 @@ class ControllerExtensionFeedYamodule extends Controller {
 		$data['mws_orgname'] = HTTP_CATALOG;
 		$data['mws_cn'] = '/business/oc2/yacms-'.$this->Sget('ya_kassa_sid');
 		$data['mws_email'] = $this->Sget('config_email');
-		
 
+        $this->load->model('localisation/stock_status');
+        $stock_results = $this->model_localisation_stock_status->getStockStatuses();
+        foreach ($stock_results as $result) {
+            $data['stockstatuses'][] = array(
+                'id' => $result['stock_status_id'],
+                'name' => $result['name']
+            );
+        }
 		//
 		$data['token'] = $this->session->data['token'];
 		
@@ -687,7 +698,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 			'ya_market_delivery' => 1,
 			'ya_market_pickup' => 1,
 			'ya_pokupki_yandex' => 1,
-			'ya_pokupki_sprepaid' => 1,
+			'ya_pokupki_sprepaid' => 0,
 			'ya_pokupki_cash' => 1,
 			'ya_pokupki_bank' => 1,
 			'ya_pokupki_status_pickup' => 16, //
