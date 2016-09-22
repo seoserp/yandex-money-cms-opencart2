@@ -625,24 +625,34 @@
 												<input type="radio" <?php echo ($ya_market_set_available == 4 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="4"/> <?php echo $market_dostup_4; ?></label>
 										</div>
 									</div>
-
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="">Товар в наличии</label>
+										<div class="col-sm-8">
+											<table class="table">
+												<tr>
+													<div class="form-group">
+														<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
+														<div class="col-sm-8">
+															<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
+																   id="ya_market_localcoast" class="form-control"/>
+														</div>
+													</div>
+												</tr>
+												<tr>
+													<div class="form-group">
+														<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
+														<div class="col-sm-8">
+															<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
+																   id="ya_market_localdays" class="form-control"/>
+														</div>
+													</div>
+												</tr>
+											</table>
+										</div>
+									</div>
 									<!-- -->
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
-												   id="ya_market_localcoast" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
-												   id="ya_market_localdays" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php //echo $market_d_stocks; ?></label>
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo "Товара нет в наличии"; ?></label>
 										<div class="col-sm-8">
 											<table class="table">
 												<tr>
