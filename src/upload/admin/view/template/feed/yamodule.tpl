@@ -675,12 +675,6 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>" id="ya_market_localcoast" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
 										<label class="col-sm-4 control-label"><?php echo $market_color_option; ?></label>
 										<div class="col-sm-8">
 											<div class="scrollbox" style="height: 100px; overflow-x: auto; width: 100%;">
