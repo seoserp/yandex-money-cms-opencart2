@@ -14,14 +14,21 @@ class ControllerFeedYamarket extends Controller {
 
 		$categories = $this->model_yamodel_yamarket->getCategories();
 		$allow_cat_array = $this->config->get('ya_market_categories');
-		$ids_cat = implode(',', $allow_cat_array);
-		if($this->config->get('ya_market_catall')) $ids_cat = '';
+        if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
+            $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
+        } else {
+            throw new Exception("Need select categories");
+        }
 		$products = $this->model_yamodel_yamarket->getProducts($ids_cat, true);
 		$currencies = $this->model_localisation_currency->getCurrencies();
+        $shop_currency = $this->config->get('config_currency');
 		$offers_currency = 'RUB';
 		$currency_default = $this->model_yamodel_yamarket->getCurrencyByISO($offers_currency);
+        if (!isset($currency_default['value'])) throw new Exception("Not exist RUB");
+
 		$decimal_place = $this->currency->getDecimalPlace($offers_currency);
-		$shop_currency = $this->config->get('config_currency');
+        if (empty($decimal_place) || $decimal_place==0) throw new Exception("Need set decimal places for RUB");
+
 		$currencies = array_intersect_key($currencies, array_flip(array('RUR', 'RUB', 'USD', 'EUR', 'UAH')));
 		$yamarket = new YandexMarket($this->config);
 		$yamarket->yml('utf-8');
@@ -79,11 +86,23 @@ class ControllerFeedYamarket extends Controller {
 			$data['categoryId'] = $product['category_id'];
 			$data['vendor'] = $product['manufacturer'];
 			$data['vendorCode'] = $product['model'];
+
+            //TODO Добавить зависимость delivery, pickup, store от кол-ва товара на складе
 			$data['delivery'] = ($this->config->get('ya_market_delivery') ? 'true' : 'false');
 			$data['pickup'] = ($this->config->get('ya_market_pickup') ? 'true' : 'false');
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
-			//TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
+
+            if($product['quantity'] < 1){
+                $stock_id = $product['stock_status_id'];
+                $delivery_cost = $this->config->get('ya_market_stock_cost');
+                $delivery_days = $this->config->get('ya_market_stock_days');
+                $data['delivery-options'][] = array(
+                    'cost' => $delivery_cost[$stock_id],
+                    'days' => $delivery_days[$stock_id]
+                );
+            }
+            //TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
 				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
 			$data['picture'] = array();
@@ -210,6 +229,7 @@ class ControllerFeedYamarket extends Controller {
 					if (isset($data_temp['oldprice']))
 						$data_temp['oldprice'] = number_format($this->currency->convert($this->tax->calculate($data_temp['oldprice'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 					if ($data['price'] > 0) {
+                        $data_temp['group_id'] = $product['product_id'];
 						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available']);
 					}
 					unset($data_temp);
@@ -219,6 +239,7 @@ class ControllerFeedYamarket extends Controller {
 			{
 				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 				if ($data['price'] > 0) {
+                    $data['group_id'] = $product['product_id'];
 					$object->add_offer($data['id'], $data, $data['available']);
 				}
 			}
@@ -271,20 +292,24 @@ class YandexMarket{
 			{
 				foreach ($val as $v){
 					$s .= '<'.$tag.'>'.$v.'</'.$tag.'>';
-					$s .= "\r\n";
+					$s .= PHP_EOL;
 				}
 			}
 			elseif($tag == 'param')
 			{
 				foreach ($val as $v){
 					$s .= '<param name="'.$this->prepare_field($v['name']).'">'.$this->prepare_field($v['value']).'</param>';
-					$s .= "\r\n";
+					$s .= PHP_EOL;
 				}
-			}
-			else
-			{
+            }elseif($tag == 'delivery-options'){
+                foreach ($val as $v){
+                    $s .= '<delivery-options>'.PHP_EOL.
+                        '<option cost="'.$v['cost'].'" days="'.$v['days'].'"/>'.PHP_EOL.
+                        '</delivery-options>'.PHP_EOL;
+                }
+            }else{
 				$s .= '<'.$tag.'>'.$val.'</'.$tag.'>';
-				$s .= "\r\n";
+				$s .= PHP_EOL;
 			}
 		}
 
@@ -298,7 +323,7 @@ class YandexMarket{
 			$s .= $attrname . '="'.$attrval.'" ';
 
 		$s .= ($tagvalue!='') ? '>'.$tagvalue.'</'.$tagname.'>' : '/>';
-		$s .= "\r\n";
+		$s .= PHP_EOL;
 		return $s;
 	}
 
@@ -346,17 +371,23 @@ class YandexMarket{
 
 	function add_offer($id, $data, $available = true)
 	{
-		$allowed = array('url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery', 'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes', 'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin');
-		$param = array();
+        $allowed = array(
+            'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
+            'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
+            'delivery-options', 'group_id',
+            'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
+        );
+        $param = array();
 		// $data['model'] = $data['id'].'_tovar';
 		// $data['vendor'] = $data['id'].'_tovar';
 		if(isset($data['param']))
 			$param = $data['param'];
 		foreach($data as $k => $v)
 		{
-			if (!in_array($k, $allowed)) unset($data[$k]);
-			if(!in_array($k, array('picture','param','rec','description')))	$data[$k] = strip_tags($this->prepare_field($v));
-			if ($k=='description') {
+			if(!in_array($k, $allowed)) unset($data[$k]);
+            if(!in_array($k, array('picture','param','rec','description','delivery-options')))
+                $data[$k] = strip_tags($this->prepare_field($v));
+            if ($k=='description') {
 				$data[$k] = preg_replace('|<[/]?[^>]+?>|', '', trim(html_entity_decode ($v)));
 				$data[$k] = preg_replace("/&#?[a-z0-9]+;/i", '', $data[$k]);
 				if (strlen($data[$k])>175) {
@@ -386,32 +417,39 @@ class YandexMarket{
 
 	function get_xml_shop()
 	{
-		$s = '<shop>' . "\r\n";
+		$s = '<shop>' . PHP_EOL;
 		$s .= $this->convert_array_to_tag($this->shop);
-		$s .= '<currencies>' . "\r\n";
+		$s .= '<currencies>' . PHP_EOL;
 		foreach($this->currencies as $currency)
 			$s .= $this->convert_array_to_attr($currency, 'currency');
 
-		$s .= '</currencies>' . "\r\n";
-		$s .= '<categories>' . "\r\n";
+		$s .= '</currencies>' . PHP_EOL;
+		$s .= '<categories>' . PHP_EOL;
 		foreach($this->categories as $category)
 		{
 			$category_name = $category['name'];
 			unset($category['name']);
 			$s .= $this->convert_array_to_attr($category, 'category', $category_name);
 		}
-		$s .= '</categories>' . "\r\n";
+        $s .= '</categories>' . PHP_EOL;
 
-		if($this->config->get('ya_market_homecarrier')) $s .= '<local_delivery_cost>'.$this->config->get('ya_market_localcoast').'</local_delivery_cost>' . "\r\n"; //TODO Доработать на основании https://yandex.ru/support/partnermarket/elements/delivery-options.xml
+        $localShippingCost = explode (';', $this->config->get('ya_market_localcoast'));
+        $localShippingDays = explode (';', $this->config->get('ya_market_localdays'));
+        if (count($localShippingCost) != count ($localShippingDays)) throw new Exception("'Стоимость доставки в домашнем регионе' и/или 'Срок доставки в домашнем регионе' заполнены с ошибкой");
+        $s .= '<delivery-options>'. PHP_EOL;
+        foreach ($localShippingCost as $key=>$value){
+            $s .= '<option cost="'.$value.'" days="'.$localShippingDays[$key].'"/>'. PHP_EOL;
+        }
+        $s .=  '</delivery-options>' . PHP_EOL;
 
-		$s .= '<offers>' . "\r\n";
+        $s .= '<offers>' . PHP_EOL;
 		foreach($this->offers as $offer)
 		{
 			$data = $offer['data'];
 			unset($offer['data']);
 			$s .= $this->convert_array_to_attr($offer, 'offer', $this->convert_array_to_tag($data));
 		}
-		$s .= '</offers>' . "\r\n";
+		$s .= '</offers>' . PHP_EOL;
 		$s .= '</shop>';
 		return $s;
 	}

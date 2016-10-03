@@ -62,8 +62,11 @@ class ControllerFeedYamodule extends Controller {
 		'ya_market_set_available',
 		'ya_market_shopname',
 		'ya_market_localcoast',
+        'ya_market_localdays',
+        'ya_market_stock_days',
+        'ya_market_stock_cost',
 		'ya_market_available',
-		'ya_market_homecarrier',
+		//'ya_market_homecarrier',
 		'ya_market_combination',
 		'ya_market_features',
 		'ya_market_dimensions',
@@ -124,6 +127,8 @@ class ControllerFeedYamodule extends Controller {
 			$data['market_status'][] = $this->errors_alert('Не введено название магазина');
 		if ($this->config->get('ya_market_localcoast') == '')
 			$data['market_status'][] = $this->errors_alert('Введите стоимость доставки в домашнем регионе');
+        if ($this->config->get('ya_market_localdays') == '')
+            $data['market_status'][] = $this->errors_alert('Введите срок доставки в домашнем регионе');
 
 		if ($this->config->get('ya_metrika_number') == '')
 			$data['metrika_status'][] = $this->errors_alert('Не заполнен номер счётчика');
@@ -414,7 +419,7 @@ class ControllerFeedYamodule extends Controller {
 
 	public function carrierList()
 	{
-		$types = array('POST', 'PICKUP', 'DELIVERY');
+        $types = array('POST' => "Доставка почтой", 'PICKUP' => "Самовывоз", 'DELIVERY' => "Доставка курьером");
 		$this->load->model('extension/extension');
 		$extensions = $this->model_extension_extension->getInstalled('shipping');
 		foreach ($extensions as $key => $value) {
@@ -451,8 +456,8 @@ class ControllerFeedYamodule extends Controller {
 							<label class="col-sm-4 control-label" for="ya_pokupki_carrier">'.$row['name'].'</label>
 							<div class="col-sm-8">
 								<select name="ya_pokupki_carrier['.$row['ext'].']" id="ya_pokupki carrier" class="form-control">';
-									foreach ($types as $t)
-										$html .= '<option value="'.$t.'" '.((isset($save_data[$row['ext']]) && $save_data[$row['ext']] == $t) ? 'selected="selected"' : '').'>'.$t.'</option>';
+                            foreach ($types as $t => $t_name)
+                                $html .= '<option value="'.$t.'" '.((isset($save_data[$row['ext']]) && $save_data[$row['ext']] == $t) ? 'selected="selected"' : '').'>'.$t_name.'</option>';
 							$html .= '</select>
 							</div>
 						</div>';
@@ -517,6 +522,7 @@ class ControllerFeedYamodule extends Controller {
 			'kassa_text_inv_text', 'kassa_text_inv_texthelp','kassa_text_inv_pattern',
 			'p2p_text_connect','p2p_text_enable','p2p_text_url_help','p2p_text_setting_head','p2p_text_account','p2p_text_appId','p2p_text_appWord','p2p_text_app_help',
 			'p2p_text_extra_head','p2p_text_debug',	'p2p_text_off',	'p2p_text_on','p2p_text_debug_help','p2p_text_status',
+
 			'metrika_gtoken','metrika_number','metrika_idapp','metrika_o2auth','metrika_pw','metrika_uname','metrika_upw','metrika_set','metrika_celi','metrika_callback',
 			'metrika_sv','metrika_set_1','metrika_set_2','metrika_set_3','metrika_set_4','metrika_set_5','celi_cart','celi_order',
 			'pokupki_gtoken','pokupki_stoken','pokupki_yapi','pokupki_number','pokupki_login','pokupki_pw','pokupki_idapp','pokupki_token',
@@ -524,7 +530,7 @@ class ControllerFeedYamodule extends Controller {
 			'pokupki_callback','market_color_option','market_size_option','market_size_unit','text_select_all','text_unselect_all','text_no','market_set',
 			'market_set_1','market_set_2','market_set_3','market_set_4','market_set_5','market_set_6','market_set_7','market_set_8','market_set_9','market_lnk_yml',
 			'market_cat','market_out','market_out_sel','market_out_all','market_dostup','market_dostup_1','market_dostup_2','market_dostup_3','market_dostup_4',
-			'market_s_name','market_d_cost','market_sv_all','market_rv_all','market_ch_all','market_unch_all','market_prostoy','market_sv','market_gen','p2p_os',
+            'market_s_name','market_d_cost','market_d_days','market_sv_all','market_rv_all','market_ch_all','market_unch_all','market_prostoy','market_sv','market_gen','p2p_os',
 			'p2p_sv','p2p_number','p2p_idapp','p2p_pw','p2p_linkapp','lbl_mws_main','txt_mws_main','lbl_mws_alert','lbl_mws_cn','lbl_mws_orgname','lbl_mws_email',
 			'lbl_mws_connect','lbl_mws_crt','lbl_mws_doc','txt_mws_doc','txt_mws_cer','tab_mws_before','tab_row_sign','tab_row_cause','tab_row_primary','btn_mws_gen',
 			'btn_mws_csr','btn_mws_doc','btn_mws_crt','btn_mws_crt_load','ya_version','text_license','market','kassa','metrika','pokupki','p2p','active','active_on',
@@ -532,7 +538,8 @@ class ControllerFeedYamodule extends Controller {
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
-
+        $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
+        $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
 		//MWS
 		$data['mws_global_error']= array();
 		if (!extension_loaded ('openssl')) $data['mws_global_error'][]= $this->language->get('ext_mws_openssl');
@@ -546,8 +553,15 @@ class ControllerFeedYamodule extends Controller {
 		$data['mws_orgname'] = HTTP_CATALOG;
 		$data['mws_cn'] = '/business/oc2/yacms-'.$this->Sget('ya_kassa_sid');
 		$data['mws_email'] = $this->Sget('config_email');
-		
 
+        $this->load->model('localisation/stock_status');
+        $stock_results = $this->model_localisation_stock_status->getStockStatuses();
+        foreach ($stock_results as $result) {
+            $data['stockstatuses'][] = array(
+                'id' => $result['stock_status_id'],
+                'name' => $result['name']
+            );
+        }
 		//
 		$data['token'] = $this->session->data['token'];
 		
@@ -677,7 +691,7 @@ class ControllerFeedYamodule extends Controller {
 			'ya_market_prostoy' => 0,
 			'ya_market_set_available' => 2,
 			'ya_market_available' => 1,
-			'ya_market_homecarrier' => 1,
+			//'ya_market_homecarrier' => 1,
 			'ya_market_combination' => 1,
 			'ya_market_features' => 1,
 			'ya_market_dimensions' => 1,
@@ -686,7 +700,7 @@ class ControllerFeedYamodule extends Controller {
 			'ya_market_delivery' => 1,
 			'ya_market_pickup' => 1,
 			'ya_pokupki_yandex' => 1,
-			'ya_pokupki_sprepaid' => 1,
+			'ya_pokupki_sprepaid' => 0,
 			'ya_pokupki_cash' => 1,
 			'ya_pokupki_bank' => 1,
 			'ya_pokupki_status_pickup' => 16, //

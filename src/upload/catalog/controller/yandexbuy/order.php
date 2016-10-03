@@ -35,7 +35,7 @@ class ControllerYandexbuyOrder extends Controller
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.0 403 Forbidden');
 			echo '<h1>Wrong token</h1>';
 			exit;
 		}
@@ -284,7 +284,7 @@ class ControllerYandexbuyOrder extends Controller
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
-			header('HTTP/1.0 404 Not Found');
+			header('HTTP/1.0 403 Forbidden');
 			echo '<h1>Wrong token</h1>';
 			$this->log_save('Yandex.Market CPA: Wrong auth-token in setting module.');
 			exit;

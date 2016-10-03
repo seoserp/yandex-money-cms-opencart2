@@ -94,17 +94,17 @@
 											<div class="form-group">
 												<label for="ya_kassa_sid" class="col-sm-3 control-label">Shop ID</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_sid" value="<?php echo $ya_kassa_sid; ?>" id="ya_kassa_sid" class="form-control">
+													<input name="ya_kassa_sid" value="<?php echo trim($ya_kassa_sid); ?>" id="ya_kassa_sid" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_sid; ?></p>
 												</div>
 												<label for="ya_kassa_scid" class="col-sm-3 control-label">scid</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_scid" value="<?php echo $ya_kassa_scid; ?>" id="ya_kassa_scid" class="form-control">
+													<input name="ya_kassa_scid" value="<?php echo trim($ya_kassa_scid); ?>" id="ya_kassa_scid" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_scid; ?></p>
 												</div>
 												<label for="ya_kassa_pw" class="col-sm-3 control-label">ShopPassword</label>
 												<div class="col-sm-9">
-													<input name="ya_kassa_pw" value="<?php echo $ya_kassa_pw; ?>" id="ya_kassa_pw" class="form-control">
+													<input name="ya_kassa_pw" value="<?php echo trim($ya_kassa_pw); ?>" id="ya_kassa_pw" class="form-control">
 													<p class="help-block"><?php echo $kassa_text_pw; ?></p>
 												</div>
 											</div>
@@ -394,20 +394,20 @@
 												<div class="form-group">
 													<label for="ya_p2p_number" class="col-sm-3 control-label"><?php echo $p2p_text_account; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_number" value="<?php echo $ya_p2p_number; ?>" id="ya_p2p_number" class="form-control">
+														<input name="ya_p2p_number" value="<?php echo trim($ya_p2p_number); ?>" id="ya_p2p_number" class="form-control">
 													</div>
 												</div>
 												<div class="form-group">
 													<label for="ya_p2p_idapp" class="col-sm-3 control-label"><?php echo $p2p_text_appId; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_idapp" value="<?php echo $ya_p2p_idapp; ?>" id="ya_p2p_idapp" class="form-control">
+														<input name="ya_p2p_idapp" value="<?php echo trim($ya_p2p_idapp); ?>" id="ya_p2p_idapp" class="form-control">
 													</div>
 												</div>
 												<div class="form-group">
 													<div class="col-sm-12"></div>
 													<label for="ya_p2p_pw" class="col-sm-3 control-label"><?php echo $p2p_text_appWord; ?></label>
 													<div class="col-sm-9">
-														<input name="ya_p2p_pw" value="<?php echo $ya_p2p_pw; ?>" id="ya_p2p_pw" class="form-control">
+														<input name="ya_p2p_pw" value="<?php echo trim($ya_p2p_pw); ?>" id="ya_p2p_pw" class="form-control">
 													</div>
 													<div class="col-sm-9 col-sm-offset-3">
 														<?php echo $p2p_text_app_help; ?>
@@ -576,6 +576,38 @@
 										</div>
 									</div>
 									<div class="form-group">
+										<label class="control-label col-sm-4"><?php echo $market_set; ?></label>
+										<div class="col-sm-8">
+											<div class="checkbox">
+												<label for="ya_market_available"><input type="checkbox" <?php echo ($ya_market_available? ' checked="checked"' : ''); ?> name="ya_market_available" id="ya_market_available" class="" value="1"/> <?php echo $market_set_1; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_homecarrier"><input type="checkbox" <?php echo ($ya_market_homecarrier ? ' checked="checked"' : ''); ?> name="ya_market_homecarrier" id="ya_market_homecarrier" class="" value="1"/> <?php echo $market_set_2; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_combination"><input type="checkbox" <?php echo ($ya_market_combination ? ' checked="checked"' : ''); ?> name="ya_market_combination" id="ya_market_combination" class="" value="1"/> <?php echo $market_set_3; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_features"><input type="checkbox" <?php echo ($ya_market_features ? ' checked="checked"' : ''); ?> name="ya_market_features" id="ya_market_features" class="" value="1"/> <?php echo $market_set_4; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_dimensions"><input type="checkbox" <?php echo ($ya_market_dimensions ? ' checked="checked"' : ''); ?> name="ya_market_dimensions" id="ya_market_dimensions" class="" value="1"/> <?php echo $market_set_5; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_allcurrencies"><input type="checkbox" <?php echo ($ya_market_allcurrencies ? ' checked="checked"' : ''); ?> name="ya_market_allcurrencies" id="ya_market_allcurrencies" class="" value="1"/> <?php echo $market_set_6; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_store"><input type="checkbox" <?php echo ($ya_market_store ? ' checked="checked"' : ''); ?> name="ya_market_store" id="ya_market_store" class="" value="1"/> <?php echo $market_set_7; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_delivery"><input type="checkbox" <?php echo ($ya_market_delivery ? ' checked="checked"' : ''); ?> name="ya_market_delivery" id="ya_market_delivery" class="" value="1"/> <?php echo $market_set_8; ?></label>
+											</div>
+											<div class="checkbox">
+												<label for="ya_market_pickup"><input type="checkbox" <?php echo ($ya_market_pickup ? ' checked="checked"' : ''); ?> name="ya_market_pickup" id="ya_market_pickup" class="" value="1"/> <?php echo $market_set_9; ?></label>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
 										<label class="col-sm-4 control-label"><?php echo $market_out; ?></label>
 										<div class="col-sm-8">
 											<label class="radio-inline">
@@ -595,6 +627,57 @@
 												<input type="radio" <?php echo ($ya_market_set_available == 3 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="3"/> <?php echo $market_dostup_3; ?></label>
 											<label class="radio-inline">
 												<input type="radio" <?php echo ($ya_market_set_available == 4 ? ' checked="checked"' : ''); ?> name="ya_market_set_available" value="4"/> <?php echo $market_dostup_4; ?></label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="">Товар в наличии</label>
+										<div class="col-sm-8">
+											<table class="table">
+												<tr>
+													<div class="form-group">
+														<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
+														<div class="col-sm-8">
+															<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>"
+																   id="ya_market_localcoast" class="form-control"/>
+														</div>
+													</div>
+												</tr>
+												<tr>
+													<div class="form-group">
+														<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo $market_d_days; ?></label>
+														<div class="col-sm-8">
+															<input type="text" name="ya_market_localdays" value="<?php echo $ya_market_localdays; ?>"
+																   id="ya_market_localdays" class="form-control"/>
+														</div>
+													</div>
+												</tr>
+											</table>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_localdays"><?php echo "Товара нет в наличии"; ?></label>
+										<div class="col-sm-8">
+											<table class="table">
+												<tr>
+													<th>Статус товара на складе</th>
+													<th>Срок доставки</th>
+													<th>Стоимость доставки </th>
+												</tr>
+												<?php
+												foreach ($stockstatuses as $stock) {?>
+													<tr>
+														<td>
+															<?php echo $stock['name']; ?>
+														</td>
+														<td>
+															<input type="text" name="ya_market_stock_days[<?php echo $stock['id']; ?>]" value="<?php echo $ya_market_stock_days[$stock['id']]; ?>" class="form-control"/>
+														</td>
+														<td>
+															<input type="text" name="ya_market_stock_cost[<?php echo $stock['id']; ?>]" value="<?php echo $ya_market_stock_cost[$stock['id']]; ?>" class="form-control"/>
+														</td>
+													</tr>
+												<?php } ?>
+											</table>
 										</div>
 									</div>
 									<div class="form-group">
@@ -677,38 +760,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="form-group">
-										<label class="control-label col-sm-4"><?php echo $market_set; ?></label>
-										<div class="col-sm-8">
-											<div class="checkbox">
-												<label for="ya_market_available"><input type="checkbox" <?php echo ($ya_market_available? ' checked="checked"' : ''); ?> name="ya_market_available" id="ya_market_available" class="" value="1"/> <?php echo $market_set_1; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_homecarrier"><input type="checkbox" <?php echo ($ya_market_homecarrier ? ' checked="checked"' : ''); ?> name="ya_market_homecarrier" id="ya_market_homecarrier" class="" value="1"/> <?php echo $market_set_2; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_combination"><input type="checkbox" <?php echo ($ya_market_combination ? ' checked="checked"' : ''); ?> name="ya_market_combination" id="ya_market_combination" class="" value="1"/> <?php echo $market_set_3; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_features"><input type="checkbox" <?php echo ($ya_market_features ? ' checked="checked"' : ''); ?> name="ya_market_features" id="ya_market_features" class="" value="1"/> <?php echo $market_set_4; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_dimensions"><input type="checkbox" <?php echo ($ya_market_dimensions ? ' checked="checked"' : ''); ?> name="ya_market_dimensions" id="ya_market_dimensions" class="" value="1"/> <?php echo $market_set_5; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_allcurrencies"><input type="checkbox" <?php echo ($ya_market_allcurrencies ? ' checked="checked"' : ''); ?> name="ya_market_allcurrencies" id="ya_market_allcurrencies" class="" value="1"/> <?php echo $market_set_6; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_store"><input type="checkbox" <?php echo ($ya_market_store ? ' checked="checked"' : ''); ?> name="ya_market_store" id="ya_market_store" class="" value="1"/> <?php echo $market_set_7; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_delivery"><input type="checkbox" <?php echo ($ya_market_delivery ? ' checked="checked"' : ''); ?> name="ya_market_delivery" id="ya_market_delivery" class="" value="1"/> <?php echo $market_set_8; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_pickup"><input type="checkbox" <?php echo ($ya_market_pickup ? ' checked="checked"' : ''); ?> name="ya_market_pickup" id="ya_market_pickup" class="" value="1"/> <?php echo $market_set_9; ?></label>
-											</div>
-										</div>
-									</div>
+
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_market_dynamic"><?php echo $market_lnk_yml; ?></label>
 										<div class="col-sm-8">
@@ -732,16 +784,11 @@
 								<?php echo $text_license; ?><br>
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="pokupki_form form-horizontal">
 									<input type="hidden" value="pokupki" name="type_data"/>
+									<input type="hidden" name="ya_pokupki_yapi" value="https://api.partner.market.yandex.ru/v2/" id="ya_pokupki_yapi"/>
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_pokupki_stoken"><?php echo $pokupki_stoken; ?></label>
 										<div class="col-sm-8">
 											<input type="text" name="ya_pokupki_stoken" value="<?php echo $ya_pokupki_stoken; ?>" id="ya_pokupki_stoken" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_yapi"><?php echo $pokupki_yapi; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_yapi" value="https://api.partner.market.yandex.ru/v2/" id="ya_pokupki_yapi" disabled="disabled" class="form-control disable"/>
 										</div>
 									</div>
 									<div class="form-group">
@@ -857,11 +904,16 @@ var total = 0;
 		}
 	}
 $('input[name=ya_kassa_inv]').bind('click', triggerInvoiceSetting);
-$('#mws_csr_gen').bind('click', function() {
+$('#mws_csr_gen').bind('click', function(e) {
 	if (confirm('<?php echo $lbl_mws_alert; ?>')) {
+		e.preventDefault();
+		e.stopPropagation();
 		$.ajax({
-				url: 'index.php?route=yamodule/mws/generate&token=<?php echo $token; ?>',
-				cache: false
+			url: 'index.php?route=yamodule/mws/generate&token=<?php echo $token; ?>',
+			cache: false,
+			success: function(json) {
+				location.reload();
+			}
 		});
 	}
 });
