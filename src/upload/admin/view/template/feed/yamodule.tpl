@@ -567,6 +567,12 @@
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="market_form form-horizontal">
 									<input type="hidden" value="market" name="type_data"/>
 									<div class="form-group">
+										<label class="col-sm-4 control-label" for="ya_market_shopname"><?php echo $market_s_name; ?></label>
+										<div class="col-sm-8">
+											<input type="text" name="ya_market_shopname" value="<?php echo $ya_market_shopname; ?>" id="ya_market_shopname" class="form-control"/>
+										</div>
+									</div>
+									<div class="form-group">
 										<label class="col-sm-4 control-label"><?php echo $market_prostoy; ?></label>
 										<div class="col-sm-8">
 											<label class="radio-inline">
@@ -580,9 +586,6 @@
 										<div class="col-sm-8">
 											<div class="checkbox">
 												<label for="ya_market_available"><input type="checkbox" <?php echo ($ya_market_available? ' checked="checked"' : ''); ?> name="ya_market_available" id="ya_market_available" class="" value="1"/> <?php echo $market_set_1; ?></label>
-											</div>
-											<div class="checkbox">
-												<label for="ya_market_homecarrier"><input type="checkbox" <?php echo ($ya_market_homecarrier ? ' checked="checked"' : ''); ?> name="ya_market_homecarrier" id="ya_market_homecarrier" class="" value="1"/> <?php echo $market_set_2; ?></label>
 											</div>
 											<div class="checkbox">
 												<label for="ya_market_combination"><input type="checkbox" <?php echo ($ya_market_combination ? ' checked="checked"' : ''); ?> name="ya_market_combination" id="ya_market_combination" class="" value="1"/> <?php echo $market_set_3; ?></label>
@@ -605,15 +608,6 @@
 											<div class="checkbox">
 												<label for="ya_market_pickup"><input type="checkbox" <?php echo ($ya_market_pickup ? ' checked="checked"' : ''); ?> name="ya_market_pickup" id="ya_market_pickup" class="" value="1"/> <?php echo $market_set_9; ?></label>
 											</div>
-										</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-4 control-label"><?php echo $market_out; ?></label>
-										<div class="col-sm-8">
-											<label class="radio-inline">
-												<input type="radio" <?php echo ($ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="1"/> <?php echo $market_out_all; ?></label>
-											<label class="radio-inline">
-												<input type="radio" <?php echo (!$ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="0"/> <?php echo $market_out_sel; ?></label>
 										</div>
 									</div>
 									<div class="form-group">
@@ -681,12 +675,6 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_market_shopname"><?php echo $market_s_name; ?></label>
-										<div class="col-sm-8">
-											<input type="text" name="ya_market_shopname" value="<?php echo $ya_market_shopname; ?>" id="ya_market_shopname" class="form-control"/>
-										</div>
-									</div>
-									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_market_localcoast"><?php echo $market_d_cost; ?></label>
 										<div class="col-sm-8">
 											<input type="text" name="ya_market_localcoast" value="<?php echo $ya_market_localcoast; ?>" id="ya_market_localcoast" class="form-control"/>
@@ -732,6 +720,15 @@
 												<?php } ?>
 											</div>
 											<a onclick="$(this).parent().find(':checkbox').attr('checked', true);"><?php echo $text_select_all; ?></a> / <a onclick="$(this).parent().find(':checkbox').attr('checked', false);"><?php echo $text_unselect_all; ?></a>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?php echo $market_out; ?></label>
+										<div class="col-sm-8">
+											<label class="radio-inline">
+												<input type="radio" <?php echo ($ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="1"/> <?php echo $market_out_all; ?></label>
+											<label class="radio-inline">
+												<input type="radio" <?php echo (!$ya_market_catall ? ' checked="checked"' : ''); ?> name="ya_market_catall" value="0"/> <?php echo $market_out_sel; ?></label>
 										</div>
 									</div>
 									<div class="form-group">
