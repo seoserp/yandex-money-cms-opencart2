@@ -807,12 +807,9 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
+										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
-											<p class="help-block">
-												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
-											</p>
+											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
 										</div>
 									</div>
 									<div class="form-group">
@@ -870,9 +867,12 @@
 									</div>
 									<!-- -->
 									<div class="form-group">
-										<label class="col-sm-4 control-label" for="ya_pokupki_callback"><?php echo $pokupki_callback; ?></label>
+										<label class="col-sm-4 control-label" for="ya_pokupki_token"><?php echo $pokupki_token; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_pokupki_callback" disabled="disabled" value="<?php echo $ya_pokupki_callback; ?>" id="ya_pokupki_callback" class="form-control"/>
+											<input type="text" name="ya_pokupki_token" value="<?php echo $ya_pokupki_gtoken; ?>" id="ya_pokupki_token" disabled="disabled" class="form-control"/>
+											<p class="help-block">
+												<a href="<?php echo $ya_pokupki_callback_url; ?>"><?php echo $pokupki_gtoken; ?></a>
+											</p>
 										</div>
 									</div>
 									<?php echo $data_carrier ?>
