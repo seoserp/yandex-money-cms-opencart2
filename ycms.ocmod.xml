@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
-	<name>Y.CMS</name>
+	<name>Y.CMS for Opencart 2.0.x - 2.2.x</name>
 	<code>ycms.mws</code>
 	<version>1.0.5</version>
 	<author>Yandex.Money</author>
@@ -99,7 +99,7 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 			]]></add>
 		</operation>
 	</file>
-	<file path="catalog/view/theme/*/template/common/*.tpl">
+	<file path="catalog/view/theme/*/template/common/footer.tpl">
 		<operation>
 			<search position="replace"><![CDATA[<footer]]></search>
 			<add><![CDATA[

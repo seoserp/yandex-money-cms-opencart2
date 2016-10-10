@@ -831,9 +831,9 @@
 											<div class="checkbox">
 												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
 											</div>
-											<div class="checkbox">
+											<!--<div class="checkbox">
 												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
-											</div>
+											</div>-->
 											<div class="checkbox">
 												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
 											</div>
