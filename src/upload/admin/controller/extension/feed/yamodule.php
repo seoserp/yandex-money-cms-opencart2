@@ -14,6 +14,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 	
 	public $fields_kassa = array(
 		'ya_kassa_active',
+        'yamodule_total_sort_order',
 		'ya_kassa_sid',
         'ya_kassa_scid',
         'ya_kassa_pw',
@@ -514,7 +515,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 			'kassa_text_status','kassa_text_debug_help','kassa_text_debug_dis','kassa_text_debug_en','kassa_text_debug','kassa_text_adv_head',
 			'kassa_text_paylogo_help','kassa_paylogo_text',
 			'kassa_text_cart_reset','kassa_cart_reset_text',
-			'kassa_text_create_order','kassa_create_order_text',
+			'kassa_text_create_order','kassa_create_order_text', 'kassa_text_sort_order',
 			'kassa_text_pay_help','kassa_text_paymode_help','kassa_text_paymode_shop','kassa_text_paymode_kassa','kassa_text_paymode_label',
 			'kassa_text_paymode_head','kassa_text_pw','kassa_text_scid','kassa_text_sid','kassa_text_get_setting','kassa_text_lk_head','kassa_sv',
 			'kassa_text_inv', 'kassa_text_invhelp', 'kassa_text_inv_subj','kassa_text_inv_subjhelp','kassa_text_inv_logo','kassa_text_inv_logohelp',
@@ -538,6 +539,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
         $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
         $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
+        $data['yamodule_total_sort_order']= $this->Sget('yamodule_total_sort_order');
 
 		//MWS
 		$data['mws_global_error']= array();
@@ -667,6 +669,7 @@ class ControllerExtensionFeedYamodule extends Controller {
 			'ya_p2p_active' => 0,
 			'ya_p2p_test' => 0,
 			'ya_p2p_log' => 0,
+            'yamodule_total_sort_order' => '0',
 			'ya_kassa_active' => 1,
 			'ya_kassa_log' => 0,
 			'ya_kassa_paymode' => 1,

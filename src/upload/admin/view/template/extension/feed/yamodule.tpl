@@ -193,6 +193,13 @@
 													<p class="help-block"><?php echo $kassa_text_debug_help; ?></p>
 												</div>
 												<!-- -->
+												<label class="control-label col-sm-3"><?php echo $kassa_text_sort_order; ?></label>
+												<div class='col-sm-8'>
+													<input type="text" class="form-control" value="<?php echo $yamodule_total_sort_order; ?>" name="yamodule_total_sort_order" />
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php //echo $kassa_text_help_url; ?></p>
+												</div>
 												<label class="control-label col-sm-3"><?php echo $kassa_text_cart_reset; ?></label>
 												<div class='col-sm-8'>
 													<div class="checkbox">
