@@ -38,6 +38,7 @@ class ControllerExtensionPaymentYamodule extends Controller
 		$data['email'] = $order_info['email'];
 		$data['phone'] = preg_replace("/[-+()]/",'',$order_info['telephone']);
 		$data['comment'] = $order_info['comment'];
+        //TODO Добавить возможность выбора работы с валютой в настройках модуля
 		$data['sum'] = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
 		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','qp','qw') as $pName) {
             $data['method_'.$pName] = $this->config->get('ya_kassa_'.$pName);
@@ -346,13 +347,15 @@ class ControllerExtensionPaymentYamodule extends Controller
 			if($this->model_extension_yamodel_yamoney->checkSign($data, $password, $shopid, true)){
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
-				if (number_format($data['orderSumAmount'], 2)>=number_format($order_info['total'],2)){
+                //TODO Добавить возможность выбора работы с валютой в настройках модуля
+                $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
+                if (number_format($data['orderSumAmount'], 2)>= $sum){
 					if ($data['action'] == 'paymentAviso'){
 						if ($order_id > 0)	$this->makeOrder($order_id, false);
 					}
 					$this->model_extension_yamodel_yamoney->sendCode($data, $shopid, '0', "ok");
 				}else{
-					$this->model_extension_yamodel_yamoney->sendCode($data, $shopid, '100', "Error total amount");
+                    $this->model_extension_yamodel_yamoney->sendCode($data, $shopid, '100', "Error total amount ".$sum);
 				}
 			}
 		}else{

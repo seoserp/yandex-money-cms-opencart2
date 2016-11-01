@@ -540,6 +540,7 @@ class ControllerExtensionFeedYamodule extends Controller {
         $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
         $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
         $data['yamodule_total_sort_order']= $this->Sget('yamodule_total_sort_order');
+        //TODO Добавить возможность выбора работы с валютой в настройках модуля
 
 		//MWS
 		$data['mws_global_error']= array();
