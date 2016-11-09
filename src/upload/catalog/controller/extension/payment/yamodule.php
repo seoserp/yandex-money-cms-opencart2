@@ -348,8 +348,8 @@ class ControllerExtensionPaymentYamodule extends Controller
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
                 //TODO Добавить возможность выбора работы с валютой в настройках модуля
-                $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
-                if (number_format($data['orderSumAmount'], 2)>= $sum){
+                $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2);
+                if (number_format($data['orderSumAmount'], 2)== $sum){
 					if ($data['action'] == 'paymentAviso'){
 						if ($order_id > 0)	$this->makeOrder($order_id, false);
 					}
