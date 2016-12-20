@@ -17,18 +17,16 @@ class ControllerFeedYamarket extends Controller {
         if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
             $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
         } else {
-            throw new Exception("Need select categories");
+            die("Need select categories");
         }
 		$products = $this->model_yamodel_yamarket->getProducts($ids_cat, true);
 		$currencies = $this->model_localisation_currency->getCurrencies();
         $shop_currency = $this->config->get('config_currency');
 		$offers_currency = 'RUB';
 		$currency_default = $this->model_yamodel_yamarket->getCurrencyByISO($offers_currency);
-        if (!isset($currency_default['value'])) throw new Exception("Not exist RUB");
+        if (!isset($currency_default['value'])) die("Not exist RUB");
 
-		$decimal_place = $this->currency->getDecimalPlace($offers_currency);
-        if (empty($decimal_place) || $decimal_place==0) throw new Exception("Need set decimal places for RUB");
-
+		$decimal_place = 2;
 		$currencies = array_intersect_key($currencies, array_flip(array('RUR', 'RUB', 'USD', 'EUR', 'UAH')));
 		$yamarket = new YandexMarket($this->config);
 		$yamarket->yml('utf-8');
