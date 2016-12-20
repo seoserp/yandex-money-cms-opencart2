@@ -473,7 +473,7 @@ class ControllerPaymentYamodule extends Controller {
             $message .= PHP_EOL;
             if ($this->sendMailForm("cms@yamoney.ru", $mail_cc, $subject, $message)) {
                 $data['can_push'] = time();
-                setcookie("yamodule_kassa_sendmail_timeout", $data['can_push'],time()+60*2);
+                setcookie("yamodule_kassa_sendmail_timeout", $data['can_push'],time()+60*60*24);
             }
         }
         foreach (array("sendmail", "email", "text") as $name_error) if (isset($this->error[$name_error])) $data['error_'.$name_error] = $this->error[$name_error];
@@ -492,7 +492,7 @@ class ControllerPaymentYamodule extends Controller {
             $this->error['email'] = $this->language->get('error_mail');
         }
         if (isset($this->request->cookie['yamodule_kassa_sendmail_timeout'])){
-            //$this->error['expire'] = $this->language->get('error_expire');
+            $this->error['expire'] = $this->language->get('error_expire');
         }
         return !$this->error;
     }
