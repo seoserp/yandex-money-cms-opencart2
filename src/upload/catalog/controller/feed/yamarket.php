@@ -227,8 +227,7 @@ class ControllerFeedYamarket extends Controller {
 					if (isset($data_temp['oldprice']))
 						$data_temp['oldprice'] = number_format($this->currency->convert($this->tax->calculate($data_temp['oldprice'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 					if ($data['price'] > 0) {
-                        $data_temp['group_id'] = $product['product_id'];
-						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available']);
+						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available'], $product['product_id']);
 					}
 					unset($data_temp);
 				}
@@ -237,8 +236,7 @@ class ControllerFeedYamarket extends Controller {
 			{
 				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 				if ($data['price'] > 0) {
-                    $data['group_id'] = $product['product_id'];
-					$object->add_offer($data['id'], $data, $data['available']);
+					$object->add_offer($data['id'], $data, $data['available'], $product['product_id']);
 				}
 			}
 
@@ -367,19 +365,17 @@ class YandexMarket{
 		return true;
 	}
 
-	function add_offer($id, $data, $available = true)
+	function add_offer($id, $data, $available = true, $group_id = 0)
 	{
         $allowed = array(
             'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
             'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
-            'delivery-options', 'group_id',
+            'delivery-options',
             'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
         );
         $param = array();
 		// $data['model'] = $data['id'].'_tovar';
 		// $data['vendor'] = $data['id'].'_tovar';
-		if(isset($data['param']))
-			$param = $data['param'];
 		foreach($data as $k => $v)
 		{
 			if(!in_array($k, $allowed)) unset($data[$k]);
@@ -402,6 +398,7 @@ class YandexMarket{
 				$data[$key] = $tmp[$key];
 
 		$out = array('id' => $id, 'data' => $data, 'available' => ($available) ? 'true' : 'false');
+        if ($group_id>0) $out['group_id'] = $group_id;
 		if(!$this->config->get('ya_market_prostoy'))
 			$out['type'] = 'vendor.model';
 		$this->offers[] = $out;
