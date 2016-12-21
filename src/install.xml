@@ -101,7 +101,7 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 	</file>
 	<file path="catalog/view/theme/*/template/common/footer.tpl">
 		<operation>
-			<search position="replace"><![CDATA[<footer>]]></search>
+			<search position="replace"><![CDATA[<footer]]></search>
 			<add><![CDATA[
 			<?php if (isset ($ya_metrika_active) && $ya_metrika_active){ ?>
 				<?php echo $yandex_metrika; ?>
@@ -134,8 +134,7 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 				}
 				</script>
 			<?php } ?>
-			<footer>
-			]]></add>
+			<footer	]]></add>
 		</operation>
 	</file>
 	<file path="admin/view/template/sale/order_info.tpl">

@@ -17,17 +17,16 @@ class ControllerExtensionFeedYamarket extends Controller {
         if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
             $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
         } else {
-            throw new Exception("Need select categories");
+            die("Need select categories");
         }
 		$products = $this->model_extension_yamodel_yamarket->getProducts($ids_cat, true);
 		$currencies = $this->model_localisation_currency->getCurrencies();
         $shop_currency = $this->config->get('config_currency');
 		$offers_currency = 'RUB';
 		$currency_default = $this->model_extension_yamodel_yamarket->getCurrencyByISO($offers_currency);
-        if (!isset($currency_default['value'])) throw new Exception("Not exist RUB");
+        if (!isset($currency_default['value'])) die("Not exist RUB");
 
-		$decimal_place = $this->currency->getDecimalPlace($offers_currency);
-        if (empty($decimal_place) || $decimal_place==0) throw new Exception("Need set decimal places for RUB");
+		$decimal_place = 2;
 		$currencies = array_intersect_key($currencies, array_flip(array('RUR', 'RUB', 'USD', 'EUR', 'UAH')));
 
         $yamarket = new YandexMarket($this->config);
@@ -229,8 +228,7 @@ class ControllerExtensionFeedYamarket extends Controller {
 					if (isset($data_temp['oldprice']))
 						$data_temp['oldprice'] = number_format($this->currency->convert($this->tax->calculate($data_temp['oldprice'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 					if ($data['price'] > 0) {
-                        $data_temp['group_id'] = $product['product_id'];
-						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available']);
+						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available'], $product['product_id']);
 					}
 					unset($data_temp);
 				}
@@ -239,8 +237,7 @@ class ControllerExtensionFeedYamarket extends Controller {
 			{
 				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 				if ($data['price'] > 0) {
-                    $data['group_id'] = $product['product_id'];
-					$object->add_offer($data['id'], $data, $data['available']);
+					$object->add_offer($data['id'], $data, $data['available'], $product['product_id']);
 				}
 			}
 
@@ -371,19 +368,14 @@ class YandexMarket{
 		return true;
 	}
 
-	function add_offer($id, $data, $available = true)
+	function add_offer($id, $data, $available = true, $group_id = 0)
 	{
 		$allowed = array(
 		    'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
             'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
-            'delivery-options', 'group_id',
+            'delivery-options',
             'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
         );
-		$param = array();
-		// $data['model'] = $data['id'].'_tovar';
-		// $data['vendor'] = $data['id'].'_tovar';
-		if(isset($data['param']))
-			$param = $data['param'];
 		foreach($data as $k => $v)
 		{
 			if (!in_array($k, $allowed)) unset($data[$k]);
@@ -406,6 +398,7 @@ class YandexMarket{
 				$data[$key] = $tmp[$key];
 
 		$out = array('id' => $id, 'data' => $data, 'available' => ($available) ? 'true' : 'false');
+        if ($group_id>0) $out['group_id'] = $group_id;
 		if(!$this->config->get('ya_market_prostoy'))
 			$out['type'] = 'vendor.model';
 		$this->offers[] = $out;
@@ -437,7 +430,7 @@ class YandexMarket{
 
 		    $localShippingCost = explode (';', $this->config->get('ya_market_localcoast'));
             $localShippingDays = explode (';', $this->config->get('ya_market_localdays'));
-            if (count($localShippingCost) != count ($localShippingDays)) throw new Exception("'Стоимость доставки в домашнем регионе' и/или 'Срок доставки в домашнем регионе' заполнены с ошибкой");
+            if (count($localShippingCost) != count ($localShippingDays)) die("'Стоимость доставки в домашнем регионе' и/или 'Срок доставки в домашнем регионе' заполнены с ошибкой");
             $s .= '<delivery-options>'. PHP_EOL;
             foreach ($localShippingCost as $key=>$value){
                 $s .= '<option cost="'.$value.'" days="'.$localShippingDays[$key].'"/>'. PHP_EOL;
