@@ -2,7 +2,7 @@
 <modification>
 	<name>Y.CMS for Opencart 2.0.x - 2.2.x</name>
 	<code>ycms.mws</code>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<author>Yandex.Money</author>
 
 	<file path="admin/model/sale/order.php">
@@ -34,6 +34,12 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 
 	<file path="admin/controller/sale/order.php">
 		<operation>
+			<search position="replace"><![CDATA['shipping_code' => $result['shipping_code'],]]></search>
+			<add><![CDATA['shipping_code' => $result['shipping_code'],
+			'mws'		=> $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
+			'payment_code' => $result['payment_code'],]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA['view'          => $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),]]></search>
 			<add><![CDATA[
 			'mws'		=> $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
@@ -63,6 +69,15 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 				<a href="<?php echo $order['mws']; ?>" data-toggle="tooltip" title="Управление заказом" class="btn btn-success"><i class="fa fa-briefcase"></i></a>
 				<?php } ?>
 				<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<td class="text-right"><a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a> <a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" id="button-edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></search>
+			<add><![CDATA[<td class="text-right">
+				<a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a>
+				<?php if(isset($order['payment_code']) && $order['payment_code']=='yamodule'){ ?>
+				<a href="<?php echo $order['mws']; ?>" data-toggle="tooltip" title="Управление заказом" class="btn btn-success"><i class="fa fa-briefcase"></i></a>
+				<?php } ?>
+				<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" id="button-edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></add>
 		</operation>
 	</file>
 	<file path="catalog/controller/common/footer.php">
