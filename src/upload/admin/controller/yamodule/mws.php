@@ -138,11 +138,7 @@ class ControllerYamoduleMws extends Controller {
 			
 			$payment = $mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
 			if (!isset($payment['invoiceId'])) {
-                //$mws->PkeyPem ="";
-                //$mws->CertPem ="";
-				$errors[]=$this->language->get('err_mws_listorder');
-                //$this->log->write(print_r($mws, true));
-                //$this->log->write(print_r($_SERVER['SERVER_ADDR'], true));
+				$errors[]=sprintf($this->language->get('err_mws_listorder'), $_SERVER['SERVER_ADDR'], serialize($mws->txt_request), htmlspecialchars($mws->txt_respond));
 			}
 			
 			if (!$errors && $this->request->server['REQUEST_METHOD'] == 'POST' && $is_act_return && isset($this->request->post['return_sum'])){

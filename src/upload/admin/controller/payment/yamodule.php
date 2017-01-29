@@ -447,7 +447,7 @@ class ControllerPaymentYamodule extends Controller {
         {
             $mail_cc = filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL);
             $data['email'] = $mail_cc;
-            $mail_text = htmlentities($this->request->post['text']);
+            $mail_text = htmlspecialchars($this->request->post['text']);
             $data['text'] = html_entity_decode($mail_text);
             $subject = sprintf($this->language->get('sendmail_subject'), $this->config->get('config_email'), $sid);
 

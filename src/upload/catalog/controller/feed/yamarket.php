@@ -77,16 +77,18 @@ class ControllerFeedYamarket extends Controller {
 			$data['id'] = $product['product_id'];
 			$data['available'] = $available;
 			$data['url'] = htmlspecialchars_decode($this->url->link('product/product', 'product_id=' . $product['product_id']));
+
 			$data['price'] = $product['price'];
-			if ($product['special'] && $product['special'] < $product['price'])
-				$data['price'] = $product['special'];
+			if ($product['special'] && $product['special'] < $product['price']){
+                $data['price'] = $product['special'];
+                $data['oldprice'] = $product['price'];
+            }
+
 			$data['currencyId'] = $currency_default['code'];
 			$data['categoryId'] = $product['category_id'];
 			$data['vendor'] = $product['manufacturer'];
 			$data['vendorCode'] = $product['model'];
-
-            //TODO Добавить зависимость delivery, pickup, store от кол-ва товара на складе
-			$data['delivery'] = ($this->config->get('ya_market_delivery') ? 'true' : 'false');
+			$data['delivery'] = ($this->config->get('ya_market_delivery') && $product['shipping'] == '1')? 'true' : 'false';
 			$data['pickup'] = ($this->config->get('ya_market_pickup') ? 'true' : 'false');
 			$data['store'] = ($this->config->get('ya_market_store') ? 'true' : 'false');
 			$data['description'] = $product['description'];
@@ -100,9 +102,11 @@ class ControllerFeedYamarket extends Controller {
                     'days' => $delivery_days[$stock_id]
                 );
             }
-            //TODO	Добавить пользовательскую установку параметра $data['sales_notes'] по умолчанию
 			if ($product['minimum'] > 1)
 				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
+            if ($this->config->get('config_comment'))
+                $data['sales_notes'] = $this->config->get('config_comment');
+
 			$data['picture'] = array();
 			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
@@ -258,6 +262,7 @@ class ControllerFeedYamarket extends Controller {
 		return $product;
 	}
 }
+
 class YandexMarket{
 	private $config;
 	var $from_charset = 'windows-1251';
@@ -369,9 +374,8 @@ class YandexMarket{
 	{
         $allowed = array(
             'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
-            'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
-            'delivery-options',
-            'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
+            'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes','oldprice',
+            'delivery-options','downloadable', 'weight', 'dimensions', 'param', 'country_of_origin'
         );
         $param = array();
 		// $data['model'] = $data['id'].'_tovar';
