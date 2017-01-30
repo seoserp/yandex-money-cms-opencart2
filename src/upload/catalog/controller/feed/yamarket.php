@@ -108,9 +108,9 @@ class ControllerFeedYamarket extends Controller {
                 $data['sales_notes'] = $this->config->get('config_comment');
 
 			$data['picture'] = array();
-			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
+			if (isset($product['image'])) $data['picture'][] = str_replace(" ", "%20", $this->model_tool_image->resize($product['image'], 600, 600));
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
-				if (count($data['picture'])<=9) $data['picture'][] = str_replace('&amp;','&',$this->model_tool_image->resize($pic['image'], 600, 600));
+				if (count($data['picture'])<=9) $data['picture'][] = str_replace(array('&amp;',' '),array('&', '%20'), $this->model_tool_image->resize($pic['image'], 600, 600));
 			}
 
 			if ($this->config->get('ya_market_prostoy'))
