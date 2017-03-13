@@ -1,4 +1,5 @@
 <?php
+class Controllerextensionpaymentyamodule extends ControllerPaymentYamodule{}
 class ControllerPaymentYamodule extends Controller
 {
 	const MONEY_URL = "https://money.yandex.ru";
@@ -17,9 +18,10 @@ class ControllerPaymentYamodule extends Controller
 	public function index() {
 		$this->load->model('checkout/order');
 		$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-		$this->language->load('payment/yamodule');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->language->load($for23.'payment/yamodule');
 		$data['button_confirm'] = $this->language->get('button_confirm');
-		$data['p2p_action'] = $this->url->link('payment/yamodule/yaredirect', '', 'SSL');
+		$data['p2p_action'] = $this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL');
 		if ($this->config->get('ya_kassa_test'))
 			$data['kassa_action'] = 'https://demomoney.yandex.ru/eshop.xml';
 		else
@@ -52,10 +54,11 @@ class ControllerPaymentYamodule extends Controller
 		$data['order_text'] =  $this->language->get('text_order');
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
 		$begin_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":"default/template/";
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/yamodule'.$end_tpl)) {
-			return $this->load->view($this->config->get('config_template') . '/template/payment/yamodule'.$end_tpl, $data);
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/'.$for23.'payment/yamodule'.$end_tpl)) {
+			return $this->load->view($this->config->get('config_template') . '/template/'.$for23.'payment/yamodule'.$end_tpl, $data);
 		} else {
-			return $this->load->view($begin_tpl.'payment/yamodule'.$end_tpl, $data);
+			return $this->load->view($begin_tpl.$for23.'payment/yamodule'.$end_tpl, $data);
 		}
 	}
 	public function confirm(){
@@ -118,8 +121,8 @@ class ControllerPaymentYamodule extends Controller
 					"payment.to-account(\"".$this->config->get('ya_p2p_number')."\",\"account\").limit(,".$limit.")",
 					"money-source(\"wallet\",\"card\")"
 				);
-				
-				$auth_url = $this->buildObtainTokenUrl($this->config->get('ya_p2p_idapp'), $this->url->link('payment/yamodule/insidewallet', '', 'SSL'), $scope);
+                $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+				$auth_url = $this->buildObtainTokenUrl($this->config->get('ya_p2p_idapp'), $this->url->link($for23.'payment/yamodule/insidewallet', '', 'SSL'), $scope);
 				$this->response->redirect($auth_url);
 			}
 			elseif ($_POST['payment-type'] == 'card')
@@ -160,6 +163,7 @@ class ControllerPaymentYamodule extends Controller
 
 	public function insidecard()
 	{
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		$instance = $this->sendRequest('/api/instance-id', array('client_id' => $this->config->get('ya_p2p_idapp')));
 		if($instance->status == 'success')
 		{
@@ -191,7 +195,7 @@ class ControllerPaymentYamodule extends Controller
 					$process_options = array(
 						"request_id" => $request_id,
 						'instance_id' => $instance_id,
-						'ext_auth_success_uri' => $this->url->link('payment/yamodule/successcard', '', 'SSL'),
+						'ext_auth_success_uri' => $this->url->link($for23.'payment/yamodule/successcard', '', 'SSL'),
 						'ext_auth_fail_uri' => $this->url->link('checkout/failure', '', 'SSL')
 					);	
 					
@@ -232,12 +236,13 @@ class ControllerPaymentYamodule extends Controller
 
 	public function insidewallet()
 	{
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		$code = $this->request->get['code'];
 		if (empty($code))
-			$this->response->redirect($this->url->link('payment/yamodule/yaredirect', '', 'SSL'));
+			$this->response->redirect($this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL'));
 		else
 		{
-			$response = $this->getAccessToken($this->config->get('ya_p2p_idapp'), $code, $this->url->link('payment/yamodule/yaredirect', '', 'SSL'), $this->config->get('ya_p2p_pw'));
+			$response = $this->getAccessToken($this->config->get('ya_p2p_idapp'), $code, $this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL'), $this->config->get('ya_p2p_pw'));
 			$error = '';
 			$token = '';
 			if (isset($response->access_token))
@@ -300,8 +305,8 @@ class ControllerPaymentYamodule extends Controller
 						break;
 						
 				}
-
-				$this->language->load('payment/yamodule');
+                $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+				$this->language->load($for23.'payment/yamodule');
 				$data['column_left'] = $this->load->controller('common/column_left');
 				$data['column_right'] = $this->load->controller('common/column_right');
 				$data['content_top'] = $this->load->controller('common/content_top');
@@ -326,7 +331,7 @@ class ControllerPaymentYamodule extends Controller
 				}
 			}
 			else
-				$this->response->redirect($this->url->link('payment/yamodule/yaredirect', '', 'SSL'));
+				$this->response->redirect($this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL'));
 		}
 	}
 
@@ -347,7 +352,9 @@ class ControllerPaymentYamodule extends Controller
 			if($this->model_yamodel_yamoney->checkSign($data, $password, $shopid, true)){
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
-				if (number_format($data['orderSumAmount'], 2)>=number_format($order_info['total'],2)){
+                $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2);
+
+                if (number_format($data['orderSumAmount'], 2)== $sum){
 					if ($data['action'] == 'paymentAviso'){
 						if ($order_id > 0)	$this->makeOrder($order_id, false);
 					}

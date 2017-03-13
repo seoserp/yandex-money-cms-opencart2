@@ -1,4 +1,6 @@
 <?php
+
+class ControllerExtensionFeedYamodule extends ControllerFeedYamodule{}
 class ControllerFeedYamodule extends Controller {
 
 	private $error = array();
@@ -14,6 +16,7 @@ class ControllerFeedYamodule extends Controller {
 	
 	public $fields_kassa = array(
 		'ya_kassa_active',
+        'yamodule_total_sort_order',
 		'ya_kassa_sid',
         'ya_kassa_scid',
         'ya_kassa_pw',
@@ -174,8 +177,8 @@ class ControllerFeedYamodule extends Controller {
 	{
 		$headers = array();
 		$headers[] = 'Content-Type: application/x-www-form-urlencoded';
-
-		$this->load->language('feed/yamodule');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->load->language($for23.'feed/yamodule');
 		
 		$array = array(
 			'url' => HTTP_CATALOG,
@@ -248,7 +251,8 @@ class ControllerFeedYamodule extends Controller {
 		$this->session->data['metrika_status'] = array();
 		$this->session->data['market_status'] = array();
 		$this->session->data['pokupki_status'] = array();
-		$this->load->language('feed/yamodule');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->load->language($for23.'feed/yamodule');
 
 		switch($this->request->post['type_data'])
 		{
@@ -256,7 +260,7 @@ class ControllerFeedYamodule extends Controller {
 				$this->saveData($this->fields_kassa);
 				$this->session->data['kassa_status'][] = $this->success_alert($this->language->get('text_success'));
 				if(isset($this->request->post['ya_kassa_active']) && $this->request->post['ya_kassa_active'] == 1){
-					$testUrl = $this->url->link('payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
+					$testUrl = $this->url->link($for23.'payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
 					$this->session->data['kassa_status'][] = '<div class="alert"><a  class="btn btn-success" target="_blank" href="'.$testUrl.'">Проверить работу модуля</a></div>';
 					$this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
 				}
@@ -287,36 +291,43 @@ class ControllerFeedYamodule extends Controller {
 			
 		}
 		$updater = $this->sendStatistics();
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        if (!$this->Sget('ya_kassa_active') && !$this->Sget('ya_p2p_active')){
+            $this->load->controller($for23.'payment/yamodule/uninstall');
+        }else{
+            $this->load->controller($for23.'payment/yamodule/install');
+        }
 		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
 		
 	}
 	public function initForm($array)
 	{
+	    $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		foreach ($array as $a)
 			$data[$a] = $this->config->get($a);
 
-		$data['ya_kassa_check'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route=payment/yamodule/callback';
-		$data['ya_kassa_aviso'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route=payment/yamodule/callback';
+		$data['ya_kassa_check'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
+		$data['ya_kassa_aviso'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
 		$data['ya_pokupki_sapi'] = HTTPS_CATALOG.'yandexbuy';
 		if ($this->config->get('config_secure'))
 		{
 			$data['ya_kassa_fail'] = HTTPS_CATALOG.'index.php?route=checkout/failure';
 			$data['ya_kassa_success'] = HTTPS_CATALOG.'index.php?route=checkout/success';
-			$data['ya_p2p_linkapp'] = HTTPS_CATALOG.'index.php?route=payment/yamodule/inside';
+			$data['ya_p2p_linkapp'] = HTTPS_CATALOG.'index.php?route='.$for23.'payment/yamodule/inside';
 			$data['ya_market_lnk_yml'] = HTTPS_CATALOG.'index.php?route=feed/yamarket';
 		}
 		else
 		{
 			$data['ya_kassa_fail'] = HTTP_CATALOG.'index.php?route=checkout/failure';
 			$data['ya_kassa_success'] = HTTP_CATALOG.'index.php?route=checkout/success';
-			$data['ya_p2p_linkapp'] = HTTP_CATALOG.'index.php?route=payment/yamodule/inside';
-			$data['ya_market_lnk_yml'] = HTTP_CATALOG.'index.php?route=feed/yamarket';
+			$data['ya_p2p_linkapp'] = HTTP_CATALOG.'index.php?route='.$for23.'payment/yamodule/inside';
+			$data['ya_market_lnk_yml'] = HTTP_CATALOG.'index.php?route='.$for23.'feed/yamarket';
 		}
 
 		$data['ya_metrika_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_metrika_idapp').'&device_id='.md5('metrika'.$this->config->get('ya_metrika_idapp')).'&client_secret='.$this->config->get('ya_metrika_pw');
-		$data['ya_metrika_callback'] = $this->url->link('feed/yamodule/preparem', 'token='.$this->session->data['token'], 'SSL');
+		$data['ya_metrika_callback'] = $this->url->link($for23.'feed/yamodule/preparem', 'token='.$this->session->data['token'], 'SSL');
 		$data['ya_pokupki_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_pokupki_idapp').'&device_id='.md5('pokupki'.$this->config->get('ya_pokupki_idapp')).'&client_secret='.$this->config->get('ya_pokupki_pw');
-		$data['ya_pokupki_callback'] = $this->url->link('feed/yamodule/preparep', 'token='.$this->session->data['token'], 'SSL');
+		$data['ya_pokupki_callback'] = $this->url->link($for23.'feed/yamodule/preparep', 'token='.$this->session->data['token'], 'SSL');
 		$data['ya_pokupki_gtoken'] = $this->config->get('ya_pokupki_gtoken');
 		$data['ya_metrika_o2auth'] = $this->config->get('ya_metrika_o2auth');
 		$data['token_url'] = 'https://oauth.yandex.ru/token?';
@@ -438,9 +449,10 @@ class ControllerFeedYamodule extends Controller {
 				$extension = basename($file, '.php');
 				if (in_array($extension, $extensions))
 				{
-					$this->load->language('shipping/' . $extension);
+                    $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+					$this->load->language($for23.'shipping/' . $extension);
 					$data['extensions'][] = array(
-						'name'       => $this->language->get('heading_title')." (".$extension.")",
+						'name'       => $this->language->get('heading_title'),
 						'sort_order' => $this->config->get($extension . '_sort_order'),
 						'installed'  => in_array($extension, $extensions),
 						'ext' => $extension
@@ -484,7 +496,8 @@ class ControllerFeedYamodule extends Controller {
 	
 	public function index()
 	{
-		$this->load->language('feed/yamodule');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->load->language($for23.'feed/yamodule');
 		$this->load->model('setting/setting');
 		$this->load->model('catalog/option');
 		$this->load->model('localisation/order_status');
@@ -515,7 +528,7 @@ class ControllerFeedYamodule extends Controller {
 			'kassa_text_status','kassa_text_debug_help','kassa_text_debug_dis','kassa_text_debug_en','kassa_text_debug','kassa_text_adv_head',
 			'kassa_text_paylogo_help','kassa_paylogo_text',
 			'kassa_text_cart_reset','kassa_cart_reset_text',
-			'kassa_text_create_order','kassa_create_order_text',
+			'kassa_text_create_order','kassa_create_order_text','kassa_text_sort_order',
 			'kassa_text_pay_help','kassa_text_paymode_help','kassa_text_paymode_shop','kassa_text_paymode_kassa','kassa_text_paymode_label',
 			'kassa_text_paymode_head','kassa_text_pw','kassa_text_scid','kassa_text_sid','kassa_text_get_setting','kassa_text_lk_head','kassa_sv',
 			'kassa_text_inv', 'kassa_text_invhelp', 'kassa_text_inv_subj','kassa_text_inv_subjhelp','kassa_text_inv_logo','kassa_text_inv_logohelp',
@@ -534,20 +547,23 @@ class ControllerFeedYamodule extends Controller {
 			'p2p_sv','p2p_number','p2p_idapp','p2p_pw','p2p_linkapp','lbl_mws_main','txt_mws_main','lbl_mws_alert','lbl_mws_cn','lbl_mws_orgname','lbl_mws_email',
 			'lbl_mws_connect','lbl_mws_crt','lbl_mws_doc','txt_mws_doc','txt_mws_cer','tab_mws_before','tab_row_sign','tab_row_cause','tab_row_primary','btn_mws_gen',
 			'btn_mws_csr','btn_mws_doc','btn_mws_crt','btn_mws_crt_load','ya_version','text_license','market','kassa','metrika','pokupki','p2p','active','active_on',
-			'active_off','log','mod_off','button_cancel','text_installed','button_save','button_cancel','pokupki_text_status'
+			'active_off','log','button_cancel','text_installed','button_save','button_cancel','pokupki_text_status'
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
+		$data['mod_off'] = sprintf($this->language->get('mod_off'), $this->url->link('extension/payment/install', 'token=' . $this->session->data['token'] . '&extension=yamodule', true));
+
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
         $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
         $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
+        $data['yamodule_total_sort_order']= $this->Sget('yamodule_total_sort_order');
 		//MWS
 		$data['mws_global_error']= array();
 		if (!extension_loaded ('openssl')) $data['mws_global_error'][]= $this->language->get('ext_mws_openssl');
 		if (!$this->Sget('ya_kassa_active')) $data['mws_global_error'][]= $this->language->get('err_mws_kassa');
 		if (!$this->Sget('ya_kassa_sid')) $data['mws_global_error'][]= $this->language->get('err_mws_shopid');
-		//if (count($data['mws_global_error'])==0) $this->load->controller('yamodule/mws/generate');
+		//if (count($data['mws_global_error'])==0) $this->load->controller('tool/mws/generate');
 
-		$data['txt_mws_connect'] = sprintf($this->language->get('txt_mws_connect'),$this->url->link('yamodule/mws/csr', 'token=' . $this->session->data['token'], 'SSL'));
+		$data['txt_mws_connect'] = sprintf($this->language->get('txt_mws_connect'),$this->url->link('tool/mws/csr', 'token=' . $this->session->data['token'], 'SSL'));
 		$data['success_mws_alert'] = sprintf($this->language->get('success_mws_alert'), $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL'), $this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		
 		$data['mws_orgname'] = HTTP_CATALOG;
@@ -565,18 +581,17 @@ class ControllerFeedYamodule extends Controller {
 		//
 		$data['token'] = $this->session->data['token'];
 		
-		$data['url_mws_gen'] = $this->url->link('yamodule/mws/generate', 'token=' . $this->session->data['token'], 'SSL');
+		$data['url_mws_gen'] = $this->url->link('tool/mws/generate', 'token=' . $this->session->data['token'], 'SSL');
 		
 		$conf = $this->model_setting_setting->getSetting("yamodule_mws");
 		if (isset($conf['yamodule_mws_csr_sign'])){
 			$data['mws_sign'] = $conf['yamodule_mws_csr_sign'];
-		}elseif(count($data['mws_global_error'])==0 && !isset($conf['yamodule_mws_cert'])){
+		}else{
 			//Генерация CSR
-			$this->load->controller('yamodule/mws/generate');
+			$this->load->controller('tool/mws/generate');
 			$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		}
-		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']))?true:false;
-		//
+		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?true:false;
 		//
 		$results = $this->model_catalog_option->getOptions(array('sort' => 'name'));
 		$data['options'] = $results;
@@ -617,7 +632,7 @@ class ControllerFeedYamodule extends Controller {
 
 		$this->load->model('localisation/currency');
 		$currencies = $this->model_localisation_currency->getCurrencies();
-		$allowed_currencies = array_flip(array('RUR', 'RUB', 'BYR', 'KZT', 'UAH'));
+		$allowed_currencies = array_flip(array('RUR', 'RUB', 'BYN', 'KZT', 'UAH'));
 		$data['currencies'] = array_intersect_key($currencies, $allowed_currencies);
 
 		$data['header'] = $this->load->controller('common/header');
@@ -668,7 +683,8 @@ class ControllerFeedYamodule extends Controller {
 			'ya_p2p_active' => 0,
 			'ya_p2p_test' => 0,
 			'ya_p2p_log' => 0,
-			'ya_kassa_active' => 1,
+            'yamodule_total_sort_order' => '0',
+            'ya_kassa_active' => 1,
 			'ya_kassa_log' => 0,
 			'ya_kassa_paymode' => 1,
 			'ya_kassa_paylogo' => 1,
@@ -771,13 +787,14 @@ class ControllerFeedYamodule extends Controller {
 		$this->model_extension_extension->install('payment', 'yamodule');
 		//$this->load->controller('extension/modification/refresh');
 		$this->load->model('user/user_group');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'payment/yamodule');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'payment/yamodule');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'feed/yamodule');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'feed/yamodule');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'yamodule/mws');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'yamodule/mws');
-		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'payment/test');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', $for23.'payment/yamodule');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', $for23.'payment/yamodule');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', $for23.'feed/yamodule');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', $for23.'feed/yamodule');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'tool/mws');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'tool/mws');
+		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', $for23.'payment/test');
 	}
 
 	public function changestatus(){
@@ -794,7 +811,6 @@ class ControllerFeedYamodule extends Controller {
 			//$notify = $this->request->post['notify'];
 			//$append = $this->request->post['append'];
 			//$override = (bool) $this->request->post['override'];
-
 			$this->load->model('yamodule/pokupki');
 			$json = $this->model_yamodule_pokupki->sendOrder($order_id, $order_status_id, $comment);
 		}
@@ -813,7 +829,6 @@ class ControllerFeedYamodule extends Controller {
 				$this->db->query("UPDATE " . DB_PREFIX . "customer SET address_id = '" . (int)$address_id . "' WHERE customer_id = '" . (int)$customer_id . "'");
 			}
 		}
-		
 		return $customer_id;
 	}
 

@@ -146,7 +146,8 @@
     </div>
     <script type="text/javascript"><!--
         $('#button-filter').on('click', function() {
-            url = 'index.php?route=payment/yamodule/invoice&token=<?php echo $token; ?>';
+            <?php $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":""; ?>
+            url = 'index.php?route=<?php echo $for23; ?>payment/yamodule/invoice&token=<?php echo $token; ?>';
 
             var filter_order_id = $('input[name=\'filter_order_id\']').val();
 
@@ -192,7 +193,7 @@
             if (confirm('<?php echo $text_confirm; ?>')) {
                 var node = this;
                 $.ajax({
-                    url: '<?php echo $store_url; ?>admin/index.php?route=payment/yamodule/sendmail&token=<?php echo $token; ?>&order_id=' + $(node).val(),
+                    url: '<?php echo $store_url; ?>admin/index.php?route=<?php echo $for23;?>payment/yamodule/sendmail&token=<?php echo $token; ?>&order_id=' + $(node).val(),
                     dataType: 'json',
                     crossDomain: true,
                     beforeSend: function() {

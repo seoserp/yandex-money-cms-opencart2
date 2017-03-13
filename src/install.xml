@@ -1,108 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
-	<name>Y.CMS for Opencart 2.0.x - 2.2.x</name>
+	<name>Y.CMS for Opencart 2.0.x - 2.3.x</name>
 	<code>ycms.mws</code>
-	<version>1.0.6</version>
+	<version>1.1.0</version>
 	<author>Yandex.Money</author>
-
+    <!-- Вставка кнопки в историю заказов-->
+    <file path="catalog/controller/account/order.php">
+        <operation>
+            <search><![CDATA[// History]]></search>
+            <add position="before"><![CDATA[$for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+            $this->language->load($for23.'payment/yamodule');
+            if($order_info['payment_method']==$this->language->get('kassa_title') || $order_info['payment_method']==$this->language->get('p2p_title')){
+               $this->session->data['order_id']= $this->request->get['order_id'];
+               $data["yamodule"] = $this->load->controller($for23."payment/yamodule");
+            }]]></add>
+        </operation>
+    </file>
+    <file path="catalog/view/theme/default/template/account/order_info.tpl">
+        <operation>
+            <search><![CDATA[</tfoot>]]></search>
+            <add position="before"><![CDATA[<?php if (isset($yamodule)) {?><tr>
+            <td colspan="<?php if ($products) {echo "6";}else{echo "5";} ?>">
+               <?php echo $yamodule; ?>
+            </td></tr><?php } ?>]]></add>
+        </operation>
+    </file>
+    <!-- -->
 	<file path="admin/model/sale/order.php">
 		<operation>
-			<search position="replace"><![CDATA[$sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified FROM `" . DB_PREFIX . "order` o";]]></search>
-			<add><![CDATA[$sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, o.payment_code FROM `" . DB_PREFIX . "order` o";
-			]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[$sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified FROM `" . DB_PREFIX . "order` o";]]></search>
-			<add><![CDATA[$sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified, o.payment_code FROM `" . DB_PREFIX . "order` o";
-			]]></add>
+			<search regex="true"><![CDATA[~o.date_added, o.date_modified FROM~]]></search>
+			<add><![CDATA[o.date_added, o.date_modified, o.payment_code FROM]]></add>
 		</operation>
 	</file>
-	<file path="admin/language/*/sale/order.php">
+	<file path="admin/language/{english,russian,en-gb,ru-ru}/sale/order.php">
 		<operation>
-			<search position="replace"><![CDATA[$_['text_add']                   = 'Add Order';]]></search>
-			<add><![CDATA[$_['text_add']                   = 'Add Order';
-$_['button_invoice_kassa']                   = 'Выставление счета';]]></add>
+			<search regex="true"><![CDATA[~(\$_\[\'text_add\'\])~]]></search>
+			<add><![CDATA[$_['button_invoice_kassa'] = 'Выставление счета';
+                            $_['text_add']]]></add>
 		</operation>
 	</file>
-
 	<file path="system/library/mail.php">
 		<operation>
-			<search position="replace"><![CDATA[basename(urlencode($attachment))]]></search>
+			<search><![CDATA[basename(urlencode($attachment))]]></search>
 			<add><![CDATA[urlencode(basename($attachment))]]></add>
 		</operation>
 	</file>
-
 	<file path="admin/controller/sale/order.php">
 		<operation>
-			<search position="replace"><![CDATA['shipping_code' => $result['shipping_code'],]]></search>
-			<add><![CDATA['shipping_code' => $result['shipping_code'],
-			'mws'		=> $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
-			'payment_code' => $result['payment_code'],]]></add>
+			<search><![CDATA['shipping_code' => $result['shipping_code'],]]></search>
+			<add position="after"><![CDATA[
+			'mws'		=> $this->url->link('tool/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
+			'payment_code' => (isset($result['payment_code']) && $this->config->get('ya_kassa_active'))?$result['payment_code']:'',]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA['view'          => $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),]]></search>
-			<add><![CDATA[
-			'mws'		=> $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
-			'payment_code'		=> isset($result['payment_code'])?$result['payment_code']:'',
-			'view'	=> $this->url->link('sale/order/info', 'token=' . $this->session->data['token'] . '&order_id=' . $result['order_id'] . $url, true),
-			]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[$data['button_add'] = $this->language->get('button_add');]]></search>
-			<add><![CDATA[$data['button_add'] = $this->language->get('button_add');
-			$data['button_invoice_kassa'] = $this->language->get('button_invoice_kassa');
-			$data['invoice_kassa'] = $this->url->link('payment/yamodule/invoice', 'token=' . $this->session->data['token'], true);
-			]]></add>
+			<search><![CDATA[$data['button_add'] = $this->language->get('button_add');]]></search>
+			<add position="after"><![CDATA[if($this->config->get('ya_kassa_active')){
+			    $data['button_invoice_kassa'] = $this->language->get('button_invoice_kassa');
+			    $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+			    $data['invoice_kassa'] = $this->url->link($for23.'payment/yamodule/invoice', 'token=' . $this->session->data['token'], true);
+			}]]></add>
 		</operation>
 	</file>
 	<file path="admin/view/template/sale/order_list.tpl">
 		<operation>
-			<search position="replace"><![CDATA[<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a></div>]]></search>
-			<add><![CDATA[<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-			        <a href="<?php echo $invoice_kassa; ?>" data-toggle="tooltip" title="<?php echo $button_invoice_kassa; ?>" class="btn btn-warning"><i class="fa fa-envelope"></i></a></div>]]></add>
+			<search><![CDATA[<div class="pull-right">]]></search>
+			<add position="after"><![CDATA[<?php if(isset($invoice_kassa)){ ?>
+			<a href="<?php echo $invoice_kassa; ?>" data-toggle="tooltip" title="<?php echo $button_invoice_kassa; ?>" class="btn btn-warning"><i class="fa fa-envelope"></i></a>
+            <?php } ?>]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA[<td class="text-right"><a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a> <a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></search>
-			<add><![CDATA[<td class="text-right">
-				<a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a>
-				<?php if(isset($order['payment_code']) && $order['payment_code']=='yamodule'){ ?>
+			<search regex="true"><![CDATA[~(\<\/i\>\<\/)(button|a)(\>)(\<\/td\>)~]]></search>
+			<add><![CDATA[$1$2$3
+			    <?php if(isset($order['payment_code']) && $order['payment_code']=='yamodule'){ ?>
 				<a href="<?php echo $order['mws']; ?>" data-toggle="tooltip" title="Управление заказом" class="btn btn-success"><i class="fa fa-briefcase"></i></a>
-				<?php } ?>
-				<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[<td class="text-right"><a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a> <a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" id="button-edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></search>
-			<add><![CDATA[<td class="text-right">
-				<a href="<?php echo $order['view']; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-info"><i class="fa fa-eye"></i></a>
-				<?php if(isset($order['payment_code']) && $order['payment_code']=='yamodule'){ ?>
-				<a href="<?php echo $order['mws']; ?>" data-toggle="tooltip" title="Управление заказом" class="btn btn-success"><i class="fa fa-briefcase"></i></a>
-				<?php } ?>
-				<a href="<?php echo $order['edit']; ?>" data-toggle="tooltip" title="<?php echo $button_edit; ?>" id="button-edit" class="btn btn-primary"><i class="fa fa-pencil"></i></a>]]></add>
+				<?php } ?>$4]]></add>
 		</operation>
 	</file>
 	<file path="catalog/controller/common/footer.php">
 		<operation error="skip">
-			<search position="replace"><![CDATA[$data['newsletter'] = $this->url->link('account/newsletter', '', 'SSL');]]></search>
-			<add><![CDATA[ $data['newsletter'] = $this->url->link('account/newsletter', '', 'SSL');
-			$data['yandex_metrika'] = $this->config->get('ya_metrika_code') ? html_entity_decode($this->config->get('ya_metrika_code'), ENT_QUOTES, 'UTF-8') : '';
-			$data['ya_metrika_active'] = $this->config->get('ya_metrika_active') ? true : false;
-			]]></add>
-		</operation>
-		<operation error="skip">
-			<search position="replace"><![CDATA[$data['newsletter'] = $this->url->link('account/newsletter', '', true);]]></search>
-			<add><![CDATA[ $data['newsletter'] = $this->url->link('account/newsletter', '', true);
-			$data['yandex_metrika'] = $this->config->get('ya_metrika_code') ? html_entity_decode($this->config->get('ya_metrika_code'), ENT_QUOTES, 'UTF-8') : '';
+			<search><![CDATA[$data['newsletter'] = $this->url->link('account/newsletter']]></search>
+			<add position="after"><![CDATA[$data['yandex_metrika'] = $this->config->get('ya_metrika_code') ? html_entity_decode($this->config->get('ya_metrika_code'), ENT_QUOTES, 'UTF-8') : '';
 			$data['ya_metrika_active'] = $this->config->get('ya_metrika_active') ? true : false;
 			]]></add>
 		</operation>
 	</file>
 	<file path="catalog/controller/checkout/success.php">
 		<operation>
-			<search position="replace"><![CDATA[if (isset($this->session->data['order_id'])) {]]></search>
-			<add><![CDATA[ if (isset($this->session->data['order_id'])) {
-			$this->load->model('yamodel/pokupki');
-			$data['script_order'] = $this->model_yamodel_pokupki->getscript($this->session->data['order_id']);
-			]]></add>
+			<search><![CDATA[if (isset($this->session->data['order_id'])) {]]></search>
+			<add position="after"><![CDATA[$this->load->model('yamodel/pokupki');
+			$data['script_order'] = $this->model_yamodel_pokupki->getscript($this->session->data['order_id']);]]></add>
 		</operation>
 	</file>
 	<file path="catalog/view/theme/*/template/common/success.tpl">
@@ -116,8 +102,8 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 	</file>
 	<file path="catalog/view/theme/*/template/common/footer.tpl">
 		<operation>
-			<search position="replace"><![CDATA[<footer]]></search>
-			<add><![CDATA[
+			<search><![CDATA[<footer]]></search>
+			<add position="before"><![CDATA[
 			<?php if (isset ($ya_metrika_active) && $ya_metrika_active){ ?>
 				<?php echo $yandex_metrika; ?>
 				<script type="text/javascript">
@@ -148,22 +134,20 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 					}
 				}
 				</script>
-			<?php } ?>
-			<footer ]]></add>
+			<?php } ?>]]></add>
 		</operation>
 	</file>
 	<file path="admin/view/template/sale/order_info.tpl">
 		<operation>
-			<search position="replace"><![CDATA[$('.alert').remove();]]></search>
-			<add><![CDATA[
-			]]></add>
+			<search><![CDATA[$('.alert').remove();]]></search>
+			<add><![CDATA[ ]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA[$('#button-history').on('click', function() {]]></search>
-			<add><![CDATA[$('#button-history').on('click', function() {
-			//
+			<search><![CDATA[$('#button-history').on('click', function() {]]></search>
+			<add position="after"><![CDATA[//
+			<?php $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":""; ?>
 			$.ajax({
-				url: 'index.php?route=feed/yamodule/changestatus&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
+				url: 'index.php?route=<?php echo $for23;?>feed/yamodule/changestatus&token=<?php echo $token; ?>&order_id=<?php echo $order_id; ?>',
 				type: 'post',
 				dataType: 'json',
 				data: 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&append=' + ($('input[name=\'append\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val()),
@@ -194,4 +178,48 @@ $_['button_invoice_kassa']                   = 'Выставление счет�
 			]]></add>
 		</operation>
 	</file>
+    <!-- -->
+    <file path="admin/controller/extension/{feed,payment,yamodule}/{yamodule,mws}.php">
+        <operation>
+            <search regex="true"><![CDATA[
+            ~\$this\-\>load\-\>model\(\'yamodule\/(pokupki|metrika|return)\'\)\;~
+            ]]></search>
+            <add><![CDATA[
+            $this->load->model('extension/yamodule/$1');
+            ]]></add>
+        </operation>
+        <operation>
+            <search regex="true"><![CDATA[
+            ~\$this\-\>model\_yamodule\_(pokupki|metrika|return)\-\>~
+            ]]></search>
+            <add><![CDATA[$this->model_extension_yamodule_$1->]]></add>
+        </operation>
+        <operation>
+            <search regex="true"><![CDATA[
+            ~\$this\-\>(load|url)\-\>(link|controller)\((['"]+)(shipping|feed|payment|yamodule)~
+            ]]></search>
+            <add><![CDATA[$this->$1->$2($3extension/$4]]></add>
+        </operation>
+        <operation>
+            <search regex="true"><![CDATA[
+            ~controller\/shipping~
+            ]]></search>
+            <add><![CDATA[controller/extension/shipping]]></add>
+        </operation>
+        <operation>
+            <search regex="true"><![CDATA[
+				~route\=(payment|feed)~
+				]]></search>
+            <add><![CDATA[route=extension/$1]]></add>
+        </operation>
+    </file>
+    <file path="admin/view/template/extension/{feed,yamodule}/{yamodule,check,invoice_list,invoice_msg,mws_info}.{php,tpl}">
+        <operation>
+            <search regex="true"><![CDATA[
+				~route\=(payment|feed)~
+				]]></search>
+            <add><![CDATA[route=extension/$1]]></add>
+        </operation>
+    </file>
+    <!-- -->
 </modification>

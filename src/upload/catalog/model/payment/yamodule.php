@@ -1,12 +1,16 @@
 <?php
+class ModelExtensionPaymentYamodule extends ModelPaymentYamodule {}
 class ModelPaymentYamodule extends Model {
 	public function getMethod($address, $total) {
-		$this->load->language('payment/yamodule');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->load->language($for23.'payment/yamodule');
 
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('worldpay_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
 
-		if ($this->config->get('yamodule_total') > 0 && $this->config->get('yamodule_total') > $total) {
+		if (!$this->config->get('yamodule_status')) {
 			$status = false;
+		//} elseif ($this->config->get('yamodule_total') > 0 && $this->config->get('yamodule_total') > $total) {
+		//	$status = false;
 		} elseif (!$this->config->get('yamodule_total_geo_zone_id')) {
 			$status = true;
 		} elseif ($query->num_rows) {

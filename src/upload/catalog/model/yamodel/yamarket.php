@@ -1,5 +1,6 @@
 <?php
 
+Class ModelExtensionYamodelYamarket extends ModelYamodelYamarket{}
 Class ModelYamodelYamarket extends Model
 {
 	public function getCategories($parent_id = 0) {
@@ -21,7 +22,7 @@ Class ModelYamodelYamarket extends Model
 	}
 
 	public function getProducts($allowed_categories, $vendor_required = true) {
-		$query = $this->db->query("SELECT p.*, pd.name, pd.description, m.name AS manufacturer, p2c.category_id, IFNULL(ps.price, p.price) AS price, ps.price AS special, wcd.unit AS weight_unit,
+		$query = $this->db->query("SELECT p.*, pd.name, pd.description, m.name AS manufacturer, p2c.category_id, p.price AS price, ps.price AS special, wcd.unit AS weight_unit,
 									GROUP_CONCAT(DISTINCT CAST(pr.related_id AS CHAR) SEPARATOR ',') AS rel
 									FROM " . DB_PREFIX . "product p JOIN " . DB_PREFIX . "product_to_category AS p2c ON (p.product_id = p2c.product_id)
 									" . ($vendor_required ? '' : 'LEFT ') . "JOIN " . DB_PREFIX . "manufacturer m ON (p.manufacturer_id = m.manufacturer_id)

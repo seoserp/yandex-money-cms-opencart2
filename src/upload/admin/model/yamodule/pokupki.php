@@ -1,5 +1,6 @@
 <?php
 
+Class ModelExtensionYamodulePokupki extends ModelYamodulePokupki{}
 Class ModelYamodulePokupki extends Model
 {
     protected function getId($id){

@@ -1,5 +1,5 @@
 <?php
-class ControllerYamoduleMws extends Controller {
+class ControllerToolMws extends Controller {
 	private $error = array();
 	const PREFIX_DEBUG = "";
    const ORDERNUMBER = "orderNumber";
@@ -17,12 +17,12 @@ class ControllerYamoduleMws extends Controller {
 			"localityName" => "Moscow",
 			"commonName" => "/business/oc2/yacms-".$sid['ya_kassa_sid'],
 		),	$pkey, $csr);
-		$this->model_setting_setting->editSetting("yamodule_mws", array("yamodule_mws_pkey" => $pkey, "yamodule_mws_csr" =>$csr, "yamodule_mws_csr_sign" => $sign));
+		$this->model_setting_setting->editSetting("yamodule_mws", array("yamodule_mws_pkey" => $pkey, "yamodule_mws_csr" =>$csr, "yamodule_mws_csr_sign" => $sign, 'yamodule_mws_cert'=>""));
 		//$this->response->addHeader('Content-Type: application/json');
 		//$this->response->setOutput(json_encode(array('ok')));
 	}
 	public function upload(){
-		$this->load->language('yamodule/mws');
+		$this->load->language('tool/mws');
 		$json=array();
 		if (!empty($this->request->files['file']['name'])) {
 			if (substr($this->request->files['file']['name'], -4) != '.cer') {
@@ -41,7 +41,7 @@ class ControllerYamoduleMws extends Controller {
 			$this->load->model('setting/setting');
 			$cert = file_get_contents($this->request->files['file']['tmp_name']);
 			$conf = $this->model_setting_setting->getSetting("yamodule_mws");		
-			$this->model_setting_setting->editSetting("yamodule_mws", array('yamodule_mws_cert'=>$cert, 'yamodule_mws_pkey'=>$conf['yamodule_mws_pkey']));
+			$this->model_setting_setting->editSetting("yamodule_mws", array('yamodule_mws_cert'=>$cert, 'yamodule_mws_pkey'=>$conf['yamodule_mws_pkey'], "yamodule_mws_csr_sign" => $conf['yamodule_mws_csr_sign']));
 		}
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 		$this->response->setOutput(json_encode($json));
@@ -68,7 +68,7 @@ class ControllerYamoduleMws extends Controller {
 	public function index() {
 		$this->load->model('sale/order');
 		$this->load->model('setting/setting');
-		$this->load->language('yamodule/mws');
+		$this->load->language('tool/mws');
 
 		if (isset($this->request->get['order_id'])) {
 			$order_id = $this->request->get['order_id'];
@@ -134,14 +134,11 @@ class ControllerYamoduleMws extends Controller {
 			$mws->demo = ($test["ya_kassa_test"]==true);
 			$mws->shopId = $sid['ya_kassa_sid'];
 			$mws->PkeyPem = (isset($conf['yamodule_mws_pkey']))?$conf['yamodule_mws_pkey']:'';
-			$mws->CertPem = (isset($conf['yamodule_mws_cert']))?$conf['yamodule_mws_cert']:'';
+			$mws->CertPem = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?$conf['yamodule_mws_cert']:'';
 			
 			$payment = $mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
 			if (!isset($payment['invoiceId'])) {
-				$errors[]=$this->language->get('err_mws_listorder');
-				//
-				//$this->log_save($mws->txt_request);
-				//$this->log_save($mws->txt_request);
+				$errors[]=sprintf($this->language->get('err_mws_listorder'), $_SERVER['SERVER_ADDR'], serialize($mws->txt_request), htmlspecialchars($mws->txt_respond));
 			}
 			
 			if (!$errors && $this->request->server['REQUEST_METHOD'] == 'POST' && $is_act_return && isset($this->request->post['return_sum'])){
@@ -188,7 +185,7 @@ class ControllerYamoduleMws extends Controller {
 			
 			$url = '';
 			$data['return_total'] = $this->currency->format($sum_returned, $order_info['currency_code'], $order_info['currency_value']);
-			$data['form_return_url'] = $this->url->link('yamodule/mws', 'order_id='.$order_id.'&act=return&token=' . $this->session->data['token'], 'SSL');
+			$data['form_return_url'] = $this->url->link('tool/mws', 'order_id='.$order_id.'&act=return&token=' . $this->session->data['token'], 'SSL');
 			$data['cancel'] = $this->url->link('sale/order', 'token=' . $this->session->data['token'] . $url, 'SSL');
 			$data['order_id'] = $this->request->get['order_id'];
 			$data['total'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value']);
@@ -210,7 +207,7 @@ class ControllerYamoduleMws extends Controller {
 			);
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('yamodule/mws', 'token=' . $this->session->data['token'] . $url, 'SSL')
+				'href' => $this->url->link('tool/mws', 'token=' . $this->session->data['token'] . $url, 'SSL')
 			);
 			$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
 			$this->response->setOutput($this->load->view('yamodule/mws_info'.$end_tpl, $data));
@@ -439,9 +436,9 @@ Class YamoduleMws{
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_ENCODING, "");
-		curl_setopt($ch, CURLOPT_USERAGENT, "Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.14");  // useragent
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Yamoney/Plugin");  // useragent
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 3);
 		curl_setopt($ch,CURLOPT_POST, 1);
 		curl_setopt($ch,CURLOPT_POSTFIELDS, $xml);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

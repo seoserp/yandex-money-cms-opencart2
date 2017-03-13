@@ -193,6 +193,13 @@
 													<p class="help-block"><?php echo $kassa_text_debug_help; ?></p>
 												</div>
 												<!-- -->
+												<label class="control-label col-sm-3"><?php echo $kassa_text_sort_order; ?></label>
+												<div class='col-sm-8'>
+													<input type="text" class="form-control" value="<?php echo $yamodule_total_sort_order; ?>" name="yamodule_total_sort_order" />
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php //echo $kassa_text_help_url; ?></p>
+												</div>
 												<label class="control-label col-sm-3"><?php echo $kassa_text_cart_reset; ?></label>
 												<div class='col-sm-8'>
 													<div class="checkbox">
@@ -439,11 +446,11 @@
 													<div class='col-sm-8'>
 														<select name="ya_p2p_os" id="ya_p2p_os" class="form-control">
 															<?php foreach ($order_statuses as $order_status) { ?>
-															<?php if ($order_status['order_status_id'] == $ya_p2p_os) { ?>
-															<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
-															<?php } else { ?>
-															<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-															<?php } ?>
+																<?php if ($order_status['order_status_id'] == $ya_p2p_os) { ?>
+																<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+																<?php } else { ?>
+																<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+																<?php } ?>
 															<?php } ?>
 														</select>
 													</div>
@@ -824,9 +831,9 @@
 											<div class="checkbox">
 												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
 											</div>
-											<div class="checkbox">
+											<!--<div class="checkbox">
 												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
-											</div>
+											</div>-->
 											<div class="checkbox">
 												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
 											</div>
@@ -900,7 +907,7 @@ $('#mws_csr_gen').bind('click', function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		$.ajax({
-			url: 'index.php?route=yamodule/mws/generate&token=<?php echo $token; ?>',
+			url: 'index.php?route=tool/mws/generate&token=<?php echo $token; ?>',
 			cache: false,
 			success: function(json) {
 				location.reload();
@@ -923,7 +930,7 @@ $('#mws_crt_load').on('click', function() {
 			clearInterval(timer);
 			$('.alert').remove();
 			$.ajax({
-				url: 'index.php?route=yamodule/mws/upload&token=<?php echo $token; ?>',
+				url: 'index.php?route=tool/mws/upload&token=<?php echo $token; ?>',
 				type: 'post',
 				dataType: 'json',
 				data: new FormData($('#form-upload')[0]),

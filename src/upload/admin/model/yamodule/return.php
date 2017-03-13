@@ -1,4 +1,5 @@
 <?php
+class ModelExtensionYamoduleReturn extends ModelYamoduleReturn{}
 class ModelYamoduleReturn extends Model{
     public function addReturn($data){
         $this->db->query("INSERT INTO `" . DB_PREFIX . "mws_return` (`".implode("`,`",array_keys($data))."`)
