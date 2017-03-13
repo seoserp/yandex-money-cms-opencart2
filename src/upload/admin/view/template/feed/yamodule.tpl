@@ -193,13 +193,6 @@
 													<p class="help-block"><?php echo $kassa_text_debug_help; ?></p>
 												</div>
 												<!-- -->
-												<label class="control-label col-sm-3"><?php echo $kassa_text_sort_order; ?></label>
-												<div class='col-sm-8'>
-													<input type="text" class="form-control" value="<?php echo $yamodule_total_sort_order; ?>" name="yamodule_total_sort_order" />
-												</div>
-												<div class='col-sm-8 col-sm-offset-3'>
-													<p class="help-block"><?php //echo $kassa_text_help_url; ?></p>
-												</div>
 												<label class="control-label col-sm-3"><?php echo $kassa_text_cart_reset; ?></label>
 												<div class='col-sm-8'>
 													<div class="checkbox">
@@ -831,9 +824,9 @@
 											<div class="checkbox">
 												<label for="ya_pokupki_yandex"><input type="checkbox" <?php echo ($ya_pokupki_yandex ? ' checked="checked"' : ''); ?> name="ya_pokupki_yandex" id="ya_pokupki_yandex" class="" value="1"/> <?php echo $pokupki_set_1; ?></label>
 											</div>
-											<!--<div class="checkbox">
+											<div class="checkbox">
 												<label for="ya_pokupki_sprepaid"><input type="checkbox" <?php echo ($ya_pokupki_sprepaid ? ' checked="checked"' : ''); ?> name="ya_pokupki_sprepaid" id="ya_pokupki_sprepaid" class="" value="1"/> <?php echo $pokupki_set_2; ?></label>
-											</div>-->
+											</div>
 											<div class="checkbox">
 												<label for="ya_pokupki_cash"><input type="checkbox" <?php echo ($ya_pokupki_cash ? ' checked="checked"' : ''); ?> name="ya_pokupki_cash" id="ya_pokupki_cash" class="" value="1"/> <?php echo $pokupki_set_3; ?></label>
 											</div>

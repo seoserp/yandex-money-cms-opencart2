@@ -347,9 +347,7 @@ class ControllerPaymentYamodule extends Controller
 			if($this->model_yamodel_yamoney->checkSign($data, $password, $shopid, true)){
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
-                $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2);
-
-                if (number_format($data['orderSumAmount'], 2)== $sum){
+				if (number_format($data['orderSumAmount'], 2)>=number_format($order_info['total'],2)){
 					if ($data['action'] == 'paymentAviso'){
 						if ($order_id > 0)	$this->makeOrder($order_id, false);
 					}

@@ -5,6 +5,7 @@
 */
 class ControllerYandexbuyCart extends Controller
 {
+
 	public function getinfo()
 	{
 		$id_product = isset($this->request->post['product_id']) ? $this->request->post['product_id'] : 0;
@@ -57,9 +58,9 @@ class ControllerYandexbuyCart extends Controller
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 		$this->response->setOutput(json_encode($result));
 	}
-
 	public function index()
 	{
+		//
 		$sign = $this->config->get('ya_pokupki_stoken');
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) !== strtoupper($key))
@@ -71,7 +72,6 @@ class ControllerYandexbuyCart extends Controller
 		else
 		{
 			$json = file_get_contents("php://input");
-			$this->log_save('pokupki cart request: '.$json);
 			if (!$json)
 			{
 				header('HTTP/1.0 404 Not Found');
@@ -85,6 +85,7 @@ class ControllerYandexbuyCart extends Controller
 				$carriers = array();
 				$items = array();
 				$this->load->model('catalog/product');
+				$this->load->model('localisation/country');
 				$shop_currency = $this->config->get('config_currency');//RUB
 				$offers_currency = ($data->cart->currency == 'RUR') ? 'RUB' : $data->cart->currency;
 				$decimal_place = $this->currency->getDecimalPlace($offers_currency);
@@ -135,7 +136,7 @@ class ControllerYandexbuyCart extends Controller
 							$total = number_format($this->currency->convert($this->tax->calculate($product_info['special'] + $price_option, $product_info['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 						else
 							$total = number_format($this->currency->convert($this->tax->calculate($product_info['price'] + $price_option, $product_info['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
-
+					
 						$items[] = array(
 							'feedId' => $item->feedId,
 							'offerId' => $item->offerId,
@@ -148,18 +149,26 @@ class ControllerYandexbuyCart extends Controller
 
 				if (count($items))
 				{
+					$region = self::get_region($data->cart->delivery->region);
+					$this->load->model('yamodel/pokupki');
+												
+					$country_id = $this->model_yamodel_pokupki->getCountryId($region['country']);
+					$zone_id = $this->model_yamodel_pokupki->getZoneId($region['zone'], $country_id);
+					$postcode_id = $this->model_yamodel_pokupki->getPostCode($region['district_id']);
+					// "id": 3, "name": "Центральный федеральный округ", "type": "COUNTRY_DISTRICT"
+					
 					$address_array = array(
 						'firstname'      => '',
 						'lastname'       => '',
 						'company'        => '',
 						'address_1'      => '',
 						'address_2'      => '',
-						'postcode'       => '',
-						'city'           => '',
-						'zone_id'        => '',
+						'postcode'       => $postcode_id,
+						'city'           => $region['city'],
+						'zone_id'        => $zone_id,
 						'zone'           => '',
 						'zone_code'      => '',
-						'country_id'     => '',
+						'country_id'     => $country_id,
 						'country'        => '',
 						'iso_code_2'     => '',
 						'iso_code_3'     => '',
@@ -168,6 +177,7 @@ class ControllerYandexbuyCart extends Controller
 					if (count($data->cart->items)){
 							$this->cart->clear();
 							$count_items = 0;
+
 							foreach ($data->cart->items as $item){
 								$opt = array();
 								$id_array = explode('c', $item->offerId);
@@ -191,44 +201,82 @@ class ControllerYandexbuyCart extends Controller
 					$this->load->model('extension/extension');
 					$results = $this->model_extension_extension->getExtensions('shipping');
 					$k = 0;
+					$pickup = array();
 					foreach ($results as $result)
 					{
 						if ($this->config->get($result['code'] . '_status')) {
 							$this->load->model('shipping/'.$result['code']);
-							$quote = $this->{'model_shipping_'.$result['code']}->getQuote($address_array);
 							$id = $result['code'];
 							$types = $this->config->get('ya_pokupki_carrier');
 							$type = isset($types[$id]) ? $types[$id] : 'POST';
+							if ($type=="POST" && $address_array['postcode']==""){
+								$address_array['postcode']= (property_exists($data->cart->delivery, "address") && 
+									property_exists($data->cart->delivery->address, "postcode"))?$data->cart->delivery->address->postcode:"606000";
+							}
+							if ($type=="SKIP") 
+								continue;
+							$quote = $this->{'model_shipping_'.$result['code']}->getQuote($address_array);
 							if ($quote)
 							{
-								$carriers[$k] = array(
-									'id' => $result['extension_id'],
-									'serviceName' => $quote['title'],
-									'type' => $type,
-									'price' => (float)number_format($this->currency->convert($this->tax->calculate($quote['quote'][$result['code']]['cost'], $product_info['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', ''),
-									'dates' => array(
-										'fromDate' => date('d-m-Y'),
-										'toDate' => date('d-m-Y'),
-									),
-								);
-								
-								if($type == 'PICKUP')
-								{
-									$this->load->model('yamodel/pokupki');
+								/*if ($type=="PICKUP"){
 									$outlets = $this->model_yamodel_pokupki->getOutlets();
-									$carriers[$k] = array_merge($carriers[$k], $outlets['json']);
+									$market_id = self::preOutlets($outlets['json']['outlets'], $quote['sort_order']);
+									$market_outlet = (int) $outlets['array'][$market_id]->id;
+									$pickup[] = array('id'=> $market_outlet);
+									continue;
+								}*/
+								$title_ship = (isset($quote['title2']))?$quote['title2']: $quote['title'];
+								$carriers[$k] = array();
+								$carriers[$k]['id'] = $result['code'];//$result['extension_id'];
+
+								$carriers[$k]['serviceName'] = $title_ship;
+								if ($type == 'POST') $carriers[$k]['paymentAllow'] = false;
+
+								$carriers[$k]['type'] = $type;
+								if (!isset($quote['quote'][$result['code']])) {
+									$this->log_save("См. Cart.php, т.к. в списке доставок отсутствует ключ ".$result['code']);
+									continue;
+								}
+								$carriers[$k]['price'] = (float)number_format(
+									$this->currency->convert(
+										$this->tax->calculate(
+											$quote['quote'][$result['code']]['cost'], 
+											$product_info['tax_class_id'], 
+											$this->config->get('config_tax')
+										),
+										$shop_currency, 
+										$offers_currency
+									), 
+									$decimal_place, '.', '');
+								$carriers[$k]['dates'] = array(
+										'fromDate' => date('d-m-Y', time()),
+										'toDate' => date('d-m-Y', time()+24*60*60),
+									);
+								if($type == 'PICKUP') 
+								{
+									$outlets = $this->model_yamodel_pokupki->getOutlets();
+									$market_id = self::preOutlets($outlets['json']['outlets'], $quote['sort_order']);
+									$market_outlet = (int) $outlets['array'][$market_id]->id;
+									$carriers[$k]['outlets'][] = array('id'=> $market_outlet);
 								}
 								
 								$k++;
 							}
 						}
 					}
-					
+					/*
+					$carriers[$k]['id'] ="pickup";
+					$carriers[$k]['serviceName'] ="Самовывоз";
+					$carriers[$k]['type'] ="PICKUP";
+					$carriers[$k]['price'] = 0;
+					$carriers[$k]['dates'] = array(
+										'fromDate' => date('d-m-Y', time()),
+										'toDate' => date('d-m-Y', time()+24*60*60),);
+					$carriers[$k]['outlets'] = $pickup;
+					*/
+					//$mytime .= $this->getTime("Конец цикла getExtensions('shipping')");
 					if ($this->config->get('ya_pokupki_yandex'))
 						$payments[] = 'YANDEX';
-
-					//if ($this->config->get('ya_pokupki_sprepaid'))
-						//$payments[] = 'SHOP_PREPAID';
 
 					if ($this->config->get('ya_pokupki_cash'))
 						$payments[] = 'CASH_ON_DELIVERY';
@@ -244,17 +292,52 @@ class ControllerYandexbuyCart extends Controller
 						'paymentMethods' => $payments
 					)
 				);
-
+				//$mytime .= $this->getTime("Подытог ");
 				$this->response->addHeader('Content-Type: application/json; charset=utf-8');
 				$this->response->setOutput(json_encode($array));
 			}
 		}
 	}
-	
+
+	private static function preOutlets($list, $find){
+		foreach ($list as $key_outlet => $val_outlet) {
+			if ($val_outlet['id']== $find){
+				return $key_outlet;
+			}
+		}
+		return false;
+	}
+
+	private static function get_region($region){
+		$item = $region;
+		$iStop=0;
+		do{
+			switch ($item->type) {
+				case 'COUNTRY_DISTRICT':
+					$data["district_id"]=$item->id;
+					break;
+				case 'CITY':
+					$data["city"] = $item->name;
+					break;
+				case 'SUBJECT_FEDERATION':
+					$data["zone"] = $item->name;
+					break;
+				case 'COUNTRY':
+					$data["country"] = $item->name;
+					break;
+
+			}
+			$item = (property_exists($item, 'parent'))?$item->parent:null;
+			$item = ($iStop>15)?null:$item;
+			$iStop++;
+		} 
+		while ($item!== null); 
+		return $data;
+	}
 	public static function log_save($logtext)
 	{
 		$error_log = new Log('error.log');
 		$error_log->write($logtext.PHP_EOL);
-		$error_log = null;
+		$error_log = null; 
 	}
 }

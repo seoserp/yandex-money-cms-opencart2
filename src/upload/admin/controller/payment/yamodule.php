@@ -1,8 +1,6 @@
 <?php
 class ControllerPaymentYamodule extends Controller {
 
-    private $error;
-
 	public function index() {
 		$this->load->language('payment/yamodule');
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -424,9 +422,6 @@ class ControllerPaymentYamodule extends Controller {
 	public function test(){
 		$data = array();
 		$this->load->model('setting/setting');
-        $this->load->language('feed/yamodule');
-        $this->load->language('payment/yamodule');
-
 		$sid = $this->config->get('ya_kassa_sid');
 		$sсid = $this->config->get('ya_kassa_scid');
 		$psw = $this->config->get('ya_kassa_pw');
@@ -438,101 +433,13 @@ class ControllerPaymentYamodule extends Controller {
 		$data['listTests'] = array('zeroTest','firstTest');
 		if (!empty($firstTest->resultData)) $data['listTests'][]='secondTest';
 		$data['secondTest'] = new checkXmlAnswer(array('raw'=> $firstTest->resultData, 'url' => $url, 'shopId'=>$sid));
-        $data['email'] = (isset($this->request->post['email']))?filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL):$this->config->get('config_email');
-        $data['from_email'] = $this->config->get('config_email');
-        $data['text'] = "";
-        $data['can_push'] = (isset($this->request->cookie['yamodule_kassa_sendmail_timeout']))?$this->request->cookie['yamodule_kassa_sendmail_timeout']:false;
-        //
-        if (($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validateForm()))
-        {
-            $mail_cc = filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL);
-            $data['email'] = $mail_cc;
-            $mail_text = htmlentities($this->request->post['text']);
-            $data['text'] = html_entity_decode($mail_text);
-            $subject = sprintf($this->language->get('sendmail_subject'), $this->config->get('config_email'), $sid);
-
-            $message = $this->language->get('mail_intro')."<br><br>";
-            $message .= "CMS Opencart ver. ".VERSION.PHP_EOL;
-            $message .= "Y.CMS Opencart ver. ".$this->language->get('ya_version').PHP_EOL;
-            $message .= PHP_EOL;
-            $message .= "shopId ".$sid.PHP_EOL;
-            $message .= "scid ".$sсid.PHP_EOL;
-            $message .= "hash ".md5($psw).PHP_EOL;
-            $message .= "checkUrl/avisoUrl ".$url.PHP_EOL;
-            $message .= PHP_EOL;
-            foreach ($this->getMinimalExt() as $name=>$val)$message .= $this->language->get('mail_ext_title').$name." - ".$val. PHP_EOL;
-            $message .= PHP_EOL;
-            foreach ($data['listTests'] as $clsTest)  {
-                $txt_Test = ($data[$clsTest]->done)?"OK":$data[$clsTest]->getWarnText();
-                $message .= $data[$clsTest]->getTitle()." ".$txt_Test.PHP_EOL;
-            }
-            $message .= PHP_EOL;
-            $message .= $this->language->get('mail_reply').$mail_cc.PHP_EOL;
-            $message .= $this->language->get('mail_message').PHP_EOL;
-            $message .= $mail_text;
-            $message .= PHP_EOL;
-            if ($this->sendMailForm("cms@yamoney.ru", $mail_cc, $subject, $message)) {
-                $data['can_push'] = time();
-                setcookie("yamodule_kassa_sendmail_timeout", $data['can_push'],time()+60*60*24);
-            }
-        }
-        foreach (array("sendmail", "email", "text") as $name_error) if (isset($this->error[$name_error])) $data['error_'.$name_error] = $this->error[$name_error];
 		//
-        $data['header'] = $this->load->controller('common/header');
+		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
 		$this->response->setOutput($this->load->view('yamodule/check'.$end_tpl, $data));
 	}
-	private function validateForm(){
-        if ((utf8_strlen($this->request->post['text']) < 10) || (utf8_strlen($this->request->post['text']) > 1024)) {
-            $this->error['text'] = $this->language->get('error_text');
-        }
-        if ((utf8_strlen($this->request->post['email']) > 96) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)){
-            $this->error['email'] = $this->language->get('error_mail');
-        }
-        if (isset($this->request->cookie['yamodule_kassa_sendmail_timeout'])){
-            $this->error['expire'] = $this->language->get('error_expire');
-        }
-        return !$this->error;
-    }
-	private function sendMailForm($to, $replay, $subject, $message){
-        try{
-            $mail = new Mail();
-            $mail->protocol = $this->config->get('config_mail_protocol');
-            $mail->parameter = $this->config->get('config_mail_parameter');
-            $mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-            $mail->smtp_username = $this->config->get('config_mail_smtp_username');
-            $mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-            $mail->smtp_port = $this->config->get('config_mail_smtp_port');
-            $mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
-            $mail->setTo($to);
-            $mail->setFrom($this->config->get('config_email'));
-            $mail->setSender($this->config->get('config_email'));
-            $mail->setReplyTo($replay);
-            $mail->setSubject($subject);
-            $mail->setText($message);
-            $mail->send();
-            return true;
-        }catch(Exception $e){
-            $this->error['sendmail'] = sprintf($this->language->get('fail_sendmail'), $e->getMessage());
-            return false;
-        }
-    }
-	private function getMinimalExt(){
-	    $arResult = array('curl'=>"", 'openssl'=>"", 'php'=>"");
-        if (extension_loaded("curl")){
-            $v_curl =curl_version();
-            if (extension_loaded("openssl")){
-                $arResult['openssl'] = $v_curl['ssl_version'];
-            }
-            $arResult['curl'] = $v_curl['version'];
-        }
-        $arResult['php'] = phpversion();
-        return $arResult;
-    }
-
 	public function install() {
 		$this->load->model('setting/setting');
 		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 1));
@@ -655,12 +562,6 @@ class TestBaseClass{
 		if (count($this->warning)>0) return $this->warning;
 		return array();
 	}
-
-    public function getWarnText(){
-        $sResult = "";
-        if (count($this->warning)>0) foreach ($this->warning as $item => $value) $sResult.=$value['text'].PHP_EOL;
-        return $sResult;
-    }
 
 	public function getTitle(){
 		return $this->name;

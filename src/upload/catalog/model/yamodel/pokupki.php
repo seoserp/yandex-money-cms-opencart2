@@ -39,6 +39,38 @@ Class ModelYamodelPokupki extends Model
 		return $query->rows;
 	}
 
+	public function getCountryId($name) {
+		if ($name == "Россия") $name = "Российская Федерация";
+		$query = $this->db->query("SELECT `country_id` `id` FROM `" . DB_PREFIX . "country` WHERE `name` ='".$name."'"); 
+
+		return $query->row['id'];
+	}
+	public function getPostCode ($id) {
+		$post_index = array(
+			"3" => 101001,//"Центральный федеральный округ",
+			"17"=>190190,//"Северо-Западный федеральный округ",
+			"26"=>344344,//"Южный федеральный округ",
+			"102444" => 357500,//"Северо-Кавказский федеральный округ",
+			"40" => 606000, //"Приволжский федеральный округ",
+			"52" => 620620,//"Уральский федеральный округ",
+			"59" => 630630,//"Сибирский федеральный округ",
+			"73" => 680001 //"Дальневосточный федеральный округ",
+		);
+		if(isset($post_index[$id])) return $post_index[$id];
+		return 0;
+	}
+	public function getQuoteShipping($shipping_id, $address){
+		$this->load->model('shipping/'.$shipping_id);
+		$quote = $this->{'model_shipping_'.$shipping_id}->getQuote($address);
+		if ($quote) return $quote['quote'][$shipping_id];
+		return "";
+	}
+	public function getZoneId($name, $country_id) {
+		$query = $this->db->query("SELECT `zone_id` `id` FROM `" . DB_PREFIX . 
+			"zone` WHERE `name` LIKE ('%".$name."%') AND `country_id`='".$country_id."'"); 
+		return (isset($query->row['id']))?$query->row['id']:0; 
+	}
+
 	public function getOrders()
 	{
 		$number = $this->config->get('ya_pokupki_number');
@@ -80,6 +112,15 @@ Class ModelYamodelPokupki extends Model
 		return $data = $this->SendResponse('/campaigns/'.$number.'/orders/'.$id.'/status', array(), $params, 'PUT');
 	}
 
+	public function sendDelivery($delivery, $id)
+	{
+		$params = array(
+			'delivery' => $delivery
+		);
+		$number = $this->config->get('ya_pokupki_number');
+
+		return $data = $this->SendResponse('/campaigns/'.$number.'/orders/'.$id.'/delivery', array(), $params, 'PUT');
+	}
 	public function SendResponse($to, $headers, $params, $type)
 	{
 		$app_id = $this->config->get('ya_pokupki_idapp');

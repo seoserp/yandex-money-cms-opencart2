@@ -11,22 +11,23 @@ class ControllerFeedYamarket extends Controller {
 		$this->load->model('catalog/product');
 		$this->load->model('tool/image');
 		$this->load->model('localisation/currency');
-
 		$categories = $this->model_yamodel_yamarket->getCategories();
 		$allow_cat_array = $this->config->get('ya_market_categories');
         if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
             $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
         } else {
-            die("Need select categories");
+            throw new Exception("Need select categories");
         }
-		$products = $this->model_yamodel_yamarket->getProducts($ids_cat, true);
+		$products = $this->model_yamodel_yamarket->getProducts($ids_cat, false);
 		$currencies = $this->model_localisation_currency->getCurrencies();
         $shop_currency = $this->config->get('config_currency');
 		$offers_currency = 'RUB';
 		$currency_default = $this->model_yamodel_yamarket->getCurrencyByISO($offers_currency);
-        if (!isset($currency_default['value'])) die("Not exist RUB");
+        if (!isset($currency_default['value'])) throw new Exception("Not exist RUB");
 
-		$decimal_place = 2;
+		$decimal_place = $this->currency->getDecimalPlace($offers_currency);
+        if (empty($decimal_place) || $decimal_place==0) throw new Exception("Need set decimal places for RUB");
+
 		$currencies = array_intersect_key($currencies, array_flip(array('RUR', 'RUB', 'USD', 'EUR', 'UAH')));
 		$yamarket = new YandexMarket($this->config);
 		$yamarket->yml('utf-8');
@@ -82,7 +83,7 @@ class ControllerFeedYamarket extends Controller {
 				$data['price'] = $product['special'];
 			$data['currencyId'] = $currency_default['code'];
 			$data['categoryId'] = $product['category_id'];
-			$data['vendor'] = $product['manufacturer'];
+			$data['vendor'] = (empty($data['vendor']))?'Имп.':$product['manufacturer'];
 			$data['vendorCode'] = $product['model'];
 
             //TODO Добавить зависимость delivery, pickup, store от кол-ва товара на складе
@@ -104,9 +105,9 @@ class ControllerFeedYamarket extends Controller {
 			if ($product['minimum'] > 1)
 				$data['sales_notes'] = 'Минимальное кол-во для заказа: '.$product['minimum'];
 			$data['picture'] = array();
-			if (isset($product['image'])) $data['picture'][] = $this->model_tool_image->resize($product['image'], 600, 600);
+			if (isset($product['image'])) $data['picture'][] = str_replace(" ", "%20", $this->model_tool_image->resize($product['image'], 600, 600));
 			foreach ($this->model_catalog_product->getProductImages($data['id']) as $pic){
-				if (count($data['picture'])<=9) $data['picture'][] = str_replace('&amp;','&',$this->model_tool_image->resize($pic['image'], 600, 600));
+				if (count($data['picture'])<=9) $data['picture'][] = str_replace(array('&amp;',' '),array('&', '%20'),$this->model_tool_image->resize($pic['image'], 600, 600));
 			}
 
 			if ($this->config->get('ya_market_prostoy'))
@@ -227,7 +228,8 @@ class ControllerFeedYamarket extends Controller {
 					if (isset($data_temp['oldprice']))
 						$data_temp['oldprice'] = number_format($this->currency->convert($this->tax->calculate($data_temp['oldprice'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 					if ($data['price'] > 0) {
-						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available'], $product['product_id']);
+                        $data_temp['group_id'] = $product['product_id'];
+						$object->add_offer($data_temp['id'], $data_temp, $data_temp['available']);
 					}
 					unset($data_temp);
 				}
@@ -236,7 +238,8 @@ class ControllerFeedYamarket extends Controller {
 			{
 				$data['price'] = number_format($this->currency->convert($this->tax->calculate($data['price'], $product['tax_class_id'], $this->config->get('config_tax')), $shop_currency, $offers_currency), $decimal_place, '.', '');
 				if ($data['price'] > 0) {
-					$object->add_offer($data['id'], $data, $data['available'], $product['product_id']);
+                    $data['group_id'] = $product['product_id'];
+					$object->add_offer($data['id'], $data, $data['available']);
 				}
 			}
 
@@ -365,17 +368,19 @@ class YandexMarket{
 		return true;
 	}
 
-	function add_offer($id, $data, $available = true, $group_id = 0)
+	function add_offer($id, $data, $available = true)
 	{
         $allowed = array(
             'url', 'price', 'currencyId', 'categoryId', 'picture', 'store', 'pickup', 'delivery',
             'name', 'vendor', 'vendorCode', 'model', 'description', 'sales_notes',
-            'delivery-options',
+            'delivery-options', 'group_id',
             'downloadable', 'weight', 'dimensions', 'param', 'sales_notes', 'country_of_origin'
         );
         $param = array();
 		// $data['model'] = $data['id'].'_tovar';
 		// $data['vendor'] = $data['id'].'_tovar';
+		if(isset($data['param']))
+			$param = $data['param'];
 		foreach($data as $k => $v)
 		{
 			if(!in_array($k, $allowed)) unset($data[$k]);
@@ -398,7 +403,6 @@ class YandexMarket{
 				$data[$key] = $tmp[$key];
 
 		$out = array('id' => $id, 'data' => $data, 'available' => ($available) ? 'true' : 'false');
-        if ($group_id>0) $out['group_id'] = $group_id;
 		if(!$this->config->get('ya_market_prostoy'))
 			$out['type'] = 'vendor.model';
 		$this->offers[] = $out;

@@ -23,7 +23,7 @@ class ControllerYandexbuyOrder extends Controller
 		$this->load->model('extension/extension');
 		$results = $this->model_extension_extension->getExtensions('shipping');
 		foreach ($results as $res)
-			if ($res['extension_id'] == $id)
+			if ($res['extension_id'] == $id || $res['code']==$id)
 				return $res['code'].'.'.$res['code'];
 		
 		return '';
@@ -89,7 +89,6 @@ class ControllerYandexbuyOrder extends Controller
 
 					if ($this->cart->countProducts() == $count_items)
 					{
-						$taxes = $this->cart->getTaxes();
 						$this->session->data['customer_id'] = '';
 						$message = isset($data->order->notes) ? $data->order->notes : null;
 						$customer_info = $this->model_account_customer->getCustomer($this->config->get('yandexbuy_customer'));
@@ -101,6 +100,12 @@ class ControllerYandexbuyOrder extends Controller
 						$floor = isset($delivery->floor) ? ' Этаж: '.$delivery->floor : '';
 						$house = isset($delivery->house) ? ' Дом: '.$delivery->house : '';
 						$address1 = $street.$subway.$block.$floor.$house;
+						//
+						$region = self::get_region($data->order->delivery->region);
+						$this->load->model('yamodel/pokupki');
+						$country_id = $this->model_yamodel_pokupki->getCountryId($region['country']);
+						$zone_id = $this->model_yamodel_pokupki->getZoneId($region['zone'], $country_id);
+						//Customer
 						$order_data['customer_id'] = $customer_info['customer_id'];
 						$order_data['customer_group_id'] = $customer_info['customer_group_id'];
 						$order_data['firstname'] = $customer_info['firstname'];
@@ -108,33 +113,33 @@ class ControllerYandexbuyOrder extends Controller
 						$order_data['email'] = $customer_info['email'];
 						$order_data['telephone'] = $customer_info['telephone'];
 						$order_data['fax'] = $customer_info['fax'];
-						$order_data['shipping_firstname'] = $customer_info['firstname'];
-						$order_data['shipping_lastname'] = $customer_info['lastname'];
-						$order_data['shipping_company'] = '';
-						$order_data['shipping_address_1'] = $address1;
-						$order_data['shipping_city'] = isset($delivery->city) ? $delivery->city : 'Город';
-						$order_data['shipping_postcode'] = isset($delivery->postcode) ? $delivery->postcode : 000000;
-						$order_data['shipping_zone'] = $this->getRegion($data->order->delivery->region, 'SUBJECT_FEDERATION');
-						$order_data['shipping_zone_id'] = '';
-						$order_data['shipping_country'] = $data->order->delivery->address->country;
-						$order_data['shipping_country_id'] = '';
-						$order_data['shipping_address_format'] = '';
-						$order_data['shipping_method'] = $data->order->delivery->serviceName;
+						$this->log_save(print_r($order_data, true));
+						//Shipping
+						$shipping_data = array();
+						$shipping_data['shipping_firstname'] = $customer_info['firstname'];
+						$shipping_data['shipping_lastname'] = $customer_info['lastname'];
+						$shipping_data['shipping_company'] = '';
+						$shipping_data['shipping_address_1'] = $address1;
+						$shipping_data['shipping_address_2'] = '';
+						$shipping_data['shipping_city'] = isset($delivery->city) ? $delivery->city : 'Город';
+						$shipping_data['shipping_postcode'] = isset($delivery->postcode) ? $delivery->postcode : 000000;
+						$shipping_data['shipping_zone'] = $this->getRegion($data->order->delivery->region, 'SUBJECT_FEDERATION');
+						$shipping_data['shipping_zone_id'] = $zone_id;
+						$shipping_data['shipping_country'] = $data->order->delivery->address->country;
+						$shipping_data['shipping_country_id'] = $country_id;
+						$shipping_data['shipping_address_format'] = '';
+						$address_array =array();
+						foreach ($shipping_data as $key=>$value) $address_array[str_replace("shipping_","",$key)] = $value;
+						$order_data = array_merge($order_data, $shipping_data);
+						$order_data['shipping_method'] = $this->model_yamodel_pokupki->getQuoteShipping ($data->order->delivery->id, $address_array);
 						$order_data['shipping_code'] = $this->getShipping($data->order->delivery->id);
-						$order_data['shipping_address_2'] = '';
-						$order_data['payment_firstname'] = $customer_info['firstname'];
-						$order_data['payment_lastname'] = $customer_info['lastname'];
-						$order_data['payment_address_1'] = $address1;
-						$order_data['payment_city'] = isset($delivery->city) ? $delivery->city : 'Город';
-						$order_data['payment_postcode'] = isset($delivery->postcode) ? $delivery->postcode : 000000;
-						$order_data['payment_zone'] = $this->getRegion($data->order->delivery->region, 'SUBJECT_FEDERATION');
-						$order_data['payment_zone_id'] = '';
-						$order_data['payment_country'] = $data->order->delivery->address->country;
-						$order_data['payment_country_id'] = '';
-						$order_data['payment_address_format'] = '';
+						//Payment
+						$payment_data = array();
+						foreach ($shipping_data as $key=>$value) $payment_data[str_replace("shipping_","payment_",$key)] = $value;
+						$order_data = array_merge($order_data, $payment_data);
 						$order_data['payment_method'] = ((isset($data->order->paymentMethod))?$data->order->paymentMethod:'');
-						$order_data['payment_address_2'] = '';
 						$order_data['payment_code'] = 'yamodule';
+						//
 						$order_data['language_id'] = $this->config->get('config_language_id');
 						if (version_compare(VERSION, "2.2.0", '>=')){
 							$order_data['currency_id'] = $this->currency->getId("RUB");
@@ -145,6 +150,7 @@ class ControllerYandexbuyOrder extends Controller
 							$order_data['currency_code'] = $this->currency->getCode();
 							$order_data['currency_value'] = $this->currency->getValue($this->currency->getCode());
 						}
+						$this->session->data['shipping_method'] = $order_data['shipping_method']; 						//
 						$order_data['ip'] = '127.0.0.1';//$this->request->server['REMOTE_ADDR'];
 						$order_data['forwarded_ip'] = '127.0.0.1';//$this->request->server['HTTP_X_FORWARDED_FOR'];
 						$order_data['user_agent'] = 'Yandex';//$this->request->server['HTTP_USER_AGENT'];
@@ -160,13 +166,44 @@ class ControllerYandexbuyOrder extends Controller
 						$order_data['commission'] = 0;
 						$order_data['marketing_id'] = 0;
 						$order_data['tracking'] = '';
-						$order_data['totals'] = array();
 						$order_data['payment_company'] = '';
+						//
+						$this->session->data=$order_data;
+						$order_data['shipping_method'] = $this->session->data['shipping_method']['code'];
+
+						foreach ($this->cart->getProducts() as $product) {
+							$option_data = array();
+							foreach ($product['option'] as $option) {
+								$option_data[] = array(
+									'product_option_id'       => $option['product_option_id'],
+									'product_option_value_id' => $option['product_option_value_id'],
+									'option_id'               => $option['option_id'],
+									'option_value_id'         => $option['option_value_id'],
+									'name'                    => $option['name'],
+									'value'                   => $option['value'],
+									'type'                    => $option['type']
+								);
+							}
+							$order_data['products'][] = array(
+								'product_id' => $product['product_id'],
+								'name'       => $product['name'],
+								'model'      => $product['model'],
+								'option'     => $option_data,
+								'download'   => $product['download'],
+								'quantity'   => $product['quantity'],
+								'subtract'   => $product['subtract'],
+								'price'      => $product['price'],
+								'total'      => $product['total'],
+								'tax'        => $this->tax->getTax($product['price'], $product['tax_class_id']),
+								'reward'     => $product['reward']
+							);
+						}
+						//
 						$this->load->model('extension/extension');
 						$sort_order = array();
-
 						$totals = array();
 						$total = 0;
+						$taxes = $this->cart->getTaxes();
 						// Because __call can not keep var references so we put them into an array.
 						$total_data = array(
 							'totals' => &$totals,
@@ -188,38 +225,15 @@ class ControllerYandexbuyOrder extends Controller
 								}
 							}
 						}
-						
-						$order_data['total'] = $total;
-						foreach ($this->cart->getProducts() as $product) {
-							$option_data = array();
-
-							foreach ($product['option'] as $option) {
-								$option_data[] = array(
-									'product_option_id'       => $option['product_option_id'],
-									'product_option_value_id' => $option['product_option_value_id'],
-									'option_id'               => $option['option_id'],
-									'option_value_id'         => $option['option_value_id'],
-									'name'                    => $option['name'],
-									'value'                   => $option['value'],
-									'type'                    => $option['type']
-								);
-							}
-
-							$order_data['products'][] = array(
-								'product_id' => $product['product_id'],
-								'name'       => $product['name'],
-								'model'      => $product['model'],
-								'option'     => $option_data,
-								'download'   => $product['download'],
-								'quantity'   => $product['quantity'],
-								'subtract'   => $product['subtract'],
-								'price'      => $product['price'],
-								'total'      => $product['total'],
-								'tax'        => $this->tax->getTax($product['price'], $product['tax_class_id']),
-								'reward'     => $product['reward']
-							);
+						//
+						$sort_order = array();
+						foreach ($total_data['totals'] as $key => $value) {
+							$sort_order[$key] = $value['sort_order'];
 						}
-						
+						array_multisort($sort_order, SORT_ASC, $total_data['totals']);
+						$order_data = array_merge($order_data, $total_data);
+						$this->log_save(print_r($order_data, true));
+						//
 						$id_order = $this->model_checkout_order->addOrder($order_data);
 						$this->model_checkout_order->addOrderHistory($id_order, 1, 'Заказ '.$data->order->id.' сформирован по запросу Яндекс.Маркета', false);
 						$this->session->data['order_id'] = $id_order;
@@ -271,7 +285,34 @@ class ControllerYandexbuyOrder extends Controller
 			}
 		}
 	}
-	
+
+	private static function get_region($region){
+		$item = $region;
+		$data=array();
+		$iStop=0;
+		do{
+			switch ($item->type) {
+				case 'COUNTRY_DISTRICT':
+					$data["district_id"]=$item->id;
+					break;
+				case 'CITY':
+					$data["city"] = $item->name;
+					break;
+				case 'SUBJECT_FEDERATION':
+					$data["zone"] = $item->name;
+					break;
+				case 'COUNTRY':
+					$data["country"] = $item->name;
+					break;
+
+			}
+			$item = (property_exists($item, 'parent'))?$item->parent:null;
+			$item = ($iStop>15)?null:$item;
+			$iStop++;
+		}
+		while ($item!== null);
+		return $data;
+	}
 	public function getShopOrderId($id)
 	{
 		$query = $this->db->query('SELECT * FROM '.DB_PREFIX.'pokupki_orders WHERE `id_market_order` = '.(int)$id);
@@ -310,7 +351,6 @@ class ControllerYandexbuyOrder extends Controller
 					$this->load->model('account/address');
 					$this->load->model('checkout/order');
 					$order = $this->model_checkout_order->getOrder($shop_order['id_order']);
-
 					$buyer = isset($data->order->buyer) ? $data->order->buyer : '';
 					if ($buyer!='' && (isset($buyer->firstName) && isset($buyer->lastName))){
 						$order['payment_firstname'] = $buyer->firstName;
@@ -334,6 +374,31 @@ class ControllerYandexbuyOrder extends Controller
 						case "PROCESSING":
 							$status = $this->config->get('ya_pokupki_status_processing');
 							$text = $this->language->get('text_marketcpa_toprocessing');
+							//Определяем индекс для заказов через почту
+							if ($data->order->delivery->type=="POST"){
+								$this->load->model('yamodel/pokupki');
+								$shipping_data = array_filter($order, function ($key){
+									return (substr($key,0, strlen("shipping_"))=="shipping_")?true:false;
+								});
+								foreach ($shipping_data as $key=>$value) $address_array[str_replace("shipping_","",$key)] = $value;
+								$quote = $this->model_yamodel_pokupki->getQuoteShipping($data->order->delivery->id, $address_array);
+									if ($quote)
+									{
+										$old_delivery_price =(float) $order['shipping_method']['cost'];
+										$new_delivery = $data->order->delivery;
+										$new_delivery->price = (float) $quote['cost'];
+										$new_delivery->dates->fromDate = date('d-m-Y', time());
+										$new_delivery->dates->toDate = date('d-m-Y', time()+24*60*60);
+										if($this->model_yamodel_pokupki->sendDelivery($new_delivery, $data->order->id)){
+											$order['shipping_method'] = $quote;
+											$order['shipping_code'] = $this->getShipping($data->order->delivery->id);
+											$this->editOrder($shop_order['id_order'], $order);
+											$this->model_checkout_order->addOrderHistory($shop_order['id_order'], 1, sprintf('Для заказа %s изменена стоимость доставки с %s на %s', $data->order->id, $old_delivery_price, $new_delivery->price), false);
+										}
+										//echo print_r($json,true);
+									}
+							}
+							//
 							break;
 						case "DELIVERY":
 							$status = $this->config->get('ya_pokupki_status_delivery');

@@ -138,11 +138,10 @@ class ControllerYamoduleMws extends Controller {
 			
 			$payment = $mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
 			if (!isset($payment['invoiceId'])) {
-                //$mws->PkeyPem ="";
-                //$mws->CertPem ="";
 				$errors[]=$this->language->get('err_mws_listorder');
-                //$this->log->write(print_r($mws, true));
-                //$this->log->write(print_r($_SERVER['SERVER_ADDR'], true));
+				//
+				//$this->log_save($mws->txt_request);
+				//$this->log_save($mws->txt_request);
 			}
 			
 			if (!$errors && $this->request->server['REQUEST_METHOD'] == 'POST' && $is_act_return && isset($this->request->post['return_sum'])){
@@ -440,9 +439,9 @@ Class YamoduleMws{
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_ENCODING, "");
-		curl_setopt($ch, CURLOPT_USERAGENT, "Yamoney/Plugin");  // useragent
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.14");  // useragent
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 120);
 		curl_setopt($ch,CURLOPT_POST, 1);
 		curl_setopt($ch,CURLOPT_POSTFIELDS, $xml);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
