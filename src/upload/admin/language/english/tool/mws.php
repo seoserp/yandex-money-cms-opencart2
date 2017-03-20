@@ -1,58 +1,58 @@
 <?php
 // Heading
-$_['heading_title']            = 'Управление денежными средствами';
+$_['heading_title']            = 'Fund Management';
 
 // Text
-$_['tab_return']                 = 'Возврат';
-$_['tab_history']                = 'История';
+$_['tab_return']                 = 'Refund';
+$_['tab_history']                = 'History';
 
-$_['text_order_id']       = 'Номер заказа';
-$_['lbl_mws_inv']       = 'Номер транзакции (Яндекс.Касса)';
-$_['text_payment_method']      = 'Способ оплаты:';
-$_['text_total']               = 'Сумма оплаты:';
-$_['text_return_total']        = 'Возвращено:';
-$_['text_amount']	= 'Вернуть';
-$_['text_cause']	= 'Причина возврата';
-$_['btn_return']	=	"Сделать возврат";
-$_['text_return_success']	= 'Платеж успешно возвращен';
+$_['text_order_id']       = 'Order number';
+$_['lbl_mws_inv']       = 'Transaction number (Yandex.Chechout)';
+$_['text_payment_method']      = 'Payment method:';
+$_['text_total']               = 'Payment amount:';
+$_['text_return_total']        = 'Returned:';
+$_['text_amount']  = 'Return';
+$_['text_cause']   = 'Refund reason';
+$_['btn_return']   =  "Make refund";
+$_['text_return_success']  = 'Payment returned successfully';
 
-$_['text_history']        = 'Список возвратов';
-$_['tbl_head_date']	= 'Дата возврата';
-$_['tbl_head_amount']	= 'Сумма возврата';
-$_['tbl_head_cause']	= 'Причина возврата';
+$_['text_history']        = 'Refund list';
+$_['tbl_head_date']    = 'Refund date';
+$_['tbl_head_amount']  = 'Refund amount';
+$_['tbl_head_cause']   = 'Refund reason';
 
-$_['text_history_empty']	=	"Успешные возвраты по данному платежу отсутствуют";
-$_['text_invoice_empty']	=	"Информация по платежу отсутствует. Причиной может быть ошибочный сертификат по работе с MWS или настройки модуля Яндекс.Касса";
+$_['text_history_empty']   =  "No successful refunds for this payment";
+$_['text_invoice_empty']   =  "No information for this payment. May be caused by errorous certificate for work with the MWS or settings of the Yandex.Checkout module";
 
-$_['err_mws_shopid']	=	'В модуле Яндекс.Касса указан пустой идентификатор магазина (shopId)';
-$_['err_mws_kassa']	=	'Модуль Яндекс.Кассы отключен';
-$_['err_mws_listorder']	=	"Ошибка запроса данных об операции. <br><br>
-                             Технические подробности:<br>
-                             <code> %s </code> 
+$_['err_mws_shopid']   =  'Void shop identifier (shopId) is specified in the Yandex.Checkout module';
+$_['err_mws_kassa']    =  'The Yandex.Checkout module is disabled';
+$_['err_mws_listorder']    =  "Error of requesting the operation details. <br><br>
+                             Technical details:<br>
+                             <code> %s </code>
                              <br>
                              <code> %s </code><br><br>
                              <code> %s </code>";
 
-$_['err_mws_amount']	=	'Сумма возврата не может превышать сумму платежа';
-$_['err_mws_cause']	=	'Причина возврата не может быть пустой или превышать длину в 100 символов';
+$_['err_mws_amount']   =  'Refund amount cannot exceed payment amount';
+$_['err_mws_cause']    =  'Refund reason cannot be empty or exceed 100 characters';
 //Payment
-$_['text_method_none']       = 'Неизвестный платежный метод';
-$_['text_method_PC']       = 'Оплата из кошелька в Яндекс.Деньгах';
-$_['text_method_WM']       = 'Оплата из кошелька в системе WebMoney';
-$_['text_method_MC']       = 'Платеж со счета мобильного телефона';
-$_['text_method_AC']       = 'Оплата с произвольной банковской карты';
-$_['text_method_GP']       = 'Оплата наличными через кассы и терминалы';
-$_['text_method_SB']       = 'Оплата через Сбербанк: оплата по SMS или Сбербанк Онлайн';
-$_['text_method_AB']       = 'Оплата через Альфа-Клик';
-$_['text_method_MA']       = 'Оплата через MasterPass';
-$_['text_method_PB']       = 'Оплата через Промсвязьбанк';
-$_['text_method_QW']       = 'Оплата через QIWI Wallet';
-$_['text_method_QP']       = 'Оплата через доверительный платеж (Куппи.ру)';
+$_['text_method_none']       = 'Unknown payment method';
+$_['text_method_PC']       = 'Payment from a Yandex.Money Wallet';
+$_['text_method_WM']       = 'Payment from a WebMoney Purse';
+$_['text_method_MC']       = 'Payment with direct carrier billing';
+$_['text_method_AC']       = 'Payment from a bank card';
+$_['text_method_GP']       = 'Payment in cash via payment kiosks and cash registers';
+$_['text_method_SB']       = 'Payment via Sberbank: by a text message or through Sberbank Online';
+$_['text_method_AB']       = 'Payment via Alfa-Click';
+$_['text_method_MA']       = 'Payment via MasterPass';
+$_['text_method_PB']       = 'Payment via Promsvyazbank';
+$_['text_method_QW']       = 'Payment via QIWI Wallet';
+$_['text_method_QP']       = 'Payment using promised payment service (QPPI.ru)';
 
 // Error
-$_['err_upload_type']      = 'Загружаемый файл имеет недопустимое расширение. Сертификат должен быть с расщирением .cer';
-$_['err_upload_size']      = 'Размер файла не должен превышать 2048 байт';
-$_['err_upload_main']      = 'Ошибка загрузки файла';
+$_['err_upload_type']      = 'The file you are uploading has incorrect format. The certificate needs to have .cer extension';
+$_['err_upload_size']      = 'The file size cannot exceed 2,048 bytes';
+$_['err_upload_main']      = 'File uploading error';
 
 $_['error_warning']            = 'Warning: Please check the form carefully for errors!';
 $_['error_permission']         = 'Warning: You do not have permission to modify orders!';
