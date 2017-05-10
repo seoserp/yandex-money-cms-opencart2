@@ -81,8 +81,9 @@ class ControllerPaymentYamodule extends Controller
 		{
 			$this->load->model('checkout/order');
 			$order_info = $this->model_checkout_order->getOrder($order_id);
-			if ($order_info['order_status_id'] != $this->config->get('ya_kassa_os'))
-				$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('ya_kassa_os'), '', true);
+            $status_name = ($this->config->get('ya_p2p_active'))?"ya_p2p_os":"ya_kassa_os";
+			if ($order_info['order_status_id'] != $this->config->get($status_name))
+				$this->model_checkout_order->addOrderHistory($order_id, $this->config->get($status_name), '', true);
 			if ($red)
 				$this->response->redirect($this->url->link('checkout/success', '', 'SSL'));
 		}
