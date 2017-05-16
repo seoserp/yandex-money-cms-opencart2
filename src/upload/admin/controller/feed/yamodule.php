@@ -435,8 +435,7 @@ class ControllerFeedYamodule extends Controller {
 		$extensions = $this->model_extension_extension->getInstalled('shipping');
 		foreach ($extensions as $key => $value) {
 			if (!file_exists(DIR_APPLICATION . 'controller/shipping/' . $value . '.php')) {
-				$this->model_extension_extension->uninstall('shipping', $value);
-
+				//$this->model_extension_extension->uninstall('shipping', $value);
 				unset($extensions[$key]);
 			}
 		}
