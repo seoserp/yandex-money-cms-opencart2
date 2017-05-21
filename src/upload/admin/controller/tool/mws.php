@@ -69,6 +69,8 @@ class ControllerToolMws extends Controller {
 		$this->load->model('sale/order');
 		$this->load->model('setting/setting');
 		$this->load->language('tool/mws');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $for23_model = (version_compare(VERSION, "2.3.0", '>='))?"extension_":"";
 
 		if (isset($this->request->get['order_id'])) {
 			$order_id = $this->request->get['order_id'];
@@ -121,7 +123,7 @@ class ControllerToolMws extends Controller {
 			$return_error = array();
 
 			//$return = new YamoduleReturn();
-			$this->load->model('yamodule/return');
+			$this->load->model($for23.'yamodule/return');
 
 			$conf = $this->model_setting_setting->getSetting("yamodule_mws");
 			$sid = $this->model_setting_setting->getSetting("ya_kassa_sid");
@@ -149,7 +151,7 @@ class ControllerToolMws extends Controller {
 				if (!$return_error){
 					$respPayment = $mws->request('returnPayment', array('invoiceId'=> $payment['invoiceId'], 'amount'=>	$amount, 'cause'=>$cause));
 					if (isset($respPayment['status'])){
-						$this->model_yamodule_return->addReturn(array(
+						$this->{"model_".$for23_model."yamodule_return"}->addReturn(array(
 							'amount'=>$amount,
 							'cause'=>$cause,
 							'request'=>$mws->txt_request || 'NULL',
@@ -173,7 +175,7 @@ class ControllerToolMws extends Controller {
 			$inv_sum = (isset($payment['orderSumAmount']))?$payment['orderSumAmount']:0;
 			$inv_type = (isset($payment['paymentType']))?$payment['paymentType']:"none";
 
-			$returns = $this->model_yamodule_return->getSuccessReturns($inv);
+			$returns = $this->{"model_".$for23_model."yamodule_return"}->getSuccessReturns($inv);
 			$sum_returned = (isset($returns->sum)?$returns->sum:0);
 			$data['return_items'] = (isset($returns->returns)?$returns->returns:false);
 			$data['invoiceId'] = $inv;
@@ -210,7 +212,7 @@ class ControllerToolMws extends Controller {
 				'href' => $this->url->link('tool/mws', 'token=' . $this->session->data['token'] . $url, 'SSL')
 			);
 			$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
-			$this->response->setOutput($this->load->view('yamodule/mws_info'.$end_tpl, $data));
+            $this->response->setOutput($this->load->view($for23.'yamodule/mws_info'.$end_tpl, $data));
 		
 		}else {
 			$this->load->language('error/not_found');

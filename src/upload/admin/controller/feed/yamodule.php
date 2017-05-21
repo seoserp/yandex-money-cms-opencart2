@@ -492,7 +492,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['mws_starter'] = $this->language->get('mws_starter');
 		$data['mws_starter'] = $this->language->get('mws_starter');
 	}
-	
+
 	public function index()
 	{
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
@@ -588,7 +588,7 @@ class ControllerFeedYamodule extends Controller {
 		}else{
 			//Генерация CSR
 			$this->load->controller('tool/mws/generate');
-			$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+			//$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?true:false;
 		//
@@ -655,7 +655,7 @@ class ControllerFeedYamodule extends Controller {
 		if (isset($this->session->data['pokupki_status']) && !empty($this->session->data['pokupki_status']))
 			$data['pokupki_status'] = array_merge($data['pokupki_status'], $this->session->data['pokupki_status']);
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
-		$this->response->setOutput($this->load->view('feed/yamodule'.$end_tpl, $data));
+		$this->response->setOutput($this->load->view($for23.'feed/yamodule'.$end_tpl, $data));
 	}
 
 	public function errors_alert($text)

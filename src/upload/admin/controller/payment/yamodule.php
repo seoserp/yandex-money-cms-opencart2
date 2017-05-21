@@ -423,7 +423,8 @@ class ControllerPaymentYamodule extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?'':".tpl";
-		$this->response->setOutput($this->load->view('yamodule/invoice_list'.$end_tpl, $data));
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->response->setOutput($this->load->view($for23.'yamodule/invoice_list'.$end_tpl, $data));
 	}
 	public function test(){
 		$data = array();
@@ -487,7 +488,7 @@ class ControllerPaymentYamodule extends Controller {
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 		$end_tpl = (version_compare(VERSION, "2.2.0", '>='))?"":".tpl";
-		$this->response->setOutput($this->load->view('yamodule/check'.$end_tpl, $data));
+		$this->response->setOutput($this->load->view($for23.'yamodule/check'.$end_tpl, $data));
 	}
 	private function validateForm(){
         if ((utf8_strlen($this->request->post['text']) < 10) || (utf8_strlen($this->request->post['text']) > 1024)) {
