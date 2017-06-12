@@ -79,7 +79,7 @@ class ControllerToolMws extends Controller {
 		}
 		$is_act_return = (isset($this->request->get['act']) && $this->request->get['act']=='return');
 		$order_info = $this->model_sale_order->getOrder($order_id);
-		
+
 		if ($order_info) {
 			$mws = new YamoduleMws();
 
@@ -139,6 +139,83 @@ class ControllerToolMws extends Controller {
 			$mws->CertPem = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?$conf['yamodule_mws_cert']:'';
 			
 			$payment = $mws->request('listOrders', array("orderNumber" => self::PREFIX_DEBUG.$order_id), false, false);
+            //$payment = array('orderSumAmount'=>'106.00', 'invoiceId'=>"200000000", "paymentType"=>"AC");
+            $data['ya_kassa_send_check'] = $this->config->get('ya_kassa_send_check');
+            $products = array();
+            if ($this->config->get('ya_kassa_send_check')) {
+                $this->load->model('sale/order');
+                $this->load->model('catalog/product');
+                $products = $this->model_sale_order->getOrderProducts($this->request->get['order_id']);
+                $totals = $this->model_sale_order->getOrderTotals($this->request->get['order_id']);
+                $delivery = 0;
+                $sum =0;
+
+                foreach ($totals as $total) {
+                    if ($total['code'] == 'shipping') {
+                        $delivery = $total['value'];
+                    }
+
+                    if ($total['code'] == 'sub_total') {
+                        $sum += $total['value'];
+                    }
+
+                    if ($total['code'] == 'tax') {
+                        $sum += $total['value'];
+                    }
+                }
+                global $registry;
+                $tax_calc = (version_compare(VERSION, "2.2.0", '<'))? new Tax($registry):$this->tax;
+                foreach ($products as &$row) {
+                    $row_tmp = $this->model_catalog_product->getProduct($row['product_id']);
+                    $row['tax_class_id'] = $row_tmp['tax_class_id'];
+                    $row['price'] = $tax_calc->calculate($row['price'], $row['tax_class_id'], $this->config->get('config_tax'));
+                }
+
+                unset($row);
+                $disc = number_format(($order_info['total'] - $delivery)/$sum, 2, '.', '');
+                $mws_products = $this->db->query('SELECT * FROM `'.DB_PREFIX.'mws_return_product` WHERE id_order = '.(int)$this->request->get['order_id'])->rows;
+
+                $mws_array = array();
+                foreach ($mws_products as $mws_product) {
+                    $mws_array[$mws_product['order_product_id']] = $mws_product['quantity'];
+
+                    if (!$mws_product['order_product_id']) {
+                        $delivery = 0;
+                    }
+                }
+
+                foreach ($products as $pk => &$product) {
+                    if (array_key_exists($product['order_product_id'], $mws_array)) {
+                        $product['quantity'] -= (float)$mws_array[$product['order_product_id']];
+                    }
+
+                    if ($product['quantity'] < 1) {
+                        unset($products[$pk]);
+                    }
+                }
+
+                unset($product);
+
+                foreach ($products as &$product) {
+                    $rates = $tax_calc->getRates($product['price'], $product['tax_class_id']);
+                    $tax_rate_id = current($rates)['tax_rate_id'];
+
+                    $product['price_total'] = number_format(($product['price']) * $disc, 2, '.', '');
+                    $product['tax_value'] = ($this->config->get('ya_kassa_tax_' . $tax_rate_id) ? $this->config->get('ya_kassa_tax_' . $tax_rate_id) : 1);
+                }
+
+                $data['id_order'] = $order_id;
+                $data['delivery'] = $delivery;
+                $data['dname'] = $order_info['shipping_method'];
+
+                if (empty($products)) {
+                    $errors[] = 'Нет товаров для отправки в Яндекс.Касса';
+                }
+            }
+
+            $data['products'] = $products;
+            $data['email'] = $order_info['email'];
+
 			if (!isset($payment['invoiceId'])) {
 				$errors[]=sprintf($this->language->get('err_mws_listorder'), $_SERVER['SERVER_ADDR'], serialize($mws->txt_request), htmlspecialchars($mws->txt_respond));
 			}
@@ -161,6 +238,22 @@ class ControllerToolMws extends Controller {
 							'invoice_id'=>$payment['invoiceId']
 						));
 						if($respPayment['status']==0) {
+                            if ($this->config->get('ya_kassa_send_check')) {
+                                if (isset($_POST['items']) && is_array($_POST['items'])) {
+                                    foreach ($_POST['items'] as $item) {
+                                        if ($item['quantity'] < 1) {
+                                            continue;
+                                        }
+
+                                        $this->db->query('
+                                            INSERT IGNORE INTO `'.DB_PREFIX.'mws_return_product`
+                                            (`id_order`, `order_product_id`, `quantity`)
+                                            VALUES ("'.$this->request->get['order_id'].'", "'.$item["order_product_id"].'", "'.$item["quantity"].'")
+                                        ');
+                                    }
+                                }
+                            }
+                            
 							$data['return_success'] = true;
 						} else{
 							$data['return_error'] = array($mws->getErr($respPayment['error']));
@@ -465,6 +558,56 @@ Class YamoduleMws{
 	private function createXml($array, $operation){
 		$domDocument = new DOMDocument('1.0', 'UTF-8');
 		$domElement = $domDocument->createElement($operation."Request");
+
+        if ($operation == 'returnPayment' && isset($_POST['email'])) {
+            $receiptContainer = $domDocument->createElement("receipt");
+            $itemsContainer = $domDocument->createElement("items");
+
+            $emailAttribute = $domDocument->createAttribute('email');
+            $emailAttribute->value = $_POST['email'];
+
+            $receiptContainer->appendChild($emailAttribute);
+            $receiptContainer->appendChild($itemsContainer);
+
+            if (isset($_POST['items']) && is_array($_POST['items'])) {
+                foreach ($_POST['items'] as $item) {
+                    if ($item['quantity'] < 1) {
+                        continue;
+                    }
+
+                    $itemContainer = $domDocument->createElement("item");
+                    $priceContainer = $domDocument->createElement('price');
+
+                    $qtyAttribute = $domDocument->createAttribute('quantity');
+                    $qtyAttribute->value = (int)$item['quantity'];
+
+                    $taxAttribute = $domDocument->createAttribute('tax');
+                    $taxAttribute->value = (int)$item['tax'];
+
+                    $textAttribute = $domDocument->createAttribute('text');
+                    $textAttribute->value = $item['text'];
+
+                    $amountAttribute = $domDocument->createAttribute('amount');
+                    $amountAttribute->value = number_format($item['price']['amount'], 2, '.', '');
+
+                    $currencyAttribute = $domDocument->createAttribute('currency');
+                    $currencyAttribute->value = $item['price']['currency'];
+
+                    $priceContainer->appendChild($amountAttribute);
+                    $priceContainer->appendChild($currencyAttribute);
+
+                    $itemContainer->appendChild($qtyAttribute);
+                    $itemContainer->appendChild($taxAttribute);
+                    $itemContainer->appendChild($textAttribute);
+                    $itemContainer->appendChild($priceContainer);
+
+                    $itemsContainer->appendChild($itemContainer);
+                }
+            }
+
+            $domElement->appendChild($receiptContainer);
+        }
+
 		foreach ($array as $name=>$val){
 			$domAttribute = $domDocument->createAttribute($name);
 			$domAttribute->value = $val;

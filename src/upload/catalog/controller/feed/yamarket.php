@@ -8,24 +8,25 @@ class ControllerFeedYamarket extends Controller {
 
 	public function index()
 	{
-		$this->load->model('yamodel/yamarket');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $this->load->model($for23.'yamodel/yamarket');
 		$this->load->model('catalog/product');
 		$this->load->model('tool/image');
 		$this->load->model('localisation/currency');
 
-		$categories = $this->model_yamodel_yamarket->getCategories();
+		$categories = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getCategories();
 		$allow_cat_array = $this->config->get('ya_market_categories');
         if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
             $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
         } else {
             die("Need select categories");
         }
-		$products = $this->model_yamodel_yamarket->getProducts($ids_cat, true);
-        if (count($products)) $products = $this->model_yamodel_yamarket->getProducts($ids_cat, false);
+		$products = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getProducts($ids_cat, true);
+        if (count($products)) $products = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getProducts($ids_cat, false);
 		$currencies = $this->model_localisation_currency->getCurrencies();
         $shop_currency = $this->config->get('config_currency');
 		$offers_currency = 'RUB';
-		$currency_default = $this->model_yamodel_yamarket->getCurrencyByISO($offers_currency);
+		$currency_default = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getCurrencyByISO($offers_currency);
         if (!isset($currency_default['value'])) die("Not exist RUB");
 
 		$decimal_place = 2;
@@ -159,9 +160,9 @@ class ControllerFeedYamarket extends Controller {
 		$colors = array();
 		$sizes = array();
 		if (count($this->config->get('ya_market_color_options')))
-			$colors = $this->model_yamodel_yamarket->getProductOptions($this->config->get('ya_market_color_options'), $product['product_id']);
+			$colors = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getProductOptions($this->config->get('ya_market_color_options'), $product['product_id']);
 		if (count($this->config->get('ya_market_size_options')))
-			$sizes = $this->model_yamodel_yamarket->getProductOptions($this->config->get('ya_market_size_options'), $product['product_id']);
+			$sizes = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getProductOptions($this->config->get('ya_market_size_options'), $product['product_id']);
 		if (!count($colors) && !count($sizes))
 			return false;
 

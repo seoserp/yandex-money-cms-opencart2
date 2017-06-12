@@ -41,7 +41,8 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_inv',
 		'ya_kassa_inv_logo',
 		'ya_kassa_inv_message',
-		'ya_kassa_inv_subject'
+		'ya_kassa_inv_subject',
+        'ya_kassa_send_check',
 	);
 
 	public $fields_metrika = array(
@@ -258,6 +259,12 @@ class ControllerFeedYamodule extends Controller {
 		{
 			case 'kassa':
 				$this->saveData($this->fields_kassa);
+				foreach ($_POST as $k => $post) {
+				    if (strpos($k,'ya_kassa_tax_') !== false) {
+                        $this->model_setting_setting->editSetting($k, array($k => $post));
+                    }
+                }
+
 				$this->session->data['kassa_status'][] = $this->success_alert($this->language->get('text_success'));
 				if(isset($this->request->post['ya_kassa_active']) && $this->request->post['ya_kassa_active'] == 1){
 					$testUrl = $this->url->link($for23.'payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
@@ -370,11 +377,11 @@ class ControllerFeedYamodule extends Controller {
 					$this->model_setting_setting->editSetting('ya_metrika_o2auth', array('ya_metrika_o2auth' => $data->access_token));
 				elseif($type == 'p')
 					$this->model_setting_setting->editSetting('ya_pokupki_gtoken', array('ya_pokupki_gtoken' => $data->access_token));
-				$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+				$this->response->redirect($this->url->link('extension/feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 			}
 		}
 
-		$this->response->redirect($this->url->link('feed/yamodule', 'err='.$data->error_description.'&token=' . $this->session->data['token'], 'SSL'));
+		$this->response->redirect($this->url->link('extension/feed/yamodule', 'err='.$data->error_description.'&token=' . $this->session->data['token'], 'SSL'));
 	}
 
 	public function treeItem($id, $name)
@@ -511,7 +518,7 @@ class ControllerFeedYamodule extends Controller {
 		{
 			$this->processSave();
 			$this->session->data['success'] = $this->language->get('text_success');
-			$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+			$this->response->redirect($this->url->link($for23.'feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
 		if(isset($this->request->get['err']))
@@ -549,21 +556,23 @@ class ControllerFeedYamodule extends Controller {
 			'active_off','log','button_cancel','text_installed','button_save','button_cancel','pokupki_text_status'
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
-		$data['mod_off'] = sprintf($this->language->get('mod_off'), $this->url->link('extension/payment/install', 'token=' . $this->session->data['token'] . '&extension=yamodule', true));
+		$data['mod_off'] = sprintf($this->language->get('mod_off'), $this->url->link($for23.'payment/install', 'token=' . $this->session->data['token'] . '&extension=yamodule', true));
 
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
         $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
         $data['ya_market_stock_cost']= $this->Sget('ya_market_stock_cost');
         $data['yamodule_total_sort_order']= $this->Sget('yamodule_total_sort_order');
+        $data['ya_kassa_send_check'] =  $this->Sget('ya_kassa_send_check');
+        $data['ya_kassa_sid'] =  $this->Sget('ya_kassa_sid');
 		//MWS
 		$data['mws_global_error']= array();
 		if (!extension_loaded ('openssl')) $data['mws_global_error'][]= $this->language->get('ext_mws_openssl');
 		if (!$this->Sget('ya_kassa_active')) $data['mws_global_error'][]= $this->language->get('err_mws_kassa');
 		if (!$this->Sget('ya_kassa_sid')) $data['mws_global_error'][]= $this->language->get('err_mws_shopid');
-		//if (count($data['mws_global_error'])==0) $this->load->controller('tool/mws/generate');
+		if (count($data['mws_global_error'])==0) $this->load->controller('tool/mws/generate');
 
 		$data['txt_mws_connect'] = sprintf($this->language->get('txt_mws_connect'),$this->url->link('tool/mws/csr', 'token=' . $this->session->data['token'], 'SSL'));
-		$data['success_mws_alert'] = sprintf($this->language->get('success_mws_alert'), $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL'), $this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+		$data['success_mws_alert'] = sprintf($this->language->get('success_mws_alert'), $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL'), $this->url->link('extension/feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		
 		$data['mws_orgname'] = HTTP_CATALOG;
 		$data['mws_cn'] = '/business/oc2/yacms-'.$this->Sget('ya_kassa_sid');
@@ -579,16 +588,50 @@ class ControllerFeedYamodule extends Controller {
         }
 		//
 		$data['token'] = $this->session->data['token'];
-		
 		$data['url_mws_gen'] = $this->url->link('tool/mws/generate', 'token=' . $this->session->data['token'], 'SSL');
-		
+
+//		taxes
+
+        //if ($this->config->get('ya_kassa_send_check')) {
+            $this->load->model('localisation/tax_class');
+            $this->load->model('localisation/tax_rate');
+            $data['kassa_taxes'] = '<table class="table table-hover">
+                            	<tbody>';
+
+            $rates = $this->model_localisation_tax_rate->getTaxRates();
+
+            foreach ($rates as $rate) {
+                $data['kassa_taxes'] .= '
+                            		<tr>
+                            			<td>'.$rate['name'].'</td>
+                            			<td>передавать в Яндекс.Кассу как</td>
+                            			<td>
+                            			    <select name="ya_kassa_tax_'.$rate['tax_rate_id'].'" id="ya_kassa_tax_'.$rate['tax_rate_id'].'" class="form-control">
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 1 ? 'selected="selected"' : '').' value="1">Без НДС</option>
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 2 ? 'selected="selected"' : '').' value="2">0%</option>
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 3 ? 'selected="selected"' : '').' value="3" selected="selected">10%</option>
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 4 ? 'selected="selected"' : '').' value="4">18%</option>
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 5 ? 'selected="selected"' : '').' value="5">Расчётная ставка 10/110</option>
+                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 6 ? 'selected="selected"' : '').' value="6">Расчётная ставка 18/118</option>
+											</select>
+                            			</td>
+                            		</tr>
+                            	';
+            }
+        $data['kassa_taxes'].="</tbody></table>";
+        //} else {
+        //    $data['kassa_taxes'] = false;
+        //}
+
+//		taxes
+
 		$conf = $this->model_setting_setting->getSetting("yamodule_mws");
 		if (isset($conf['yamodule_mws_csr_sign'])){
 			$data['mws_sign'] = $conf['yamodule_mws_csr_sign'];
 		}else{
 			//Генерация CSR
 			$this->load->controller('tool/mws/generate');
-			//$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+			//$this->response->redirect($this->url->link('extension/feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?true:false;
 		//
@@ -609,13 +652,13 @@ class ControllerFeedYamodule extends Controller {
 		);
 
 		$data['breadcrumbs'][] = array(
-			'href'      => $this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->url->link($for23.'feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'),
 			'text'      => $this->language->get('heading_title_ya'),
 			'separator' => ' :: '
 		);
 		$this->tabMws($data);
-		$data['action'] = $this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL');
-		$data['cancel'] = $this->url->link('extension/feed', 'token=' . $this->session->data['token'], 'SSL');
+		$data['action'] = $this->url->link($for23.'feed/yamodule', 'token=' . $this->session->data['token'], 'SSL');
+		$data['cancel'] = $this->url->link($for23.'feed', 'token=' . $this->session->data['token'], 'SSL');
 		$this->load->model('localisation/stock_status');
 		$data['stock_statuses'] = $this->model_localisation_stock_status->getStockStatuses();
 		$this->load->model('catalog/category');
@@ -687,6 +730,7 @@ class ControllerFeedYamodule extends Controller {
 			'ya_kassa_log' => 0,
 			'ya_kassa_paymode' => 1,
 			'ya_kassa_paylogo' => 1,
+			'ya_kassa_send_check' => 0,
 			'ya_kassa_test' => 0,
 			'ya_kassa_cart_reset' => 0,
 			'ya_kassa_create_order' => 1,
@@ -725,6 +769,25 @@ class ControllerFeedYamodule extends Controller {
 			'ya_pokupki_status_unpaid' => 3,
 			'ya_pokupki_status_delivered' => 15 //
 		);
+
+		$q = $this->db->query("CREATE TABLE IF NOT EXISTS `".DB_PREFIX."pokupki_orders` (
+		  `id_order` int(10) NOT NULL,
+		  `id_market_order` varchar(100) NOT NULL,
+		  `currency` varchar(100) NOT NULL,
+		  `ptype` varchar(100) NOT NULL,
+		  `home` varchar(100) NOT NULL,
+		  `pmethod` varchar(100) NOT NULL,
+		  `outlet` varchar(100) NOT NULL,
+		  PRIMARY KEY (`id_order`,`id_market_order`)
+		) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+
+        $q = $this->db->query('CREATE TABLE IF NOT EXISTS `'.DB_PREFIX.'mws_return_product`
+            (
+                `id_order` int(10) NOT NULL,
+                `order_product_id` int(10) NOT NULL,
+                `quantity` int(10) NOT NULL,
+                PRIMARY KEY  (`id_order`,`order_product_id`)
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;');
 
 		$q = $this->db->query("CREATE TABLE IF NOT EXISTS `".DB_PREFIX."pokupki_orders` (
 		  `id_order` int(10) NOT NULL,

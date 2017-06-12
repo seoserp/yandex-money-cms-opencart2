@@ -8,7 +8,7 @@ class ControllerPaymentYamodule extends Controller {
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		$this->load->language($for23.'payment/yamodule');
 		$this->document->setTitle($this->language->get('heading_title'));
-		$this->response->redirect($this->url->link('feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
+		$this->response->redirect($this->url->link($for23.'feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 	}
 
 	public function sendmail (){
@@ -21,7 +21,11 @@ class ControllerPaymentYamodule extends Controller {
 			$json['error']="Этот функционал отключен в настройках модуля Яндекс.Кассы";
 			$this->sendResponseJson ($json);
 			return true;
-		}
+		}elseif ($this->config->get("ya_kassa_send_check")){
+            $json['error']="Этот функционал временно недоступен при работе по 54-ФЗ. Мы работаем над его появлением в новой версии модуля.";
+            $this->sendResponseJson ($json);
+            return true;
+        }
 		$order_info = $this->model_sale_order->getOrder($order_id);
 		$to_email = $order_info['email'];
 		$subject = $this->config->get("ya_kassa_inv_subject");

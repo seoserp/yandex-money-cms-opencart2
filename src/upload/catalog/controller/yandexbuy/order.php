@@ -32,7 +32,8 @@ class ControllerYandexbuyOrder extends Controller
 	
 	public function accept()
 	{
-		$sign = $this->config->get('ya_pokupki_stoken');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $sign = $this->config->get('ya_pokupki_stoken');
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
@@ -104,9 +105,9 @@ class ControllerYandexbuyOrder extends Controller
 						$address1 = $street.$subway.$block.$floor.$house;
                         //
                         $region = self::get_region($data->order->delivery->region);
-                        $this->load->model('yamodel/pokupki');
-                        $country_id = $this->model_yamodel_pokupki->getCountryId($region['country']);
-                        $zone_id = $this->model_yamodel_pokupki->getZoneId($region['zone'], $country_id);
+                        $this->load->model($for23.'yamodel/pokupki');
+                        $country_id = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getCountryId($region['country']);
+                        $zone_id = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getZoneId($region['zone'], $country_id);
                         //Customer
 						$order_data['customer_id'] = $customer_info['customer_id'];
 						$order_data['customer_group_id'] = $customer_info['customer_group_id'];
@@ -132,7 +133,7 @@ class ControllerYandexbuyOrder extends Controller
                         $address_array =array();
                         foreach ($shipping_data as $key=>$value) $address_array[str_replace("shipping_","",$key)] = $value;
                         $order_data = array_merge($order_data, $shipping_data);
-                        $order_data['shipping_method'] = $this->model_yamodel_pokupki->getQuoteShipping ($data->order->delivery->id, $address_array);
+                        $order_data['shipping_method'] = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getQuoteShipping ($data->order->delivery->id, $address_array);
                         $order_data['shipping_code'] = $this->getShipping($data->order->delivery->id);
                         //Payment
                         $payment_data = array();
@@ -321,7 +322,8 @@ class ControllerYandexbuyOrder extends Controller
 
 	public function status()
 	{
-		$sign = $this->config->get('ya_pokupki_stoken');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $sign = $this->config->get('ya_pokupki_stoken');
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) != strtoupper($key))
 		{
@@ -377,12 +379,12 @@ class ControllerYandexbuyOrder extends Controller
 							$text = $this->language->get('text_marketcpa_toprocessing');
 							//Определяем индекс для заказов через почту
 							if ($data->order->delivery->type=="POST"){
-								$this->load->model('yamodel/pokupki');
+								$this->load->model($for23.'yamodel/pokupki');
 								$shipping_data = array_filter($order, function ($key){
 									return (substr($key,0, strlen("shipping_"))=="shipping_")?true:false;
 								});
 								foreach ($shipping_data as $key=>$value) $address_array[str_replace("shipping_","",$key)] = $value;
-								$quote = $this->model_yamodel_pokupki->getQuoteShipping($data->order->delivery->id, $address_array);
+								$quote = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getQuoteShipping($data->order->delivery->id, $address_array);
 									if ($quote)
 									{
 										$old_delivery_price =(float) $order['shipping_method']['cost'];
@@ -390,7 +392,7 @@ class ControllerYandexbuyOrder extends Controller
 										$new_delivery->price = (float) $quote['cost'];
 										$new_delivery->dates->fromDate = date('d-m-Y', time());
 										$new_delivery->dates->toDate = date('d-m-Y', time()+24*60*60);
-										if($this->model_yamodel_pokupki->sendDelivery($new_delivery, $data->order->id)){
+										if($this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->sendDelivery($new_delivery, $data->order->id)){
 											$order['shipping_method'] = $quote;
 											$order['shipping_code'] = $this->getShipping($data->order->delivery->id);
 											$this->editOrder($shop_order['id_order'], $order);

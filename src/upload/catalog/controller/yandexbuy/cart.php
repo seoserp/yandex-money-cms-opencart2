@@ -61,7 +61,8 @@ class ControllerYandexbuyCart extends Controller
 
 	public function index()
 	{
-		$sign = $this->config->get('ya_pokupki_stoken');
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $sign = $this->config->get('ya_pokupki_stoken');
 		$key = isset($_REQUEST['auth-token']) ? $_REQUEST['auth-token'] : '';
 		if (strtoupper($sign) !== strtoupper($key))
 		{
@@ -151,10 +152,10 @@ class ControllerYandexbuyCart extends Controller
                 if (count($items))
                 {
                     $region = self::get_region($data->cart->delivery->region);
-                    $this->load->model('yamodel/pokupki');
+                    $this->load->model($for23.'yamodel/pokupki');
 
-                    $country_id = $this->model_yamodel_pokupki->getCountryId($region['country']);
-                    $zone_id = $this->model_yamodel_pokupki->getZoneId($region['zone'], $country_id);
+                    $country_id = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getCountryId($region['country']);
+                    $zone_id = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getZoneId($region['zone'], $country_id);
                     // $postcode_id = $this->model_yamodel_pokupki->getPostCode($region['district_id']);
                     // "id": 3, "name": "Центральный федеральный округ", "type": "COUNTRY_DISTRICT"
 
@@ -250,7 +251,7 @@ class ControllerYandexbuyCart extends Controller
                                 );
                                 if($type == 'PICKUP')
                                 {
-                                    $outlets = $this->model_yamodel_pokupki->getOutlets();
+                                    $outlets = $this->{"model_".str_replace("/","_",$for23)."yamodel_pokupki"}->getOutlets();
                                     $market_id = self::preOutlets($outlets['json']['outlets'], $quote['sort_order']);
                                     $market_outlet = (int) $outlets['array'][$market_id]->id;
                                     $carriers[$k]['outlets'][] = array('id'=> $market_outlet);

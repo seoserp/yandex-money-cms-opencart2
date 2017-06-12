@@ -27,6 +27,64 @@ class ControllerPaymentYamodule extends Controller
 		else
 			$data['kassa_action'] = 'https://money.yandex.ru/eshop.xml';
 
+		$receipt = array();
+		if ($this->config->get('ya_kassa_send_check')) {
+            $receipt = array(
+                'customerContact' => $order_info['email'],
+                'items' => array(),
+            );
+
+            $this->load->model('catalog/product');
+            $cart_product = $this->cart->getProducts();
+
+            $sum = $this->cart->getTotal();
+            $taxes = $this->cart->getTaxes();
+            $taxes_val = 0;
+            foreach ($taxes as $tax) {
+                $taxes_val += $tax;
+            }
+
+            $disc = number_format(($order_info['total'] - $this->session->data['shipping_method']['cost'])/$sum, 2, '.', '');
+
+            foreach ($cart_product as $row) {
+                $row['price'] = $this->tax->calculate($row['price'], $row['tax_class_id'], $this->config->get('config_tax'));
+                $rates = $this->tax->getRates($row['price'], $row['tax_class_id']);
+
+                if (count($rates)) {
+                    $rate = current($rates);
+                    $tax_rate_id = $rate['tax_rate_id'];
+                    $receipt['items'][] = array(
+                        'quantity' => $row['quantity'],
+                        'text' => substr($row['name'], 0, 128),
+                        'tax' => ($this->config->get('ya_kassa_tax_' . $tax_rate_id) ? $this->config->get('ya_kassa_tax_' . $tax_rate_id) : 1),
+                        'price' => array(
+                            'amount' => number_format(($row['price'] * $disc), 3, '.', ''),
+                            'currency' => 'RUB'
+                        ),
+                    );
+                }
+            }
+
+            if (
+                $this->cart->hasShipping() &&
+                isset($this->session->data['shipping_method']) &&
+                isset($this->session->data['shipping_method']['cost']) &&
+                isset($this->session->data['shipping_method']['title']) &&
+                $this->session->data['shipping_method']['cost'] > 0
+            ) {
+                $receipt['items'][] = array(
+                    'quantity' => 1,
+                    'text' => substr($this->session->data['shipping_method']['title'], 0, 128),
+                    'tax' => 1,
+                    'price' => array(
+                        'amount' => number_format($this->session->data['shipping_method']['cost'], 2, '.', ''),
+                        'currency' => 'RUB'
+                    ),
+                );
+            }
+        }
+
+        $data['receipt'] = $receipt;
 		$data['order_id'] = self::PREFIX_DEBUG.$this->session->data['order_id'];
 		$data['p2p_mode'] = $this->config->get('ya_p2p_active');
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
@@ -339,10 +397,12 @@ class ControllerPaymentYamodule extends Controller
 	public function callback()
 	{
 		$data = $_POST;
-		if($this->config->get('ya_kassa_log'))
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+
+        if($this->config->get('ya_kassa_log'))
 			$this->log_save('callback:  request '.serialize($_REQUEST));
 
-		$this->load->model('yamodel/yamoney');
+		$this->load->model($for23.'yamodel/yamoney');
 		$password = $this->config->get('ya_kassa_pw');
 		//$this->model_yamodel_yamoney->password2 = $this->config->get('ya_p2p_pw');
 		$shopid = $this->config->get('ya_kassa_sid');
@@ -350,7 +410,7 @@ class ControllerPaymentYamodule extends Controller
 		$order_id = isset($data[self::ORDERNUMBER]) ? (int) substr($data[self::ORDERNUMBER], strlen(self::PREFIX_DEBUG), strlen($data[self::ORDERNUMBER])) : 0;
 		if ($this->config->get('ya_kassa_active') && isset($data['action']) && !empty($data['action'])){
 			$this->log_save('callback:  orderid='.$order_id);
-			if($this->model_yamodel_yamoney->checkSign($data, $password, $shopid, true)){
+			if($this->{"model_".str_replace("/","_",$for23)."yamodel_yamoney"}->checkSign($data, $password, $shopid, true)){
 				$this->load->model('checkout/order');
 				$order_info = $this->model_checkout_order->getOrder($order_id);
                 $sum = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2);
@@ -359,9 +419,9 @@ class ControllerPaymentYamodule extends Controller
 					if ($data['action'] == 'paymentAviso'){
 						if ($order_id > 0)	$this->makeOrder($order_id, false);
 					}
-					$this->model_yamodel_yamoney->sendCode($data, $shopid, '0', "ok");
+					$this->{"model_".str_replace("/","_",$for23)."yamodel_yamoney"}->sendCode($data, $shopid, '0', "ok");
 				}else{
-					$this->model_yamodel_yamoney->sendCode($data, $shopid, '100', "Error total amount");
+					$this->{"model_".str_replace("/","_",$for23)."yamodel_yamoney"}->sendCode($data, $shopid, '100', "Error total amount");
 				}
 			}
 		}else{

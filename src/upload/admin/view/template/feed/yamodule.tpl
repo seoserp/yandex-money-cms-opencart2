@@ -286,6 +286,33 @@
 										</div>
 									</div>
 									<!-- -->
+									<!-- -->
+									<div class='row'>
+										<div class='col-sm-12'>
+											<div class="form-group">
+												<label class="col-sm-3 control-label">Отправлять в Яндекс.Кассу данные для чеков (54-ФЗ)</label>
+												<div class="col-sm-9">
+													<label class='radio-inline'>
+														<input type="radio" <?php echo ($ya_kassa_send_check ? ' checked="checked"' : ''); ?> name="ya_kassa_send_check" value="1"> <?php echo $kassa_text_debug_en; ?>
+													</label>
+													<label class='radio-inline'>
+														<input type="radio" <?php echo (!$ya_kassa_send_check ? ' checked="checked"' : ''); ?> name="ya_kassa_send_check" value="0"> <?php echo $kassa_text_debug_dis; ?>
+													</label>
+												</div>
+												<!-- -->
+												<div class="col-sm-8 col-sm-offset-3 taxesArea">
+                                                    Ставка в вашем магазине
+												</div>
+												<div class="col-sm-8 col-sm-offset-3 taxesArea">
+													<p class="help-block">Слева — ставка НДС в вашем магазине, справа — в Яндекс.Кассе. Пожалуйста, сопоставьте их.</p>
+												</div>
+												<div class="col-sm-8 col-sm-offset-3 taxesArea">
+													<?php echo $kassa_taxes; ?>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- -->
 								</form>
 								<?php }  else { ?>
 								<div class="alert alert-danger">
@@ -961,6 +988,17 @@ $('#mws_crt_load').on('click', function() {
 </script>
 
 <script type="text/javascript">
+    function hideTaxes() {
+        var inside = $('input[name="ya_kassa_send_check"]:checked').val();
+
+        if (inside == 1)
+        {
+            $('.taxesArea').slideDown('slow');
+        } else {
+            $('.taxesArea').slideUp('slow');
+        }
+    }
+
 function showcatall($tree)
 {
 $tree.find("ul.tree").each(
@@ -1018,6 +1056,11 @@ $(document).ready(function(){
 	$('.tree-item-name label').click(function(){
 		$(this).parent().find('input').click();
 	});
+
+    hideTaxes();
+	$('input[name="ya_kassa_send_check"]').change(function(){
+	    hideTaxes();
+    });
 
 	$('.tree-folder-name input').change(function(){
 		if ($(this).prop("checked"))

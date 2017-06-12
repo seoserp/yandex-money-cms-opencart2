@@ -181,7 +181,6 @@ Class ModelYamodelPokupki extends Model
 		$errno = curl_errno($curl);
 		$error = curl_error($curl);
 		$rcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		// Tools::d(curl_getinfo($curl, CURLINFO_HEADER_OUT));
 		curl_close($curl);
 		$result = new stdClass();
 		$result->status_code = $rcode;
