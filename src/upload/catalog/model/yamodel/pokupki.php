@@ -62,8 +62,9 @@ Class ModelYamodelPokupki extends Model
 	}*/
 
 	public function getQuoteShipping($shipping_id, $address){
-		$this->load->model('shipping/'.$shipping_id);
-		$quote = $this->{'model_shipping_'.$shipping_id}->getQuote($address);
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+		$this->load->model($for23.'shipping/'.$shipping_id);
+		$quote = $this->{'model_'.str_replace("/", "_", $for23).'shipping_'.$shipping_id}->getQuote($address);
 		if ($quote) return $quote['quote'][$shipping_id];
 		return "";
 	}

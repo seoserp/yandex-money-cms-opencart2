@@ -199,9 +199,9 @@ class ControllerToolMws extends Controller {
                 foreach ($products as &$product) {
                     $rates = $tax_calc->getRates($product['price'], $product['tax_class_id']);
                     $tax_rate_id = current($rates)['tax_rate_id'];
-
+                    $ya_kassa_tax = $this->config->get('ya_kassa_tax');
                     $product['price_total'] = number_format(($product['price']) * $disc, 2, '.', '');
-                    $product['tax_value'] = ($this->config->get('ya_kassa_tax_' . $tax_rate_id) ? $this->config->get('ya_kassa_tax_' . $tax_rate_id) : 1);
+                    $product['tax_value'] = (isset($ya_kassa_tax[$tax_rate_id])) ? $ya_kassa_tax[$tax_rate_id] : 1;
                 }
 
                 $data['id_order'] = $order_id;
@@ -228,7 +228,7 @@ class ControllerToolMws extends Controller {
 				if (!$return_error){
 					$respPayment = $mws->request('returnPayment', array('invoiceId'=> $payment['invoiceId'], 'amount'=>	$amount, 'cause'=>$cause));
 					if (isset($respPayment['status'])){
-						$this->{"model_".$for23_model."yamodule_return"}->addReturn(array(
+						$this->{"model_".str_replace("/", "_", $for23)."yamodule_return"}->addReturn(array(
 							'amount'=>$amount,
 							'cause'=>$cause,
 							'request'=>$mws->txt_request || 'NULL',
@@ -268,7 +268,7 @@ class ControllerToolMws extends Controller {
 			$inv_sum = (isset($payment['orderSumAmount']))?$payment['orderSumAmount']:0;
 			$inv_type = (isset($payment['paymentType']))?$payment['paymentType']:"none";
 
-			$returns = $this->{"model_".$for23_model."yamodule_return"}->getSuccessReturns($inv);
+			$returns = $this->{"model_".str_replace("/", "_", $for23)."yamodule_return"}->getSuccessReturns($inv);
 			$sum_returned = (isset($returns->sum)?$returns->sum:0);
 			$data['return_items'] = (isset($returns->returns)?$returns->returns:false);
 			$data['invoiceId'] = $inv;

@@ -159,6 +159,7 @@ class ControllerFeedYamarket extends Controller {
 	{
 		$colors = array();
 		$sizes = array();
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		if (count($this->config->get('ya_market_color_options')))
 			$colors = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getProductOptions($this->config->get('ya_market_color_options'), $product['product_id']);
 		if (count($this->config->get('ya_market_size_options')))

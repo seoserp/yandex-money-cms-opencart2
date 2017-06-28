@@ -206,8 +206,8 @@ class ControllerYandexbuyCart extends Controller
 					foreach ($results as $result)
 					{
 						if ($this->config->get($result['code'] . '_status')) {
-							$this->load->model('shipping/'.$result['code']);
-							$quote = $this->{'model_shipping_'.$result['code']}->getQuote($address_array);
+							$this->load->model($for23.'shipping/'.$result['code']);
+							$quote = $this->{'model_'.str_replace("/","_",$for23).'shipping_'.$result['code']}->getQuote($address_array);
 							$id = $result['code'];
 							$types = $this->config->get('ya_pokupki_carrier');
 							$type = isset($types[$id]) ? $types[$id] : 'POST';

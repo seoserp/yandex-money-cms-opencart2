@@ -43,6 +43,7 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_inv_message',
 		'ya_kassa_inv_subject',
         'ya_kassa_send_check',
+        'ya_kassa_tax',
 	);
 
 	public $fields_metrika = array(
@@ -259,12 +260,6 @@ class ControllerFeedYamodule extends Controller {
 		{
 			case 'kassa':
 				$this->saveData($this->fields_kassa);
-				foreach ($_POST as $k => $post) {
-				    if (strpos($k,'ya_kassa_tax_') !== false) {
-                        $this->model_setting_setting->editSetting($k, array($k => $post));
-                    }
-                }
-
 				$this->session->data['kassa_status'][] = $this->success_alert($this->language->get('text_success'));
 				if(isset($this->request->post['ya_kassa_active']) && $this->request->post['ya_kassa_active'] == 1){
 					$testUrl = $this->url->link($for23.'payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
@@ -281,10 +276,10 @@ class ControllerFeedYamodule extends Controller {
 			case 'metrika':
 				$this->saveData($this->fields_metrika);
 				$this->session->data['metrika_status'][] = $this->success_alert($this->language->get('text_success'));
-				$this->load->model('yamodule/metrika');
+				$this->load->model($for23.'yamodule/metrika');
 				$yaMetrika_token = $this->config->get('ya_metrika_o2auth');
 				$yaMetrika_number = ($this->request->post['ya_metrika_number'] != $this->config->get('ya_metrika_number') ? $this->request->post['ya_metrika_number'] : $this->config->get('ya_metrika_number'));
-				$this->model_yamodule_metrika->processCounter($yaMetrika_number, $yaMetrika_token);
+				$this->{'model_'.str_replace("/", "_", $for23).'yamodule_metrika'}->processCounter($yaMetrika_number, $yaMetrika_token);
 				break;
 			case 'market':
 				$this->session->data['market_status'][] = $this->success_alert($this->language->get('text_success'));
@@ -601,18 +596,21 @@ class ControllerFeedYamodule extends Controller {
             $rates = $this->model_localisation_tax_rate->getTaxRates();
 
             foreach ($rates as $rate) {
+                $rate_id = $rate['tax_rate_id'];
+                $ya_kassa_tax = $this->config->get('ya_kassa_tax');
+                $conf_rate = (isset($ya_kassa_tax[$rate_id])) ? $ya_kassa_tax[$rate_id] : 1;
                 $data['kassa_taxes'] .= '
                             		<tr>
                             			<td>'.$rate['name'].'</td>
                             			<td>передавать в Яндекс.Кассу как</td>
                             			<td>
-                            			    <select name="ya_kassa_tax_'.$rate['tax_rate_id'].'" id="ya_kassa_tax_'.$rate['tax_rate_id'].'" class="form-control">
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 1 ? 'selected="selected"' : '').' value="1">Без НДС</option>
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 2 ? 'selected="selected"' : '').' value="2">0%</option>
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 3 ? 'selected="selected"' : '').' value="3" selected="selected">10%</option>
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 4 ? 'selected="selected"' : '').' value="4">18%</option>
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 5 ? 'selected="selected"' : '').' value="5">Расчётная ставка 10/110</option>
-                                                            <option '.($this->config->get('ya_kassa_tax_'.$rate['tax_rate_id']) == 6 ? 'selected="selected"' : '').' value="6">Расчётная ставка 18/118</option>
+                            			    <select name="ya_kassa_tax['.$rate_id.']" id="ya_kassa_tax_'.$rate_id.'" class="form-control">
+                                                            <option '.($conf_rate == 1 ? 'selected="selected"' : '').' value="1">Без НДС</option>
+                                                            <option '.($conf_rate == 2 ? 'selected="selected"' : '').' value="2">0%</option>
+                                                            <option '.($conf_rate == 3 ? 'selected="selected"' : '').' value="3">10%</option>
+                                                            <option '.($conf_rate == 4 ? 'selected="selected"' : '').' value="4">18%</option>
+                                                            <option '.($conf_rate == 5 ? 'selected="selected"' : '').' value="5">Расчётная ставка 10/110</option>
+                                                            <option '.($conf_rate == 6 ? 'selected="selected"' : '').' value="6">Расчётная ставка 18/118</option>
 											</select>
                             			</td>
                             		</tr>
@@ -862,6 +860,7 @@ class ControllerFeedYamodule extends Controller {
 	public function changestatus(){
 		$json = array();
 		$order_id = (int)$this->request->get['order_id'];
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 
 		$this->load->model('sale/order');
 		$this->load->model('setting/setting');
@@ -873,8 +872,8 @@ class ControllerFeedYamodule extends Controller {
 			//$notify = $this->request->post['notify'];
 			//$append = $this->request->post['append'];
 			//$override = (bool) $this->request->post['override'];
-			$this->load->model('yamodule/pokupki');
-			$json = $this->model_yamodule_pokupki->sendOrder($order_id, $order_status_id, $comment);
+			$this->load->model($for23.'yamodule/pokupki');
+			$json = $this->{'model_'.str_replace("/","_",$for23).'yamodule_pokupki'}->sendOrder($order_id, $order_status_id, $comment);
 		}
 		//
 		$this->response->addHeader('Content-Type: application/json; charset=utf-8');

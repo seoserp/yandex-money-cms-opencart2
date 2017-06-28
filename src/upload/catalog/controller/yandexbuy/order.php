@@ -219,9 +219,9 @@ class ControllerYandexbuyOrder extends Controller
 						array_multisort($sort_order, SORT_ASC, $results);
 						foreach ($results as $result) {
                         							if ($this->config->get($result['code'] . '_status')) {
-                            								$this->load->model('total/' . $result['code']);
+                            								$this->load->model($for23.'total/' . $result['code']);
                             								if (version_compare(VERSION, "2.2.0", '>=')) {
-                                									$this->{'model_total_' . $result['code']}->getTotal($total_data);
+                                									$this->{'model_'.str_replace("/", "_", $for23).'total_' . $result['code']}->getTotal($total_data);
                                 								}else{
                                 									$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
                                 								}

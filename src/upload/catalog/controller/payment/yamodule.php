@@ -53,10 +53,11 @@ class ControllerPaymentYamodule extends Controller
                 if (count($rates)) {
                     $rate = current($rates);
                     $tax_rate_id = $rate['tax_rate_id'];
+                    $ya_kassa_tax = $this->config->get('ya_kassa_tax');
                     $receipt['items'][] = array(
                         'quantity' => $row['quantity'],
                         'text' => substr($row['name'], 0, 128),
-                        'tax' => ($this->config->get('ya_kassa_tax_' . $tax_rate_id) ? $this->config->get('ya_kassa_tax_' . $tax_rate_id) : 1),
+                        'tax' => (isset($ya_kassa_tax[$tax_rate_id]) ? $ya_kassa_tax[$tax_rate_id] : 1),
                         'price' => array(
                             'amount' => number_format(($row['price'] * $disc), 3, '.', ''),
                             'currency' => 'RUB'
