@@ -87,8 +87,9 @@
 	<file path="catalog/controller/checkout/success.php">
 		<operation>
 			<search><![CDATA[if (isset($this->session->data['order_id'])) {]]></search>
-			<add position="after"><![CDATA[$this->load->model('yamodel/pokupki');
-			$data['script_order'] = $this->model_yamodel_pokupki->getscript($this->session->data['order_id']);]]></add>
+			<add position="after"><![CDATA[$for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+			$this->load->model($for23.'yamodel/pokupki');
+			$data['script_order'] = $this->{'model_'.str_replace("/", "_", $for23).'yamodel_pokupki'}->getscript($this->session->data['order_id']);]]></add>
 		</operation>
 	</file>
 	<file path="catalog/view/theme/*/template/common/success.tpl">
