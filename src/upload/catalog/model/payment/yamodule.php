@@ -1,5 +1,4 @@
 <?php
-class ModelExtensionPaymentYamodule extends ModelPaymentYamodule {}
 class ModelPaymentYamodule extends Model {
 	public function getMethod($address, $total) {
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
@@ -34,3 +33,5 @@ class ModelPaymentYamodule extends Model {
 		return $method_data;
 	}
 }
+
+class ModelExtensionPaymentYamodule extends ModelPaymentYamodule {}

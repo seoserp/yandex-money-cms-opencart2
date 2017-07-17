@@ -1,6 +1,5 @@
 <?php
 
-Class ModelExtensionYamodelYamarket extends ModelYamodelYamarket{}
 Class ModelYamodelYamarket extends Model
 {
 	public function getCategories($parent_id = 0) {
@@ -77,3 +76,5 @@ Class ModelYamodelYamarket extends Model
 		return $query->rows;
 	}
 }
+
+Class ModelExtensionYamodelYamarket extends ModelYamodelYamarket{}

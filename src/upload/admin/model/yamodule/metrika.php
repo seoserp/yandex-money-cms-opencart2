@@ -1,6 +1,5 @@
 <?php
 
-Class ModelExtensionYamoduleMetrika extends ModelYamoduleMetrika{}
 Class ModelYamoduleMetrika extends Model
 {
 	public $url_api = 'https://api-metrika.yandex.ru/management/v1/';
@@ -225,3 +224,5 @@ Class ModelYamoduleMetrika extends Model
 		return $result;
 	}
 }
+
+Class ModelExtensionYamoduleMetrika extends ModelYamoduleMetrika{}

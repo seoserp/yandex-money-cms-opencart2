@@ -1,6 +1,5 @@
 <?php
 
-Class ModelExtensionYamodelPokupki extends ModelYamodelPokupki{}
 Class ModelYamodelPokupki extends Model
 {
 
@@ -190,3 +189,5 @@ Class ModelYamodelPokupki extends Model
 		return $result;
 	}
 }
+
+Class ModelExtensionYamodelPokupki extends ModelYamodelPokupki{}
