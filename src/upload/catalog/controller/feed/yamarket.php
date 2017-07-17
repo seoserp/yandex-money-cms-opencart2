@@ -3,7 +3,6 @@
 +class: ControllerFeedYamarket
 +author: Yandex.Money & Alexander Toporkov <toporchillo@gmail.com>
 */
-class Controllerextensionfeedyamarket extends ControllerFeedYamarket {}
 class ControllerFeedYamarket extends Controller {
 
 	public function index()
@@ -466,3 +465,5 @@ class YandexMarket{
 		return $xml;
 	}
 }
+
+class ControllerExtensionFeedYamarket extends ControllerFeedYamarket {}

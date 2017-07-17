@@ -3,7 +3,6 @@
 +class: ControllerYandexbuyCart
 +author: Yandex.Money & Alexander Toporkov <toporchillo@gmail.com>
 */
-class Controllerextensionyandexbuycart extends ControllerYandexbuyCart{}
 class ControllerYandexbuyCart extends Controller
 {
 	public function getinfo()
@@ -336,3 +335,5 @@ class ControllerYandexbuyCart extends Controller
 		$error_log = null;
 	}
 }
+
+class ControllerExtensionYandexbuyCart extends ControllerYandexbuyCart{}

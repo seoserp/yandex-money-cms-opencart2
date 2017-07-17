@@ -1,6 +1,4 @@
 <?php
-
-class ControllerExtensionFeedYamodule extends ControllerFeedYamodule{}
 class ControllerFeedYamodule extends Controller {
 
 	private $error = array();
@@ -910,6 +908,58 @@ class ControllerFeedYamodule extends Controller {
 			$this->db->query("DELETE FROM " . DB_PREFIX . "customer WHERE customer_id = ".$cu['customer_id']);
 			$this->db->query("DELETE FROM " . DB_PREFIX . "address WHERE address_id = ".$cu['address_id']);
 		}
+        $arrFiles = array(
+            "admin" => array(
+                "controller/feed/yamodule.php",
+                "controller/payment/yamodule.php",
+                "controller/tool/mws.php",
+                "model/yamodule/metrika.php",
+                "model/yamodule/pokupki.php",
+                "model/yamodule/return.php",
+
+                "controller/extension/feed/yamodule.php",
+                "controller/extension/payment/yamodule.php",
+                "controller/extension/tool/mws.php",
+                "model/extension/yamodule/metrika.php",
+                "model/extension/yamodule/pokupki.php",
+                "model/extension/yamodule/return.php"
+            ),
+            "catalog" => array(
+                "controller/feed/yamarket.php",
+                "controller/payment/yamodule.php",
+                "controller/yandexbuy/cart.php",
+                "controller/yandexbuy/order.php",
+                "model/payment/yamodule.php",
+                "model/yamodel/pokupki.php",
+                "model/yamodel/yamarket.php",
+                "model/yamodel/yamoney.php",
+
+                "controller/extension/feed/yamarket.php",
+                "controller/extension/payment/yamodule.php",
+                "controller/yandexbuy/cart.php",
+                "controller/yandexbuy/order.php",
+                "model/extension/payment/yamodule.php",
+                "model/extension/yamodel/pokupki.php",
+                "model/extension/yamodel/yamarket.php",
+                "model/extension/yamodel/yamoney.php"
+            )
+        );
+        $error_log = new Log('error.log');
+        foreach ($arrFiles as $folder => $files){
+            foreach ($files as $file) {
+                if ($folder == "admin") {
+                    if (file_exists(DIR_APPLICATION . $file)) {
+                        if (!unlink (DIR_APPLICATION . $file)) $error_log->write(DIR_APPLICATION . $file);
+                    }
+                } else {
+                    if (file_exists(DIR_CATALOG . $file)) {
+                        if (!unlink (DIR_CATALOG . $file)) $error_log->write(DIR_CATALOG . $file);
+                    }
+                }
+            }
+        }
+        $error_log = null;
 	}
 }
+class ControllerExtensionFeedYamodule extends ControllerFeedYamodule{}
 ?>

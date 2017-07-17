@@ -1,5 +1,4 @@
 <?php
-class ControllerExtensionPaymentYamodule extends ControllerPaymentYamodule {}
 class ControllerPaymentYamodule extends Controller {
 
     private $error;
@@ -837,3 +836,5 @@ class checkXmlAnswer extends TestBaseClass{
 		}
 	}
 }
+
+class ControllerExtensionPaymentYamodule extends ControllerPaymentYamodule {}

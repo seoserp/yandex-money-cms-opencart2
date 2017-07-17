@@ -3,7 +3,6 @@
 +class: ControllerYandexbuyOrder
 +author: Yandex.Money & Alexander Toporkov <toporchillo@gmail.com>
 */
-class Controllerextensionyandexbuyorder extends ControllerYandexbuyOrder{}
 class ControllerYandexbuyOrder extends Controller
 {
 	public function getRegion($data, $type)
@@ -449,3 +448,5 @@ class ControllerYandexbuyOrder extends Controller
 		$log->write($logtext);
 	}
 }
+
+class ControllerExtensionYandexbuyOrder extends ControllerYandexbuyOrder{}

@@ -179,48 +179,4 @@
 			]]></add>
 		</operation>
 	</file>
-    <!-- -->
-    <file path="admin/controller/extension/{feed,payment,yamodule}/{yamodule,mws}.php">
-        <operation>
-            <search regex="true"><![CDATA[
-            ~\$this\-\>load\-\>model\(\'yamodule\/(pokupki|metrika|return)\'\)\;~
-            ]]></search>
-            <add><![CDATA[
-            $this->load->model('extension/yamodule/$1');
-            ]]></add>
-        </operation>
-        <operation>
-            <search regex="true"><![CDATA[
-            ~\$this\-\>model\_yamodule\_(pokupki|metrika|return)\-\>~
-            ]]></search>
-            <add><![CDATA[$this->model_extension_yamodule_$1->]]></add>
-        </operation>
-        <operation>
-            <search regex="true"><![CDATA[
-            ~\$this\-\>(load|url)\-\>(link|controller)\((['"]+)(shipping|feed|payment|yamodule)~
-            ]]></search>
-            <add><![CDATA[$this->$1->$2($3extension/$4]]></add>
-        </operation>
-        <operation>
-            <search regex="true"><![CDATA[
-            ~controller\/shipping~
-            ]]></search>
-            <add><![CDATA[controller/extension/shipping]]></add>
-        </operation>
-        <operation>
-            <search regex="true"><![CDATA[
-				~route\=(payment|feed)~
-				]]></search>
-            <add><![CDATA[route=extension/$1]]></add>
-        </operation>
-    </file>
-    <file path="admin/view/template/extension/{feed,yamodule}/{yamodule,check,invoice_list,invoice_msg,mws_info}.{php,tpl}">
-        <operation>
-            <search regex="true"><![CDATA[
-				~route\=(payment|feed)~
-				]]></search>
-            <add><![CDATA[route=extension/$1]]></add>
-        </operation>
-    </file>
-    <!-- -->
 </modification>

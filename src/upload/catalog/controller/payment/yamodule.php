@@ -1,5 +1,4 @@
 <?php
-class Controllerextensionpaymentyamodule extends ControllerPaymentYamodule{}
 class ControllerPaymentYamodule extends Controller
 {
 	const MONEY_URL = "https://money.yandex.ru";
@@ -523,3 +522,4 @@ class ControllerPaymentYamodule extends Controller
         return json_decode($result->body);
     }
 }
+class ControllerExtensionPaymentYamodule extends ControllerPaymentYamodule{}
