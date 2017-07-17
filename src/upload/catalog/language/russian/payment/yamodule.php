@@ -5,6 +5,8 @@ $_['heading_title']				= 'Thank you for shopping with %s .... ';
 // Text
 $_['kassa_title'] = 'Яндекс.Касса (банковские карты, электронные деньги и другое)';
 $_['p2p_title'] = 'Яндекс.Деньги';
+$_['fast_pay_title'] = 'Яндекс.Платежка';
+$_['fast_pay_fio_label'] = 'Ф.И.О Плательщика';
 
 $_['text_method'] = 'Метод оплаты';
 

@@ -28,6 +28,7 @@
 				<ul class="nav nav-tabs">
 					<li class=""><a href="#tab-kassa" data-toggle="tab"><?php echo $kassa; ?></a></li>
 					<li><a href="#tab-mws" data-toggle="tab"><?php echo $mws_starter; ?></a></li>
+					<li><a href="#tab-fast-pay" data-toggle="tab"><?php echo $fast_pay_title; ?></a></li>
 					<li class=""><a href="#tab-p2p" data-toggle="tab"><?php echo $p2p; ?></a></li>
 					<li><a href="#tab-metrika" data-toggle="tab"><?php echo $metrika; ?></a></li>
 					<li class=""><a href="#tab-market" data-toggle="tab"><?php echo $market; ?></a></li>
@@ -409,6 +410,81 @@
 							</form>
 						</div>
 					</div>
+					<!-- Start FastPay Tab -->
+					<div class="tab-pane" id="tab-fast-pay">
+
+						<?php if($fast_pay_status):?>
+							<?php foreach($fast_pay_status as $status):?>
+								<?= $status;?>
+							<?php endforeach;?>
+						<?php endif;?>
+
+						<div class="">
+							<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="fast_pay_form form-horizontal">
+								<input type="hidden" value="fast_pay" name="type_data"/>
+								<div class='row'>
+									<div class="col-sm-8">
+										<p><?php echo $fast_pay_text?></p>
+									</div>
+									<div class='col-sm-12'>
+										<div class='form-horizontal'>
+											<div class="form-group">
+												<label for="ya_fast_pay_active" class="col-sm-3 control-label"></label>
+												<div class="col-sm-9">
+													<label class='checkbox'>
+														<input type="checkbox" name="ya_fast_pay_active" class="cls_ya_fastpay" value="1" <?php echo ($ya_fast_pay_active ? ' checked="checked"' : ''); ?>>
+														<?php echo $fast_pay_enable_label; ?>
+													</label>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3"><?= $fast_pay_id_label?></label>
+												<div class='col-sm-8'>
+													<input class='form-control' name="ya_fast_pay_id" value='<?php echo $ya_fast_pay_id; ?>'>
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php echo ''; ?></p>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3"><?= $fast_pay_purpose_label?></label>
+												<div class='col-sm-8'>
+													<input class='form-control' name="ya_fast_pay_description" value='<?php echo $ya_fast_pay_description; ?>'>
+												</div>
+												<div class='col-sm-8 col-sm-offset-3'>
+													<p class="help-block"><?php echo $fast_pay_desc_text; ?></p>
+												</div>
+											</div>
+
+											<label class="control-label col-sm-3"><?php echo $fast_pay_os_label; ?></label>
+											<div class='col-sm-8'>
+												<select name="ya_fast_pay_os" id="ya_fast_pay_os" class="form-control">
+													<?php foreach ($order_statuses as $order_status) { ?>
+														<?php if ($order_status['order_status_id'] == $ya_fast_pay_os) { ?>
+															<option value="<?php echo $order_status['order_status_id']; ?>" selected="selected"><?php echo $order_status['name']; ?></option>
+														<?php } else { ?>
+															<option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
+														<?php } ?>
+													<?php } ?>
+												</select>
+											</div>
+											<div class='col-sm-8 col-sm-offset-3'>
+												<p class="help-block"><?php echo $fast_pay_os_text?></p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+
+						<div class="clearfix">
+							<button type="button" onclick="$('.fast_pay_form').submit(); return false;" value="1" class="btn btn-default">
+								<i class="process-icon-save"></i> <?php echo $kassa_sv; ?>
+							</button>
+						</div>
+
+					</div>
+					<!-- End FastPay Tab -->
 					<div class="tab-pane" id="tab-p2p">
 						<?php foreach ($p2p_status as $p) { echo $p; } ?>
 						<div class="">

@@ -21,7 +21,14 @@ class ModelPaymentYamodule extends Model {
 		$method_data = array();
 
 		if ($status) {
-            $name =($this->config->get('ya_kassa_active'))?'kassa_title':'p2p_title';
+		    if($this->config->get('ya_kassa_active')) {
+                $name = 'kassa_title';
+            } else if($this->config->get('ya_p2p_active')) {
+                $name = 'p2p_title';
+            } else if($this->config->get('ya_fast_pay_active')) {
+                $name = 'fast_pay_title';
+            }
+
 			$method_data = array(
 				'code'       => 'yamodule',
 				'title'      => $this->language->get($name),

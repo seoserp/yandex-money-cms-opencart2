@@ -4,28 +4,28 @@
 	<code>ycms.mws</code>
 	<version>1.1.0</version>
 	<author>Yandex.Money</author>
-    <!-- Вставка кнопки в историю заказов-->
-    <file path="catalog/controller/account/order.php">
-        <operation>
-            <search><![CDATA[// History]]></search>
-            <add position="before"><![CDATA[$for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+	<!-- Вставка кнопки в историю заказов-->
+	<file path="catalog/controller/account/order.php">
+		<operation>
+			<search><![CDATA[// History]]></search>
+			<add position="before"><![CDATA[$for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
             $this->language->load($for23.'payment/yamodule');
             if($order_info['payment_method']==$this->language->get('kassa_title') || $order_info['payment_method']==$this->language->get('p2p_title')){
                $this->session->data['order_id']= $this->request->get['order_id'];
                $data["yamodule"] = $this->load->controller($for23."payment/yamodule");
             }]]></add>
-        </operation>
-    </file>
-    <file path="catalog/view/theme/default/template/account/order_info.tpl">
-        <operation>
-            <search><![CDATA[</tfoot>]]></search>
-            <add position="before"><![CDATA[<?php if (isset($yamodule)) {?><tr>
+		</operation>
+	</file>
+	<file path="catalog/view/theme/default/template/account/order_info.tpl">
+		<operation>
+			<search><![CDATA[</tfoot>]]></search>
+			<add position="before"><![CDATA[<?php if (isset($yamodule)) {?><tr>
             <td colspan="<?php if ($products) {echo "6";}else{echo "5";} ?>">
                <?php echo $yamodule; ?>
             </td></tr><?php } ?>]]></add>
-        </operation>
-    </file>
-    <!-- -->
+		</operation>
+	</file>
+	<!-- -->
 	<file path="admin/model/sale/order.php">
 		<operation>
 			<search regex="true"><![CDATA[~o.date_added, o.date_modified FROM~]]></search>
