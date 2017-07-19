@@ -301,6 +301,21 @@
 												</div>
 												<!-- -->
 												<div class="col-sm-8 col-sm-offset-3 taxesArea">
+													<div class="form-group">
+														<label class="col-sm-4 control-label">Ставка по умолчанию</label>
+														<div class="col-sm-8">
+                                                            <select name="ya_kassa_tax_default" id="ya_kassa_tax_default" class="form-control">
+																<option <? if (ya_kassa_tax_default == 1) { ?> selected <? } ?> value="1">Без НДС</option>
+																<option <? if (ya_kassa_tax_default == 2) { ?> selected <? } ?> value="2">0%</option>
+																<option <? if (ya_kassa_tax_default == 3) { ?> selected <? } ?> value="3">10%</option>
+																<option <? if (ya_kassa_tax_default == 4) { ?> selected <? } ?> value="4">18%</option>
+																<option <? if (ya_kassa_tax_default == 5) { ?> selected <? } ?> value="5">Рассчётная ставка 10/110</option>
+																<option <? if (ya_kassa_tax_default == 6) { ?> selected <? } ?> value="6">Рассчётная ставка 18/118</option>
+															</select>
+														</div>
+													</div>
+												</div>
+												<div class="col-sm-8 col-sm-offset-3 taxesArea">
                                                     Ставка в вашем магазине
 												</div>
 												<div class="col-sm-8 col-sm-offset-3 taxesArea">

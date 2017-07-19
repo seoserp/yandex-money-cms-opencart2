@@ -42,6 +42,7 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_inv_subject',
         'ya_kassa_send_check',
         'ya_kassa_tax',
+        'ya_kassa_tax_default'
 	);
 
 	public $fields_metrika = array(
@@ -732,6 +733,7 @@ class ControllerFeedYamodule extends Controller {
 			'ya_kassa_create_order' => 1,
 			'ya_kassa_inv_logo' => 0,
 			'ya_kassa_inv' => 0,
+			'ya_kassa_tax_default' => 1,
 			'ya_metrika_active' => 0,
 			'ya_metrika_webvizor' => 1,
 			'ya_metrika_otkaz' => 1,
