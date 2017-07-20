@@ -312,6 +312,7 @@
 																<option <? if (ya_kassa_tax_default == 5) { ?> selected <? } ?> value="5">Рассчётная ставка 10/110</option>
 																<option <? if (ya_kassa_tax_default == 6) { ?> selected <? } ?> value="6">Рассчётная ставка 18/118</option>
 															</select>
+															<p class="help-block">Ставка по умолчанию будет в чеке, если в карточке товара не указана другая ставка</p>
 														</div>
 													</div>
 												</div>
