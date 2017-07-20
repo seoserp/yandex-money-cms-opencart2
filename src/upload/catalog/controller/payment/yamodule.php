@@ -68,7 +68,7 @@ class ControllerPaymentYamodule extends Controller
                         'text' => substr($row['name'], 0, 128),
                         'tax' => $this->config->get('ya_kassa_tax_default'),
                         'price' => array(
-                            'amount' => number_format(($row['price'] * $disc), 3, '.', ''),
+                            'amount' => number_format(($row['price'] * $disc), 2, '.', ''),
                             'currency' => 'RUB'
                         ),
                     );
