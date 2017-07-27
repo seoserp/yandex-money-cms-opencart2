@@ -6,6 +6,7 @@ class ControllerPaymentYamodule extends Controller
 	
    const PREFIX_DEBUG = "";
    const ORDERNUMBER = "orderNumber";
+   const PHP_VERSION = 5.4;
 	
 	public $error;
 	public $errors;
