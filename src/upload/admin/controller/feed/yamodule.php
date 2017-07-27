@@ -492,6 +492,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['mws_php_exten'] = $this->permitMws();
 		$data['mws_starter'] = $this->language->get('mws_starter');
 		$data['mws_starter'] = $this->language->get('mws_starter');
+		$data['server_ip'] = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'Не удалось определить IP';
 	}
 
 	public function index()

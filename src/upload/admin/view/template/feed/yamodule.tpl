@@ -304,13 +304,13 @@
 													<div class="form-group">
 														<label class="col-sm-4 control-label">Ставка по умолчанию</label>
 														<div class="col-sm-8">
-                                                            <select name="ya_kassa_tax_default" id="ya_kassa_tax_default" class="form-control">
-																<option <? if (ya_kassa_tax_default == 1) { ?> selected <? } ?> value="1">Без НДС</option>
-																<option <? if (ya_kassa_tax_default == 2) { ?> selected <? } ?> value="2">0%</option>
-																<option <? if (ya_kassa_tax_default == 3) { ?> selected <? } ?> value="3">10%</option>
-																<option <? if (ya_kassa_tax_default == 4) { ?> selected <? } ?> value="4">18%</option>
-																<option <? if (ya_kassa_tax_default == 5) { ?> selected <? } ?> value="5">Рассчётная ставка 10/110</option>
-																<option <? if (ya_kassa_tax_default == 6) { ?> selected <? } ?> value="6">Рассчётная ставка 18/118</option>
+															<select name="ya_kassa_tax_default" id="ya_kassa_tax_default" class="form-control">
+																<option <?= $ya_kassa_tax_default == 1 ? 'selected' : '';?> value="1">Без НДС</option>
+																<option <?= $ya_kassa_tax_default == 2 ? 'selected' : '';?> value="2">0%</option>
+																<option <?= $ya_kassa_tax_default == 3 ? 'selected' : '';?> value="3">10%</option>
+																<option <?= $ya_kassa_tax_default == 4 ? 'selected' : '';?> value="4">18%</option>
+																<option <?= $ya_kassa_tax_default == 5 ? 'selected' : '';?> value="5">Рассчётная ставка 10/110</option>
+																<option <?= $ya_kassa_tax_default == 6 ? 'selected' : '';?> value="6">Рассчётная ставка 18/118</option>
 															</select>
 															<p class="help-block">Ставка по умолчанию будет в чеке, если в карточке товара не указана другая ставка</p>
 														</div>
@@ -393,6 +393,13 @@
 												</tr>
 											</table>
 										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-3 control-label" >IP-адрес сервера.</label>
+										<div class="col-sm-9">
+											<div style="padding: 7px 0;"><?= $server_ip?></div>
+                                            <p class="help-block">IP-адрес для тестового и рабочего режимов совпадают.</p>
+                                        </div>
 									</div>
 									<?php } else { echo $success_mws_alert; }
 										}else{
@@ -612,7 +619,7 @@
 					<div class="tab-pane" id="tab-market">
 						<?php foreach ($market_status as $m) { echo $m; } ?>
 						<div class="panel panel-default">
-							<div class="panel-body">							
+							<div class="panel-body">
 							<?php echo $text_license; ?><br>
 								<form action="<?php echo $action; ?>" method="POST" id="form-seting" class="market_form form-horizontal">
 									<input type="hidden" value="market" name="type_data"/>
@@ -794,7 +801,7 @@
 															<i class="icon-check-empty"></i><?php echo $market_unch_all; ?>
 														</a>
 													</div>
-												</div>		
+												</div>
 												<ul id="categoryBox" class="tree">
 													<?php echo $market_cat_tree; ?>
 												</ul>
@@ -987,7 +994,7 @@ $('#mws_crt_load').on('click', function() {
 					$('#mws_crt_load').button('reset');
 				},
 				success: function(json) {
-					if (!json.error){	
+					if (!json.error){
 						$('#mws_form').submit();
 					} else {
 						$('#mws_form').prepend("<div class='alert alert-danger'>"+ json.error +"</div>");

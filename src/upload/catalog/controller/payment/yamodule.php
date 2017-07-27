@@ -94,7 +94,17 @@ class ControllerPaymentYamodule extends Controller
             }
         }
 
-        $data['receipt'] = $receipt;
+        $version = (float)substr(phpversion(), 0,3);
+        if($version < self::PHP_VERSION) {
+            $encoded = json_encode($receipt);
+            $receiptStr = preg_replace_callback('/\\\\u(\w{4})/', function ($matches) {
+                return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
+            }, $encoded);
+        } else {
+            $receiptStr = json_encode($receipt, JSON_UNESCAPED_UNICODE);
+        }
+
+        $data['receipt'] = htmlspecialchars($receiptStr,ENT_QUOTES);
 		$data['order_id'] = self::PREFIX_DEBUG.$this->session->data['order_id'];
 		$data['p2p_mode'] = $this->config->get('ya_p2p_active');
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
