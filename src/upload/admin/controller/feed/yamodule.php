@@ -315,7 +315,7 @@ class ControllerFeedYamodule extends Controller {
 			$data['ya_kassa_fail'] = HTTPS_CATALOG.'index.php?route=checkout/failure';
 			$data['ya_kassa_success'] = HTTPS_CATALOG.'index.php?route=checkout/success';
 			$data['ya_p2p_linkapp'] = HTTPS_CATALOG.'index.php?route='.$for23.'payment/yamodule/inside';
-			$data['ya_market_lnk_yml'] = HTTPS_CATALOG.'index.php?route=feed/yamarket';
+			$data['ya_market_lnk_yml'] = HTTPS_CATALOG.'index.php?route='.$for23.'feed/yamarket';
 		}
 		else
 		{
