@@ -215,7 +215,7 @@ class ControllerYandexbuyCart extends Controller
                                     property_exists($data->cart->delivery->address, "postcode"))?$data->cart->delivery->address->postcode:"000000"; // Индекс домашнего региона
                             }
                             if ($type=="SKIP") continue;
-                            $quote = $this->{'model_shipping_'.$result['code']}->getQuote($address_array);
+                            $quote = $this->{'model_'.str_replace("/","_",$for23).'shipping_'.$result['code']}->getQuote($address_array);
                             if ($quote)
 							{
 							    //TODO Добавить определение названия доставок в настройках модуля
