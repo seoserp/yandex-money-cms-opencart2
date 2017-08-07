@@ -56,7 +56,7 @@ class ControllerPaymentYamodule extends Controller
                     $ya_kassa_tax = $this->config->get('ya_kassa_tax');
                     $receipt['items'][] = array(
                         'quantity' => $row['quantity'],
-                        'text' => substr($row['name'], 0, 128),
+                        'text' => mb_substr($row['name'], 0, 128),
                         'tax' => (isset($ya_kassa_tax[$tax_rate_id]) ? $ya_kassa_tax[$tax_rate_id] : $this->config->get('ya_kassa_tax_default')),
                         'price' => array(
                             'amount' => number_format(($row['price'] * $disc), 3, '.', ''),
@@ -66,7 +66,7 @@ class ControllerPaymentYamodule extends Controller
                 } else {
                     $receipt['items'][] = array(
                         'quantity' => $row['quantity'],
-                        'text' => substr($row['name'], 0, 128),
+                        'text' => mb_substr($row['name'], 0, 128),
                         'tax' => $this->config->get('ya_kassa_tax_default'),
                         'price' => array(
                             'amount' => number_format(($row['price'] * $disc), 2, '.', ''),
