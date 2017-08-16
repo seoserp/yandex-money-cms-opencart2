@@ -117,7 +117,7 @@ $_['kassa_text_sort_order']       = 'Sorting order';
 $_['fast_pay_title'] = 'Yandex.Billing';
 $_['fast_pay_text'] = 'This is a payment form for your site. It allows for accepting payments to your company account from cards and Yandex.Money e-wallets without a contract. To set it up, you need to provide the Yandex.Billing identifier: we will send it via email after you <a href="https://money.yandex.ru/fastpay/">create a form in construction kit.</a>';
 $_['fast_pay_enable_label'] = 'Activate payments via Yandex.Billing';
-$_['fast_pay_id_label'] = 'Yandex.Billing\'s identifier';
+$_['fast_pay_id_label'] = 'Form ID';
 $_['fast_pay_purpose_label'] = 'Payment purpose';
 $_['fast_pay_narrative_placeholder'] = 'Order No. %order_is% Payment via Yandex.Billing ';
 $_['fast_pay_os_label'] = 'Order status';
