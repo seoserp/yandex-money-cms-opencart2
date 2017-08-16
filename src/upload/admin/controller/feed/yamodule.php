@@ -1,4 +1,5 @@
 <?php
+
 class ControllerFeedYamodule extends Controller {
 
 	private $error = array();
@@ -103,6 +104,13 @@ class ControllerFeedYamodule extends Controller {
 		'ya_pokupki_status_unpaid'
 	);
 
+	public $fields_fast_pay = array(
+	    'ya_fast_pay_active',
+        'ya_fast_pay_id',
+        'ya_fast_pay_description',
+        'ya_fast_pay_os'
+    );
+
 	public function initErrors()
 	{
 		$data = array();
@@ -154,6 +162,15 @@ class ControllerFeedYamodule extends Controller {
 			$data['kassa_status'][] = $this->errors_alert('ShopId не заполнен');
 		if ($this->config->get('ya_kassa_scid') == '')
 			$data['kassa_status'][] = $this->errors_alert('SCID Не заполнен');
+
+		if (!$this->config->get('ya_fast_pay_id')) {
+            $data['fast_pay_status'][] = $this->errors_alert('Идентификатор платежки не заполнен');
+        }
+
+        if (!$this->config->get('ya_fast_pay_description')) {
+            $data['fast_pay_status'][] = $this->errors_alert('Введите назначение платежа');
+        }
+
 
 		if (empty($data['market_status']))
 			$data['market_status'][] = '';//$this->success_alert('Все необходимые настроки заполнены!');
@@ -252,9 +269,9 @@ class ControllerFeedYamodule extends Controller {
 		$this->session->data['metrika_status'] = array();
 		$this->session->data['market_status'] = array();
 		$this->session->data['pokupki_status'] = array();
+        $this->session->data['fast_pay_status'] = array();
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		$this->load->language($for23.'feed/yamodule');
-
 		switch($this->request->post['type_data'])
 		{
 			case 'kassa':
@@ -264,13 +281,16 @@ class ControllerFeedYamodule extends Controller {
 					$testUrl = $this->url->link($for23.'payment/yamodule/test', 'token=' . $this->session->data['token'], 'SSL');
 					$this->session->data['kassa_status'][] = '<div class="alert"><a  class="btn btn-success" target="_blank" href="'.$testUrl.'">Проверить работу модуля</a></div>';
 					$this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
+                    $this->model_setting_setting->editSetting('ya_fast_pay_active', array('ya_fast_pay_active' => 0));
 				}
 				break;
 			case 'p2p':
 				$this->saveData($this->fields_p2p);
 				$this->session->data['p2p_status'][] = $this->success_alert($this->language->get('text_success'));
-				if(isset($this->request->post['ya_p2p_active']) && $this->request->post['ya_p2p_active'] == 1)
-					$this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
+				if(isset($this->request->post['ya_p2p_active']) && $this->request->post['ya_p2p_active'] == 1) {
+                    $this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
+                    $this->model_setting_setting->editSetting('ya_fast_pay_active', array('ya_fast_pay_active' => 0));
+                }
 				break;
 			case 'metrika':
 				$this->saveData($this->fields_metrika);
@@ -289,16 +309,25 @@ class ControllerFeedYamodule extends Controller {
 				$this->session->data['pokupki_status'][] = $this->success_alert($this->language->get('text_success'));
 
 				break;
-			
+
+            case 'fast_pay':
+                $this->saveData($this->fields_fast_pay);
+                if(isset($this->request->post['ya_fast_pay_active']) && $this->request->post['ya_fast_pay_active'] == 1) {
+                    $this->model_setting_setting->editSetting('ya_kassa_active', array('ya_kassa_active' => 0));
+                    $this->model_setting_setting->editSetting('ya_p2p_active', array('ya_p2p_active' => 0));
+                }
+                $this->session->data['fast_pay_status'][] = $this->success_alert($this->language->get('text_success'));
+                break;
+
 		}
 		$updater = $this->sendStatistics();
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
-        if (!$this->Sget('ya_kassa_active') && !$this->Sget('ya_p2p_active')){
+        if (!$this->Sget('ya_kassa_active') && !$this->Sget('ya_p2p_active') && !$this->Sget('ya_fast_pay_active')){
             $this->load->controller($for23.'payment/yamodule/uninstall');
         }else{
             $this->load->controller($for23.'payment/yamodule/install');
         }
-		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
+		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki', 'fast_pay') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
 		
 	}
 	public function initForm($array)
@@ -508,6 +537,7 @@ class ControllerFeedYamodule extends Controller {
 		$data['metrika_status'] = '';
 		$data['market_status'] = '';
 		$data['pokupki_status'] = '';
+		$data['fast_pay_status'] = '';
 		$array_init = array_merge($this->fields_p2p, $this->fields_kassa, $this->fields_metrika, $this->fields_market, $this->fields_pokupki);
 		if (($this->request->server['REQUEST_METHOD'] == 'POST'))
 		{
@@ -536,6 +566,8 @@ class ControllerFeedYamodule extends Controller {
 			'kassa_text_inv_text', 'kassa_text_inv_texthelp','kassa_text_inv_pattern',
 			'p2p_text_connect','p2p_text_enable','p2p_text_url_help','p2p_text_setting_head','p2p_text_account','p2p_text_appId','p2p_text_appWord','p2p_text_app_help',
 			'p2p_text_extra_head','p2p_text_debug',	'p2p_text_off',	'p2p_text_on','p2p_text_debug_help','p2p_text_status',
+
+            'fast_pay_text','fast_pay_os_text', 'fast_pay_desc_text', 'fast_pay_enable_label', 'fast_pay_id_label', 'fast_pay_purpose_label', 'fast_pay_os_label', 'fast_pay_os_text', 'fast_pay_desc_text', 'fast_pay_title',
 
 			'metrika_gtoken','metrika_number','metrika_idapp','metrika_o2auth','metrika_pw','metrika_uname','metrika_upw','metrika_set','metrika_celi','metrika_callback',
 			'metrika_sv','metrika_set_1','metrika_set_2','metrika_set_3','metrika_set_4','metrika_set_5','celi_cart','celi_order',
@@ -584,6 +616,15 @@ class ControllerFeedYamodule extends Controller {
 		//
 		$data['token'] = $this->session->data['token'];
 		$data['url_mws_gen'] = $this->url->link('tool/mws/generate', 'token=' . $this->session->data['token'], 'SSL');
+
+		/** Start FastPay template variables */
+
+        $data['ya_fast_pay_active'] = $this->Sget("ya_fast_pay_active");
+        $data['ya_fast_pay_id'] = $this->Sget("ya_fast_pay_id");
+        $data['ya_fast_pay_description'] = $this->Sget("ya_fast_pay_description");
+        $data['ya_fast_pay_os'] = $this->Sget("ya_fast_pay_os");
+
+		/** End FastPay template variables */
 
 //		taxes
 
@@ -691,6 +732,16 @@ class ControllerFeedYamodule extends Controller {
 			$data['market_status'] = array_merge($data['market_status'], $this->session->data['market_status']);
 		if (isset($this->session->data['kassa_status']) && !empty($this->session->data['kassa_status']))
 			$data['kassa_status'] = array_merge($data['kassa_status'], $this->session->data['kassa_status']);
+
+        if (isset($this->session->data['fast_pay_status']) && !empty($this->session->data['fast_pay_status'])) {
+            if( is_array($data['fast_pay_status'])) {
+                $data['fast_pay_status'] = array_merge($data['fast_pay_status'], $this->session->data['fast_pay_status']);
+            } else {
+                $data['fast_pay_status'] = $this->session->data['fast_pay_status'];
+            }
+        }
+
+
 		if (isset($this->session->data['p2p_status']) && !empty($this->session->data['p2p_status']))
 			$data['p2p_status'] = array_merge($data['p2p_status'], $this->session->data['p2p_status']);
 		if (isset($this->session->data['pokupki_status']) && !empty($this->session->data['pokupki_status']))
@@ -848,6 +899,8 @@ class ControllerFeedYamodule extends Controller {
 		$this->model_extension_extension->install('payment', 'yamodule');
 		//$this->load->controller('extension/modification/refresh');
 		$this->load->model('user/user_group');
+		$this->installFastPaySettings();
+
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', $for23.'payment/yamodule');
 		$this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', $for23.'payment/yamodule');
@@ -905,6 +958,10 @@ class ControllerFeedYamodule extends Controller {
 		$cu = $this->getCustomer($this->config->get('yandexbuy_customer'));
 		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 0));
 		$this->load->model('extension/extension');
+        $this->model_setting_setting->deleteSetting('ya_fast_pay_active');
+        $this->model_setting_setting->deleteSetting('ya_fast_pay_os');
+        $this->model_setting_setting->deleteSetting('ya_fast_pay_id');
+        $this->model_setting_setting->deleteSetting('ya_fast_pay_description');
 		$this->model_extension_extension->uninstall('payment', 'yamodule');
 		if ($cu['customer_id'] && $cu['address_id'])
 		{
@@ -963,6 +1020,16 @@ class ControllerFeedYamodule extends Controller {
         }
         $error_log = null;
 	}
+
+    private function installFastPaySettings()
+    {
+        $defaultStatusId = $this->config->get('config_order_status_id');
+        $this->model_setting_setting->editSetting('ya_fast_pay_active', array('ya_fast_pay_active' =>  0));
+        $this->model_setting_setting->editSetting('ya_fast_pay_os', array('ya_fast_pay_os' => $defaultStatusId));
+        $this->model_setting_setting->editSetting('ya_fast_pay_id', array('ya_fast_pay_id' => ''));
+        $this->model_setting_setting->editSetting('ya_fast_pay_description', array('ya_fast_pay_description' => 'Номер заказа %order_id%. Оплата через Яндекс.Платежку'));
+        $this->model_setting_setting->editSetting('ya_fast_pay_url', array('ya_fast_pay_url' => 'https://money.yandex.ru/fastpay/confirm'));
+    }
 }
+
 class ControllerExtensionFeedYamodule extends ControllerFeedYamodule{}
-?>

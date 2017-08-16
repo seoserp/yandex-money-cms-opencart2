@@ -1,4 +1,5 @@
 <?php
+
 Class ModelYamodelYamoney extends Model{
 	public function checkSign($callbackParams, $password, $sid, $bKassa = false){
 		if (isset($callbackParams['md5']) && $bKassa == true){

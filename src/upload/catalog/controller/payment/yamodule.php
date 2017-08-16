@@ -109,7 +109,13 @@ class ControllerPaymentYamodule extends Controller
 		$data['order_id'] = self::PREFIX_DEBUG.$this->session->data['order_id'];
 		$data['p2p_mode'] = $this->config->get('ya_p2p_active');
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
-		$data['shop_id'] = $this->config->get('ya_kassa_sid');
+		$data['fast_pay_mode'] = $this->config->get('ya_fast_pay_active');
+		$data['fast_pay_id'] = $this->config->get('ya_fast_pay_id');
+        $data['fast_pay_description'] = $this->generateNarravite($order_info);
+        $data['fast_pay_url'] = $this->config->get('ya_fast_pay_url');
+        $data['customerName'] = $this->generateCustomerName($order_info);
+        $data['shop_id'] = $this->config->get('ya_kassa_sid');
+        $data['fast_pay_fio_label'] = $this->language->get('fast_pay_fio_label');
 		$data['scid'] = $this->config->get('ya_kassa_scid');
 		$data['kassa_paymode'] = $this->config->get('ya_kassa_paymode');
 		$data['kassa_paylogo'] = $this->config->get('ya_kassa_paylogo');
@@ -143,7 +149,12 @@ class ControllerPaymentYamodule extends Controller
 	public function confirm(){
 		if ($this->session->data['payment_method']['code'] == 'yamodule') {
 			$this->load->model('checkout/order');
-			if ($this->config->get('ya_kassa_create_order')=='1') $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('config_order_status_id'), '', true);
+			if(isset($this->request->get['payMethod']) && $this->request->get['payMethod'] == 'fast_pay') {
+                $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('ya_fast_pay_os'), '', true);
+            } else {
+                if ($this->config->get('ya_kassa_create_order')=='1') $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('config_order_status_id'), '', true);
+            }
+
 			if ($this->config->get('ya_kassa_cart_reset')=='1') $this->cart->clear();
 		}
 	}
@@ -542,5 +553,29 @@ class ControllerPaymentYamodule extends Controller
         $result = $this->SendCurl($full_url, $headers, $options);
         return json_decode($result->body);
     }
+
+    /**
+     * @param $order_info
+     * @return string
+     */
+    private function generateNarravite($order_info)
+    {
+        $keys = array_map(function ($item){
+            return "%{$item}%";
+        }, array_keys($order_info));
+
+        $pairs = array_combine($keys, $order_info);
+        return strtr($this->config->get('ya_fast_pay_description'), $pairs);
+    }
+
+    private function generateCustomerName($order_info)
+    {
+        if(isset($order_info['firstname']) && isset($order_info['lastname'])) {
+            return "{$order_info['lastname']} {$order_info['firstname']}";
+        }
+
+        return "";
+    }
 }
+
 class ControllerExtensionPaymentYamodule extends ControllerPaymentYamodule{}
