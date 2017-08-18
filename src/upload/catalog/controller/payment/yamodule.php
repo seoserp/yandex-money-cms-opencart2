@@ -18,7 +18,12 @@ class ControllerPaymentYamodule extends Controller
     private function factoryReceipt($defaultTaxRateId)
     {
         if (!class_exists('', false)) {
-            require_once __DIR__ . '/../../model/yamodel/YandexMoneyReceipt.php';
+            $path = __DIR__ . '/../../../model/extension/yamodel/YandexMoneyReceipt.php';
+            if (file_exists($path)) {
+                require_once $path;
+            } else {
+                require_once __DIR__ . '/../../model/yamodel/YandexMoneyReceipt.php';
+            }
         }
         return new YandexMoneyReceipt($defaultTaxRateId, 'RUB');
     }
