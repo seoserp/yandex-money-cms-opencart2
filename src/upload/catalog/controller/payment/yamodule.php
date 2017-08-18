@@ -17,7 +17,7 @@ class ControllerPaymentYamodule extends Controller
 
     private function factoryReceipt($defaultTaxRateId)
     {
-        if (!class_exists('', false)) {
+        if (!class_exists('YandexMoneyReceipt', false)) {
             $path = __DIR__ . '/../../../model/extension/yamodel/YandexMoneyReceipt.php';
             if (file_exists($path)) {
                 require_once $path;
