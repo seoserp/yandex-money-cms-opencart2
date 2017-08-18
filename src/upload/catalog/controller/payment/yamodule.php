@@ -565,6 +565,10 @@ class ControllerPaymentYamodule extends Controller
         }, array_keys($order_info));
 
         $pairs = array_combine($keys, $order_info);
+        $pairs = array_filter($pairs, function($items){
+            return is_scalar($items);
+        });
+
         return strtr($this->config->get('ya_fast_pay_description'), $pairs);
     }
 
