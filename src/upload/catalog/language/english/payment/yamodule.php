@@ -5,6 +5,8 @@ $_['heading_title']             = 'Thank you for shopping with %s .... ';
 // Text
 $_['kassa_title'] = 'Yandex.Checkout (bank cards, e-money, and more)';
 $_['p2p_title'] = 'Yandex.Money';
+$_['fast_pay_title'] = 'Yandex.Billing (bank card, e-wallets)';
+$_['fast_pay_fio_label'] = 'Payer\'s full name';
 
 $_['text_method'] = 'Payment method';
 
