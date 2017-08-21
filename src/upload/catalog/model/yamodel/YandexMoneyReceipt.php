@@ -129,7 +129,7 @@ class YandexMoneyReceipt implements JsonSerializable
         if (defined('JSON_UNESCAPED_UNICODE')) {
             return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         } else {
-            // для версий PHP которые не поддерживают передацу параметров в json_encode
+            // для версий PHP которые не поддерживают передачу параметров в json_encode
             // заменяем в полученной при сериализации строке уникод последовательности
             // вида \u1234 на их реальное значение в utf-8
             return preg_replace_callback('/\\\\u(\w{4})/', function ($matches) {
