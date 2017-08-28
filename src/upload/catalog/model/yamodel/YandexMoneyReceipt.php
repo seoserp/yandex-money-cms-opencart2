@@ -1,9 +1,8 @@
 <?php
 
-if (!interface_exists('JsonSerializable')) {
-    interface JsonSerializable
-    {
-        public function JsonSerialize();
+if (!interface_exists('JsonSerializable', false)) {
+    interface JsonSerializable {
+        function jsonSerialize();
     }
 }
 
@@ -12,6 +11,15 @@ if (!interface_exists('JsonSerializable')) {
  */
 class YandexMoneyReceipt implements JsonSerializable
 {
+    /** @var string Код валюты - рубли */
+    const CURRENCY_RUB = 'RUB';
+
+    /** @var string Используемая по умолчанию валюта */
+    const DEFAULT_CURRENCY = self::CURRENCY_RUB;
+
+    /** @var int Идентификатор ставки НДС по умолчанию */
+    const DEFAULT_TAX_RATE_ID = 1;
+
     /** @var YandexMoneyReceiptItem[] Массив с информацией о покупаемых товарах */
     private $items;
 
@@ -31,7 +39,7 @@ class YandexMoneyReceipt implements JsonSerializable
      * @param int $taxRateId
      * @param string $currency
      */
-    public function __construct($taxRateId, $currency = 'RUB')
+    public function __construct($taxRateId = self::DEFAULT_TAX_RATE_ID, $currency = self::DEFAULT_CURRENCY)
     {
         $this->taxRateId = $taxRateId;
         $this->items = array();

@@ -25,7 +25,7 @@ class ControllerPaymentYamodule extends Controller
                 require_once __DIR__ . '/../../model/yamodel/YandexMoneyReceipt.php';
             }
         }
-        return new YandexMoneyReceipt($defaultTaxRateId, 'RUB');
+        return new YandexMoneyReceipt($defaultTaxRateId);
     }
 
     public function index()
