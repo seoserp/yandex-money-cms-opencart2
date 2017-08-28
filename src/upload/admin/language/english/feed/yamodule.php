@@ -14,6 +14,7 @@ $_['metrika']          = 'Yandex.Metrica';
 $_['log']       = 'Keep a register log';
 $_['pokupki']       = 'Orders on Yandex.Market';
 $_['mws_starter']       = 'Yandex.Checkout: Order management';
+$_['fast_pay'] = 'Yandex.Billing';
 // market_
 $_['market_set']          = 'Upload setups';
 $_['market_set_1']          = 'Upload products in stock only';
@@ -111,6 +112,20 @@ $_['kassa_qp']       = 'Payment using promised payment (QPPI.ru).';
 
 $_['kassa_sv']       = 'Save';
 $_['kassa_text_sort_order']       = 'Sorting order';
+
+//fastpay
+$_['fast_pay_title'] = 'Yandex.Billing';
+$_['fast_pay_text'] = 'This is a payment form for your site. It allows for accepting payments to your company account from cards and Yandex.Money e-wallets without a contract. To set it up, you need to provide the Yandex.Billing identifier: we will send it via email after you <a href="https://money.yandex.ru/fastpay/">create a form in construction kit.</a>';
+$_['fast_pay_enable_label'] = 'Activate payments via Yandex.Billing';
+$_['fast_pay_id_label'] = 'Form ID';
+$_['fast_pay_purpose_label'] = 'Payment purpose';
+$_['fast_pay_narrative_placeholder'] = 'Order No. %order_is% Payment via Yandex.Billing ';
+$_['fast_pay_os_label'] = 'Order status';
+
+$_['fast_pay_os_text'] = 'Payment purpose is added to the payment order: specify whatever will help identify the order paid via Yandex.Billing.';
+$_['fast_pay_desc_text'] = 'Order status shows the payment result is unknown: you can only learn whether the client made payment or not from an email notification or in your bank.';
+
+
 // pokupki
 $_['pokupki_gtoken']       = 'Get token (push after saving settings)';
 $_['pokupki_stoken']       = 'Authorization token from the Yandex.Market settings';
