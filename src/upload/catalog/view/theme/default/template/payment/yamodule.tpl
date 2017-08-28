@@ -54,7 +54,9 @@
 			<input type="hidden" name="customerNumber" value="<?php echo $customerNumber; ?>" >
 			<input type="hidden" name="shopSuccessURL" value="<?php echo $shopSuccessURL; ?>" >
 			<input type="hidden" name="shopFailURL" value="<?php echo $shopFailURL; ?>" >
-			<?php if ($receipt){ ?> <input type="hidden" name="ym_merchant_receipt" value='<?php echo $receipt; ?>' > <?php } ?>
+			<?php if ($receipt){ ?>
+			<textarea name="ym_merchant_receipt" style="display: none;"><?php echo $receipt; ?></textarea>
+			<?php } ?>
 			<?php if ($phone){ ?> <input type="hidden" name="cps_phone" value="<?php echo $phone; ?>" > <?php } ?>
 			<?php if ($email){ ?> <input type="hidden" name="cps_email" value="<?php echo $email; ?>" >  <?php } ?>
 			<input type="hidden" name="cms_name" value="ya_opencart2" >

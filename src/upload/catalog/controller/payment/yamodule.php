@@ -15,24 +15,50 @@ class ControllerPaymentYamodule extends Controller
 		die('ok');
 	}
 
-	public function index() {
-		$this->load->model('checkout/order');
-		$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
-		$this->language->load($for23.'payment/yamodule');
-		$data['button_confirm'] = $this->language->get('button_confirm');
-		$data['p2p_action'] = $this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL');
-		if ($this->config->get('ya_kassa_test'))
-			$data['kassa_action'] = 'https://demomoney.yandex.ru/eshop.xml';
-		else
-			$data['kassa_action'] = 'https://money.yandex.ru/eshop.xml';
+    private function factoryReceipt($defaultTaxRateId)
+    {
+        if (!class_exists('YandexMoneyReceipt', false)) {
+            $path = __DIR__ . '/../../../model/extension/yamodel/YandexMoneyReceipt.php';
+            if (file_exists($path)) {
+                require_once $path;
+            } else {
+                require_once __DIR__ . '/../../model/yamodel/YandexMoneyReceipt.php';
+            }
+        }
+        return new YandexMoneyReceipt($defaultTaxRateId);
+    }
 
-		$receipt = array();
-		if ($this->config->get('ya_kassa_send_check')) {
-            $receipt = array(
-                'customerContact' => $order_info['email'],
-                'items' => array(),
-            );
+    public function index()
+    {
+        $this->load->model('checkout/order');
+        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
+        $this->language->load($for23.'payment/yamodule');
+        $data['button_confirm'] = $this->language->get('button_confirm');
+        $data['p2p_action'] = $this->url->link($for23.'payment/yamodule/yaredirect', '', 'SSL');
+        if ($this->config->get('ya_kassa_test')) {
+            $data['kassa_action'] = 'https://demomoney.yandex.ru/eshop.xml';
+        } else {
+            $data['kassa_action'] = 'https://money.yandex.ru/eshop.xml';
+        }
+
+        $totalAmount = number_format(
+            $this->currency->convert(
+                $this->currency->format(
+                    $order_info['total'],
+                    $order_info['currency_code'],
+                    $order_info['currency_value'],
+                    false
+                ),
+                $order_info['currency_code'],
+                'RUB'
+            ), 2, '.', ''
+        );
+
+        $receipt = null;
+        if ($this->config->get('ya_kassa_send_check')) {
+            $receipt = $this->factoryReceipt($this->config->get('ya_kassa_tax_default'));
+            $receipt->setCustomerContact($order_info['email']);
 
             $this->load->model('catalog/product');
             $cart_product = $this->cart->getProducts();
@@ -54,25 +80,13 @@ class ControllerPaymentYamodule extends Controller
                     $rate = current($rates);
                     $tax_rate_id = $rate['tax_rate_id'];
                     $ya_kassa_tax = $this->config->get('ya_kassa_tax');
-                    $receipt['items'][] = array(
-                        'quantity' => $row['quantity'],
-                        'text' => mb_substr($row['name'], 0, 128),
-                        'tax' => (isset($ya_kassa_tax[$tax_rate_id]) ? $ya_kassa_tax[$tax_rate_id] : $this->config->get('ya_kassa_tax_default')),
-                        'price' => array(
-                            'amount' => number_format(($row['price'] * $disc), 3, '.', ''),
-                            'currency' => 'RUB'
-                        ),
-                    );
+                    if (isset($ya_kassa_tax[$tax_rate_id])) {
+                        $receipt->addItem($row['name'], $row['price'] * $disc, $row['quantity'], $ya_kassa_tax[$tax_rate_id]);
+                    } else {
+                        $receipt->addItem($row['name'], $row['price'] * $disc, $row['quantity']);
+                    }
                 } else {
-                    $receipt['items'][] = array(
-                        'quantity' => $row['quantity'],
-                        'text' => mb_substr($row['name'], 0, 128),
-                        'tax' => $this->config->get('ya_kassa_tax_default'),
-                        'price' => array(
-                            'amount' => number_format(($row['price'] * $disc), 2, '.', ''),
-                            'currency' => 'RUB'
-                        ),
-                    );
+                    $receipt->addItem($row['name'], $row['price'] * $disc, $row['quantity']);
                 }
             }
 
@@ -83,29 +97,12 @@ class ControllerPaymentYamodule extends Controller
                 isset($this->session->data['shipping_method']['title']) &&
                 $this->session->data['shipping_method']['cost'] > 0
             ) {
-                $receipt['items'][] = array(
-                    'quantity' => 1,
-                    'text' => substr($this->session->data['shipping_method']['title'], 0, 128),
-                    'tax' => $this->config->get('ya_kassa_tax_default'),
-                    'price' => array(
-                        'amount' => number_format($this->session->data['shipping_method']['cost'], 2, '.', ''),
-                        'currency' => 'RUB'
-                    ),
-                );
+                $receipt->addShipping($this->session->data['shipping_method']['title'], $this->session->data['shipping_method']['cost']);
             }
+            $receipt->normalize($totalAmount);
         }
 
-        $version = (float)substr(phpversion(), 0,3);
-        if($version < self::PHP_VERSION) {
-            $encoded = json_encode($receipt);
-            $receiptStr = preg_replace_callback('/\\\\u(\w{4})/', function ($matches) {
-                return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
-            }, $encoded);
-        } else {
-            $receiptStr = json_encode($receipt, JSON_UNESCAPED_UNICODE);
-        }
-
-        $data['receipt'] = htmlspecialchars($receiptStr,ENT_QUOTES);
+        $data['receipt'] = $receipt === null ? null : $receipt->getJson();
 		$data['order_id'] = self::PREFIX_DEBUG.$this->session->data['order_id'];
 		$data['p2p_mode'] = $this->config->get('ya_p2p_active');
 		$data['kassa_mode'] = $this->config->get('ya_kassa_active');
@@ -125,7 +122,7 @@ class ControllerPaymentYamodule extends Controller
 		$data['email'] = $order_info['email'];
 		$data['phone'] = preg_replace("/[-+()]/",'',$order_info['telephone']);
 		$data['comment'] = $order_info['comment'];
-		$data['sum'] = number_format($this->currency->convert($this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false), $order_info['currency_code'], 'RUB'), 2, '.', '');
+		$data['sum'] = $totalAmount;
 		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','qp','qw') as $pName) {
             $data['method_'.$pName] = $this->config->get('ya_kassa_'.$pName);
             $data['method_'.$pName.'_text'] = $this->language->get('text_method_'.$pName);
