@@ -57,7 +57,6 @@ class YandexMoneyReceipt implements JsonSerializable
     public function addItem($title, $price, $quantity = 1.0, $taxId = null)
     {
         if ($price <= 0 || $quantity <= 0) {
-            // игнорируем позиции с нулевой или отрицательной ценой или количеством
             return $this;
         }
         $this->items[] = new YandexMoneyReceiptItem($title, $quantity, $price, false, $taxId);
@@ -74,7 +73,6 @@ class YandexMoneyReceipt implements JsonSerializable
     public function addShipping($title, $price, $taxId = null)
     {
         if ($price <= 0) {
-            // игнорируем позиции с нулевой или отрицательной ценой
             return $this;
         }
         $this->shipping = new YandexMoneyReceiptItem($title, 1.0, $price, true, $taxId);
@@ -144,7 +142,7 @@ class YandexMoneyReceipt implements JsonSerializable
     {
         if (defined('JSON_UNESCAPED_UNICODE')) {
             return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        } else {
+        } elseif (function_exists('json_encode')) {
             // для версий PHP которые не поддерживают передачу параметров в json_encode
             // заменяем в полученной при сериализации строке уникод последовательности
             // вида \u1234 на их реальное значение в utf-8
@@ -153,6 +151,8 @@ class YandexMoneyReceipt implements JsonSerializable
                 array($this, 'legacyReplaceUnicodeMatches'),
                 json_encode($this->jsonSerialize())
             );
+        } else {
+            return $this->generateJson();
         }
     }
 
@@ -171,7 +171,12 @@ class YandexMoneyReceipt implements JsonSerializable
     {
         if (!$withShipping) {
             if ($this->shipping !== null) {
-                $orderAmount -= $this->shipping->getAmount();
+                if ($orderAmount > $this->shipping->getAmount()) {
+                    $orderAmount -= $this->shipping->getAmount();
+                } else {
+                    // если сумма заказа после скидки превышает стоимость доставки, то доставку включаем в нормализацию
+                    $withShipping = true;
+                }
             }
         }
         $realAmount = $this->getAmount($withShipping);
@@ -189,15 +194,30 @@ class YandexMoneyReceipt implements JsonSerializable
                 }
             }
             if ($aloneId === null) {
+                foreach ($this->items as $index => $item) {
+                    if ($withShipping || !$item->isShipping()) {
+                        if ($aloneId === null && $item->getQuantity() > 1.0) {
+                            $aloneId = $index;
+                            break;
+                        }
+                    }
+                }
+            }
+            if ($aloneId === null) {
                 $aloneId = 0;
             }
             $diff = $orderAmount - $realAmount;
             if (abs($diff) >= 0.001) {
                 if ($this->items[$aloneId]->getQuantity() === 1.0) {
                     $this->items[$aloneId]->increasePrice($diff);
-                } else {
-                    $item = $this->items[0]->fetchItem(1);
+                } elseif ($this->items[$aloneId]->getQuantity() > 1.0) {
+                    $item = $this->items[$aloneId]->fetchItem(1);
                     $item->increasePrice($diff);
+                    array_splice($this->items, $aloneId + 1, 0, array($item));
+                } else {
+                    $qty = $this->items[$aloneId]->getQuantity() / 2.0;
+                    $item = $this->items[$aloneId]->fetchItem($qty);
+                    $item->increasePrice($diff / $qty);
                     array_splice($this->items, $aloneId + 1, 0, array($item));
                 }
             }
@@ -208,11 +228,39 @@ class YandexMoneyReceipt implements JsonSerializable
     /**
      * Деэскейпирует строку для вставки в JSON
      * @param string $string Исходная строка
+     * @param bool $escapeForJson
      * @return string Строка с эскейпированными "<" и ">"
      */
-    private function escapeString($string)
+    private function escapeString($string, $escapeForJson = false)
     {
+        if ($escapeForJson) {
+            return str_replace(
+                array('<', '>', '\\', '"'),
+                array('&lt;', '&gt;', '\\\\', '\\"'),
+                html_entity_decode($string)
+            );
+        }
         return str_replace(array('<', '>'), array('&lt;', '&gt;'), html_entity_decode($string));
+    }
+
+    private function generateJson()
+    {
+        $itemsLines = array();
+        foreach ($this->items as $item) {
+            if ($item->getPrice() >= 0.0) {
+                $itemsLines[] = '{'
+                    . '"quantity":"' . $item->getQuantity() . '",'
+                    . '"price":{'
+                    . '"amount":"' . number_format($item->getPrice(), 2, '.', '') . '",'
+                    . '"currency":"' . $this->currency . '"'
+                    . '},'
+                    . '"tax":' . ($item->hasTaxId() ? $item->getTaxId() : $this->taxRateId) . ','
+                    . '"text":"' . $this->escapeString($item->getTitle(), true) . '"'
+                    . '}';
+            }
+        }
+        return '{"customerContact":"' . $this->escapeString($this->customerContact, true) . '",'
+            . '"items":[' . implode(',', $itemsLines) . ']}';
     }
 }
 
