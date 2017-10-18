@@ -56,6 +56,10 @@ class YandexMoneyReceipt implements JsonSerializable
      */
     public function addItem($title, $price, $quantity = 1.0, $taxId = null)
     {
+        if ($price <= 0 || $quantity <= 0) {
+            // игнорируем позиции с нулевой или отрицательной ценой или количеством
+            return $this;
+        }
         $this->items[] = new YandexMoneyReceiptItem($title, $quantity, $price, false, $taxId);
         return $this;
     }
@@ -69,6 +73,10 @@ class YandexMoneyReceipt implements JsonSerializable
      */
     public function addShipping($title, $price, $taxId = null)
     {
+        if ($price <= 0) {
+            // игнорируем позиции с нулевой или отрицательной ценой
+            return $this;
+        }
         $this->shipping = new YandexMoneyReceiptItem($title, 1.0, $price, true, $taxId);
         $this->items[] = $this->shipping;
         return $this;
