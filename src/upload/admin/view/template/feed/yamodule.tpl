@@ -888,7 +888,10 @@
 									<div class="form-group">
 										<label class="col-sm-4 control-label" for="ya_market_dynamic"><?php echo $market_lnk_yml; ?></label>
 										<div class="col-sm-8">
-											<input type="text" name="ya_market_dynamic" value="<?php echo $ya_market_lnk_yml; ?>" id="ya_market_dynamic" disabled="disabled" class="form-control"/>
+											<input type="hidden" name="ya_market_dynamic" value="<?php echo $ya_market_lnk_yml; ?>" id="ya_market_dynamic"/>
+											<div disabled="disabled" class="form-control">
+												<?php echo $ya_market_lnk_yml; ?>
+											</div>
 										</div>
 									</div>
 								</form>
