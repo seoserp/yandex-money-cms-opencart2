@@ -354,6 +354,14 @@
 								<?php
 							if (count($mws_global_error)==0){
 								if (!$cert_loaded){ ?>
+
+								<?php if (!$mws_ip_same) : ?>
+								<div class="alert alert-danger">
+									<i class="fa fa-exclamation-circle"></i> IP-адрес для тестового и рабочего режимов не совпадают (предыдущее значение IP адреса: <?php echo $mws_ip_old; ?>).
+									<button type="button" class="close" data-dismiss="alert">×</button>
+								</div>
+								<?php endif; ?>
+
 								<p><?php echo $txt_mws_main; ?><p>
 								<form id='mws_form' class="mws_form form-horizontal" method='post' action='<?php echo $action; ?>'>
 									<div class="form-group">
@@ -398,9 +406,13 @@
 									<div class="form-group">
 										<label class="col-sm-3 control-label" >IP-адрес сервера.</label>
 										<div class="col-sm-9">
-											<div style="padding: 7px 0;"><?= $server_ip?></div>
-                                            <p class="help-block">IP-адрес для тестового и рабочего режимов совпадают.</p>
-                                        </div>
+											<div style="padding: 7px 0;"><?php echo $mws_ip_new; ?></div>
+											<?php if ($mws_ip_same) : ?>
+												<p class="help-block">IP-адрес для тестового и рабочего режимов совпадают.</p>
+											<?php else : ?>
+												<p class="text-warning">IP-адрес для тестового и рабочего режимов не совпадают (предыдущее значение IP адреса: <?php echo $mws_ip_old; ?>).</p>
+											<?php endif; ?>
+										</div>
 									</div>
 									<?php } else { echo $success_mws_alert; }
 										}else{

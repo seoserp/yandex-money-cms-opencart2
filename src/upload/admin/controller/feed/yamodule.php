@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class ControllerFeedYamodule
+ */
 class ControllerFeedYamodule extends Controller {
 
 	private $error = array();
@@ -515,14 +518,60 @@ class ControllerFeedYamodule extends Controller {
 			}
 		}
 	}
-	
-	private function tabMws(&$data){
-		$data['mws_starter'] = $this->language->get('mws_starter');
-		$data['mws_php_exten'] = $this->permitMws();
-		$data['mws_starter'] = $this->language->get('mws_starter');
-		$data['mws_starter'] = $this->language->get('mws_starter');
-		$data['server_ip'] = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'Не удалось определить IP';
-	}
+
+    private function tabMws(&$data)
+    {
+        $data['mws_starter'] = $this->language->get('mws_starter');
+        $data['mws_php_exten'] = $this->permitMws();
+        $data['mws_starter'] = $this->language->get('mws_starter');
+        $data['mws_starter'] = $this->language->get('mws_starter');
+        $oldIp = $this->config->get('ya_mws_server_ip');
+        $newIp = $this->getServerIp();
+        if (empty($oldIp)) {
+            $oldIp = $newIp;
+            $this->load->model('setting/setting');
+            $this->model_setting_setting->editSetting('ya_mws', array('ya_mws_server_ip' => $newIp));
+        }
+        $data['mws_ip_same'] = ($oldIp === $newIp);
+        if (!$data['mws_ip_same']) {
+            $this->load->model('setting/setting');
+            if (!isset($this->session->data['ya_mws_ip_counter'])) {
+                $this->session->data['ya_mws_ip_counter'] = 1;
+            } else {
+                $this->session->data['ya_mws_ip_counter'] += 1;
+                if ($this->session->data['ya_mws_ip_counter'] > 2) {
+                    $this->model_setting_setting->editSetting('ya_mws', array('ya_mws_server_ip' => $newIp));
+                }
+            }
+        } else {
+            unset($this->session->data['ya_mws_ip_counter']);
+        }
+        $data['mws_ip_old'] = $oldIp;
+        $data['mws_ip_new'] = $newIp;
+    }
+
+    private function getServerIp()
+    {
+        $url = 'http://ipv4.internet.yandex.net/internet/api/v0/ip';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FAILONERROR, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 9);
+        curl_setopt($ch, CURLOPT_POST, 0);
+        $result = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($status == 200) {
+            $data = json_decode($result);
+            if (is_string($data)) {
+                return $data;
+            }
+        }
+        return 'Не удалось определить IP адрес';
+    }
 
 	public function index()
 	{
@@ -591,12 +640,6 @@ class ControllerFeedYamodule extends Controller {
         $data['yamodule_total_sort_order']= $this->Sget('yamodule_total_sort_order');
         $data['ya_kassa_send_check'] =  $this->Sget('ya_kassa_send_check');
         $data['ya_kassa_sid'] =  $this->Sget('ya_kassa_sid');
-		//MWS
-		$data['mws_global_error']= array();
-		if (!extension_loaded ('openssl')) $data['mws_global_error'][]= $this->language->get('ext_mws_openssl');
-		if (!$this->Sget('ya_kassa_active')) $data['mws_global_error'][]= $this->language->get('err_mws_kassa');
-		if (!$this->Sget('ya_kassa_sid')) $data['mws_global_error'][]= $this->language->get('err_mws_shopid');
-		if (count($data['mws_global_error'])==0) $this->load->controller('tool/mws/generate');
 
 		$data['txt_mws_connect'] = sprintf($this->language->get('txt_mws_connect'),$this->url->link('tool/mws/csr', 'token=' . $this->session->data['token'], 'SSL'));
 		$data['success_mws_alert'] = sprintf($this->language->get('success_mws_alert'), $this->url->link('sale/order', 'token=' . $this->session->data['token'], 'SSL'), $this->url->link('extension/feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
@@ -664,12 +707,26 @@ class ControllerFeedYamodule extends Controller {
 
 //		taxes
 
+        $data['mws_global_error'] = array();
 		$conf = $this->model_setting_setting->getSetting("yamodule_mws");
-		if (isset($conf['yamodule_mws_csr_sign'])){
+		if (isset($conf['yamodule_mws_csr_sign'])) {
 			$data['mws_sign'] = $conf['yamodule_mws_csr_sign'];
-		}else{
+		} else {
+            //MWS
+            if (!extension_loaded('openssl')) {
+                $data['mws_global_error'][] = $this->language->get('ext_mws_openssl');
+            }
+            if (!$this->Sget('ya_kassa_active')) {
+                $data['mws_global_error'][] = $this->language->get('err_mws_kassa');
+            }
+            if (!$this->Sget('ya_kassa_sid')) {
+                $data['mws_global_error'][] = $this->language->get('err_mws_shopid');
+            }
+            if (count($data['mws_global_error']) == 0) {
+                $this->load->controller('tool/mws/generate');
+            }
 			//Генерация CSR
-			$this->load->controller('tool/mws/generate');
+			//$this->load->controller('tool/mws/generate');
 			//$this->response->redirect($this->url->link('extension/feed/yamodule', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 		$data['cert_loaded'] = (isset($conf['yamodule_mws_cert']) && $conf['yamodule_mws_cert']!="")?true:false;

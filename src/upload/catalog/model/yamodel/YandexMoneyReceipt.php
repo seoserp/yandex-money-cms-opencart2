@@ -156,6 +156,15 @@ class YandexMoneyReceipt implements JsonSerializable
         }
     }
 
+    /**
+     * Проверяет чек на наличие хотя бы одной позиции
+     * @return bool True если чек не пуст false если в чеке нет ни одного товара
+     */
+    public function notEmpty()
+    {
+        return !empty($this->items);
+    }
+
     public function legacyReplaceUnicodeMatches($matches)
     {
         return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
@@ -207,7 +216,7 @@ class YandexMoneyReceipt implements JsonSerializable
                 $aloneId = 0;
             }
             $diff = $orderAmount - $realAmount;
-            if (abs($diff) >= 0.001) {
+            if (abs($diff) >= 0.001 && isset($this->items[$aloneId])) {
                 if ($this->items[$aloneId]->getQuantity() === 1.0) {
                     $this->items[$aloneId]->increasePrice($diff);
                 } elseif ($this->items[$aloneId]->getQuantity() > 1.0) {

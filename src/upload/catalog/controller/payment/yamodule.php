@@ -69,8 +69,14 @@ class ControllerPaymentYamodule extends Controller
             foreach ($taxes as $tax) {
                 $taxes_val += $tax;
             }
+            if (isset($this->session->data['shipping_method']['cost'])) {
+                $shippingCost = $this->session->data['shipping_method']['cost'];
+            }
+            if (!isset($shippingCost) || $shippingCost <= 0) {
+                $shippingCost = 0;
+            }
 
-            $disc = number_format(($order_info['total'] - $this->session->data['shipping_method']['cost'])/$sum, 2, '.', '');
+            $disc = number_format(($order_info['total'] - $shippingCost) / $sum, 2, '.', '');
 
             foreach ($cart_product as $row) {
                 $row['price'] = $this->tax->calculate($row['price'], $row['tax_class_id'], $this->config->get('config_tax'));
@@ -92,14 +98,16 @@ class ControllerPaymentYamodule extends Controller
 
             if (
                 $this->cart->hasShipping() &&
-                isset($this->session->data['shipping_method']) &&
-                isset($this->session->data['shipping_method']['cost']) &&
                 isset($this->session->data['shipping_method']['title']) &&
-                $this->session->data['shipping_method']['cost'] > 0
+                $shippingCost > 0
             ) {
-                $receipt->addShipping($this->session->data['shipping_method']['title'], $this->session->data['shipping_method']['cost']);
+                $receipt->addShipping($this->session->data['shipping_method']['title'], $shippingCost);
             }
-            $receipt->normalize($totalAmount);
+            if ($receipt->notEmpty()) {
+                $receipt->normalize($totalAmount);
+            } else {
+                $receipt = null;
+            }
         }
 
         $data['receipt'] = $receipt === null ? null : $receipt->getJson();

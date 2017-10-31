@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS by <a target="_blank" href="https://kassa.yandex.ru">Yandex.Checkout</a>';
 $_['heading_title_ya']      = 'Y.CMS by Yandex.Checkout';
-$_['ya_version']      = '2.2.2';
+$_['ya_version']      = '2.2.3';
 $_['text_license']      = "By working with the module, you agree with <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>terms of its use</a>.";
 $_['text_need_update']      = "Your module is outdated. You can <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>download and install</a> the new one (%s)";;
 
