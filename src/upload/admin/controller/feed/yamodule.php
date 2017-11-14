@@ -46,7 +46,8 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_inv_subject',
         'ya_kassa_send_check',
         'ya_kassa_tax',
-        'ya_kassa_tax_default'
+        'ya_kassa_tax_default',
+        'ya_kassa_show_in_footer',
 	);
 
 	public $fields_metrika = array(
@@ -336,8 +337,9 @@ class ControllerFeedYamodule extends Controller {
 	public function initForm($array)
 	{
 	    $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
-		foreach ($array as $a)
-			$data[$a] = $this->config->get($a);
+        foreach ($array as $a) {
+            $data[$a] = $this->config->get($a);
+        }
 
 		$data['ya_kassa_check'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
 		$data['ya_kassa_aviso'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
@@ -796,6 +798,10 @@ class ControllerFeedYamodule extends Controller {
             } else {
                 $data['fast_pay_status'] = $this->session->data['fast_pay_status'];
             }
+        }
+
+        if ($data['ya_kassa_show_in_footer'] === null || $data['ya_kassa_show_in_footer'] === '') {
+            $data['ya_kassa_show_in_footer'] = true;
         }
 
 

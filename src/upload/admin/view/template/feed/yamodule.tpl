@@ -329,6 +329,22 @@
 											</div>
 										</div>
 									</div>
+									<div class='row'>
+										<div class='col-sm-12'>
+											<div class="form-group">
+												<label class="col-sm-3 control-label">Показывать ссылку на сайт Кассы</label>
+												<div class="col-sm-9">
+													<label class='radio-inline'>
+														<input type="radio" <?php echo ($ya_kassa_show_in_footer ? ' checked="checked"' : ''); ?> name="ya_kassa_show_in_footer" value="1"> <?php echo $kassa_text_debug_en; ?>
+													</label>
+													<label class='radio-inline'>
+														<input type="radio" <?php echo (!$ya_kassa_show_in_footer ? ' checked="checked"' : ''); ?> name="ya_kassa_show_in_footer" value="0"> <?php echo $kassa_text_debug_dis; ?>
+													</label>
+													<p class="help-block">Ссылка будет отображаться в подвале вашего сайта.</p>
+												</div>
+											</div>
+										</div>
+									</div>
 									<!-- -->
 								</form>
 								<?php }  else { ?>
@@ -357,7 +373,7 @@
 
 								<?php if (!$mws_ip_same) : ?>
 								<div class="alert alert-danger">
-									<i class="fa fa-exclamation-circle"></i> IP-адрес для тестового и рабочего режимов не совпадают (предыдущее значение IP адреса: <?php echo $mws_ip_old; ?>).
+									<i class="fa fa-exclamation-circle"></i> IP-адрес Вашего сервера изменился с <?php echo $mws_ip_old; ?> на <?php echo $mws_ip_new; ?>.
 									<button type="button" class="close" data-dismiss="alert">×</button>
 								</div>
 								<?php endif; ?>
@@ -407,10 +423,8 @@
 										<label class="col-sm-3 control-label" >IP-адрес сервера.</label>
 										<div class="col-sm-9">
 											<div style="padding: 7px 0;"><?php echo $mws_ip_new; ?></div>
-											<?php if ($mws_ip_same) : ?>
-												<p class="help-block">IP-адрес для тестового и рабочего режимов совпадают.</p>
-											<?php else : ?>
-												<p class="text-warning">IP-адрес для тестового и рабочего режимов не совпадают (предыдущее значение IP адреса: <?php echo $mws_ip_old; ?>).</p>
+											<?php if (!$mws_ip_same) : ?>
+												<p class="text-warning">IP-адрес Вашего сервера изменился с <?php echo $mws_ip_old; ?> на <?php echo $mws_ip_new; ?>.</p>
 											<?php endif; ?>
 										</div>
 									</div>
