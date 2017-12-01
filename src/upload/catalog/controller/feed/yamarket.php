@@ -14,7 +14,7 @@ class ControllerFeedYamarket extends Controller {
 		$this->load->model('localisation/currency');
 
 		$categories = $this->{"model_".str_replace("/","_",$for23)."yamodel_yamarket"}->getCategories();
-		$allow_cat_array = $this->config->get('ya_market_categories');
+		$allow_cat_array = explode(',', $this->config->get('ya_market_categories'));
         if (!empty($allow_cat_array) || $this->config->get('ya_market_catall')){
             $ids_cat = ($this->config->get('ya_market_catall'))? '': implode(',', $allow_cat_array);
         } else {

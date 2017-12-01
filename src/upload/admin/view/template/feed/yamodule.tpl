@@ -1218,7 +1218,7 @@ $(document).ready(function(){
 		}
 	});
 	//
-	var market_cat = JSON.parse('<?php echo json_encode($ya_market_categories); ?>');
+	var market_cat = JSON.parse('[<?php echo $ya_market_categories; ?>]');
 	console.log(market_cat);
 	for (i in market_cat)
 		$('#categoryBox input[value="'+ market_cat[i] +'"]').prop("checked", true).change();

@@ -250,21 +250,28 @@ class ControllerFeedYamodule extends Controller {
 	}
 
 	public function saveData($source)
-		{
-			foreach ($source as $s)
-			{
-				$false = false;
-				if (in_array($s, array('ya_market_color_options', 'ya_market_size_options')))
-					$false = array(0);
-				else
-					$false = 0;
+    {
+        foreach ($source as $s) {
+            $false = false;
+            if (in_array($s, array('ya_market_color_options', 'ya_market_size_options'))) {
+                $false = array(0);
+            } else {
+                $false = 0;
+            }
 
-				if (isset($this->request->post[$s]) && !empty($this->request->post[$s]))
-					$this->model_setting_setting->editSetting($s, $this->request->post);
-				else
-					$this->model_setting_setting->editSetting($s, array($s => $false));
-			}
-		}
+            if (isset($this->request->post[$s]) && !empty($this->request->post[$s])) {
+                if ($s === 'ya_market_categories') {
+                    $this->request->post[$s] = implode(',', $this->request->post[$s]);
+                }
+                $this->model_setting_setting->editSetting($s, $this->request->post);
+                if ($s === 'ya_market_categories') {
+                    $this->request->post[$s] = explode(',', $this->request->post[$s]);
+                }
+            } else {
+                $this->model_setting_setting->editSetting($s, array($s => $false));
+            }
+        }
+    }
 
 	public function processSave()
 	{
@@ -341,28 +348,29 @@ class ControllerFeedYamodule extends Controller {
             $data[$a] = $this->config->get($a);
         }
 
-		$data['ya_kassa_check'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
-		$data['ya_kassa_aviso'] = str_replace("http://","https://",HTTPS_CATALOG).'index.php?route='.$for23.'payment/yamodule/callback';
+        $https = str_replace("http://","https://",HTTPS_CATALOG);
+		$data['ya_kassa_check'] = $https.'index.php?route='.$for23.'payment/yamodule/callback';
+		$data['ya_kassa_aviso'] = $https.'index.php?route='.$for23.'payment/yamodule/callback';
 		$data['ya_pokupki_sapi'] = HTTPS_CATALOG.'yandexbuy';
 		if ($this->config->get('config_secure'))
 		{
 			$data['ya_kassa_fail'] = HTTPS_CATALOG.'index.php?route=checkout/failure';
 			$data['ya_kassa_success'] = HTTPS_CATALOG.'index.php?route=checkout/success';
 			$data['ya_p2p_linkapp'] = HTTPS_CATALOG.'index.php?route='.$for23.'payment/yamodule/inside';
-			$data['ya_market_lnk_yml'] = HTTPS_CATALOG.'index.php?route='.$for23.'feed/yamarket';
+			$data['ya_market_lnk_yml'] = $https.'index.php?route='.$for23.'feed/yamarket';
 		}
 		else
 		{
 			$data['ya_kassa_fail'] = HTTP_CATALOG.'index.php?route=checkout/failure';
 			$data['ya_kassa_success'] = HTTP_CATALOG.'index.php?route=checkout/success';
 			$data['ya_p2p_linkapp'] = HTTP_CATALOG.'index.php?route='.$for23.'payment/yamodule/inside';
-			$data['ya_market_lnk_yml'] = HTTP_CATALOG.'index.php?route='.$for23.'feed/yamarket';
+			$data['ya_market_lnk_yml'] = $https.'index.php?route='.$for23.'feed/yamarket';
 		}
 
 		$data['ya_metrika_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_metrika_idapp').'&device_id='.md5('metrika'.$this->config->get('ya_metrika_idapp')).'&client_secret='.$this->config->get('ya_metrika_pw');
-		$data['ya_metrika_callback'] = $this->url->link($for23.'feed/yamodule/preparem', 'token='.$this->session->data['token'], 'SSL');
+		$data['ya_metrika_callback'] = str_replace('http://', 'https://', $this->url->link($for23.'feed/yamodule/preparem', 'token='.$this->session->data['token'], true));
 		$data['ya_pokupki_callback_url'] = 'https://oauth.yandex.ru/authorize?response_type=code&client_id='.$this->config->get('ya_pokupki_idapp').'&device_id='.md5('pokupki'.$this->config->get('ya_pokupki_idapp')).'&client_secret='.$this->config->get('ya_pokupki_pw');
-		$data['ya_pokupki_callback'] = $this->url->link($for23.'feed/yamodule/preparep', 'token='.$this->session->data['token'], 'SSL');
+		$data['ya_pokupki_callback'] = str_replace('http://', 'https://', $this->url->link($for23.'feed/yamodule/preparep', 'token='.$this->session->data['token'], true));
 		$data['ya_pokupki_gtoken'] = $this->config->get('ya_pokupki_gtoken');
 		$data['ya_metrika_o2auth'] = $this->config->get('ya_metrika_o2auth');
 		$data['token_url'] = 'https://oauth.yandex.ru/token?';
@@ -763,11 +771,11 @@ class ControllerFeedYamodule extends Controller {
 		$data['categories'] = $this->model_catalog_category->getCategories(0);
 		$this->document->setTitle($this->language->get('heading_title_ya'));
 		if (isset($this->request->post['ya_market_categories'])) {
-			$data['ya_market_categories'] = $this->request->post['ya_market_categories'];
-		} elseif ($this->config->get('yandex_market_categories') != '') {
-			$data['ya_market_categories'] = explode(',', $this->config->get('ya_market_categories'));
+			$data['ya_market_categories'] = implode(',', $this->request->post['ya_market_categories']);
+		} elseif ($this->config->get('ya_market_categories') != '') {
+			$data['ya_market_categories'] = $this->config->get('ya_market_categories');
 		} else {
-			$data['ya_market_categories'] = array();
+			$data['ya_market_categories'] = '';
 		}
 
 		$this->load->model('localisation/currency');
