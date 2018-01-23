@@ -47,7 +47,7 @@ $_['text_method_AB']       = 'Payment via Alfa-Click';
 $_['text_method_MA']       = 'Payment via MasterPass';
 $_['text_method_PB']       = 'Payment via Promsvyazbank';
 $_['text_method_QW']       = 'Payment via QIWI Wallet';
-$_['text_method_CR']       = 'Заплатить по частям';
+$_['text_method_QP']       = 'Payment using promised payment service (QPPI.ru)';
 
 // Error
 $_['err_upload_type']      = 'The file you are uploading has incorrect format. The certificate needs to have .cer extension';

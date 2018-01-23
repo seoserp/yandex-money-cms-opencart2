@@ -167,7 +167,7 @@
 															<label for="ya_kassa_qw"><input type="checkbox" <?php echo ($ya_kassa_qw ? ' checked="checked"' : ''); ?> name="ya_kassa_qw" id="ya_kassa_qw" class="" value="1"/> <?php echo $kassa_qw; ?></label>
 														</div>
 														<div class="checkbox">
-															<label for="ya_kassa_cr"><input type="checkbox" <?php echo ($ya_kassa_cr ? ' checked="checked"' : ''); ?> name="ya_kassa_cr" id="ya_kassa_cr" class="" value="1"/> <?php echo $kassa_cr; ?></label>
+															<label for="ya_kassa_qp"><input type="checkbox" <?php echo ($ya_kassa_qp ? ' checked="checked"' : ''); ?> name="ya_kassa_qp" id="ya_kassa_qp" class="" value="1"/> <?php echo $kassa_qp; ?></label>
 														</div>
 												</div>
 											</div>

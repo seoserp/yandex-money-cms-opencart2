@@ -131,7 +131,7 @@ class ControllerPaymentYamodule extends Controller
 		$data['phone'] = preg_replace("/[-+()]/",'',$order_info['telephone']);
 		$data['comment'] = $order_info['comment'];
 		$data['sum'] = $totalAmount;
-		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','cr','qw') as $pName) {
+		foreach (array('ym','cards','cash','mobile','wm','sber','alfa','pb','ma','qp','qw') as $pName) {
             $data['method_'.$pName] = $this->config->get('ya_kassa_'.$pName);
             $data['method_'.$pName.'_text'] = $this->language->get('text_method_'.$pName);
         }
