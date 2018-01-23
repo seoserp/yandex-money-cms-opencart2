@@ -2,6 +2,8 @@
 
 /**
  * Class ControllerFeedYamodule
+ *
+ * @property ModelExtensionExtension $model_extension_extension
  */
 class ControllerFeedYamodule extends Controller {
 
@@ -36,7 +38,7 @@ class ControllerFeedYamodule extends Controller {
 		'ya_kassa_pb',
 		'ya_kassa_ma',
 		'ya_kassa_qw',
-		'ya_kassa_qp',
+		'ya_kassa_cr',
 		'ya_kassa_os',
 		'ya_kassa_cart_reset',
 		'ya_kassa_create_order',
@@ -252,21 +254,18 @@ class ControllerFeedYamodule extends Controller {
 	public function saveData($source)
     {
         foreach ($source as $s) {
-            $false = false;
+            $false = 0;
             if (in_array($s, array('ya_market_color_options', 'ya_market_size_options'))) {
                 $false = array(0);
-            } else {
-                $false = 0;
             }
 
             if (isset($this->request->post[$s]) && !empty($this->request->post[$s])) {
                 if ($s === 'ya_market_categories') {
-                    $this->request->post[$s] = implode(',', $this->request->post[$s]);
+                    $data = array($s => implode(',', $this->request->post[$s]));
+                } else {
+                    $data = array($s => $this->request->post[$s]);
                 }
-                $this->model_setting_setting->editSetting($s, $this->request->post);
-                if ($s === 'ya_market_categories') {
-                    $this->request->post[$s] = explode(',', $this->request->post[$s]);
-                }
+                $this->model_setting_setting->editSetting($s, $data);
             } else {
                 $this->model_setting_setting->editSetting($s, array($s => $false));
             }
@@ -333,10 +332,10 @@ class ControllerFeedYamodule extends Controller {
 		}
 		$updater = $this->sendStatistics();
         $for23 = (version_compare(VERSION, "2.3.0", '>='))?"extension/":"";
-        if (!$this->Sget('ya_kassa_active') && !$this->Sget('ya_p2p_active') && !$this->Sget('ya_fast_pay_active')){
-            $this->load->controller($for23.'payment/yamodule/uninstall');
-        }else{
-            $this->load->controller($for23.'payment/yamodule/install');
+        if (!$this->Sget('ya_kassa_active') && !$this->Sget('ya_p2p_active') && !$this->Sget('ya_fast_pay_active')) {
+            $this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 0));
+        } else{
+            $this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 1));
         }
 		if ($updater!==false) foreach (array('kassa','p2p','metrika','market','pokupki', 'fast_pay') as $type) $this->session->data[$type.'_status'][] = $this->success_alert($updater, 'warning');
 		
@@ -374,8 +373,9 @@ class ControllerFeedYamodule extends Controller {
 		$data['ya_pokupki_gtoken'] = $this->config->get('ya_pokupki_gtoken');
 		$data['ya_metrika_o2auth'] = $this->config->get('ya_metrika_o2auth');
 		$data['token_url'] = 'https://oauth.yandex.ru/token?';
-		$data['mod_status'] = $this->config->get('yamodule_status');
-		
+
+		$data['mod_status'] = true;
+
 		return $data;
 	}
 	
@@ -612,7 +612,7 @@ class ControllerFeedYamodule extends Controller {
 
 		// kassa
 		$arLang = array(
-			'kassa_ma','kassa_pb','kassa_qw','kassa_qp','kassa_wm','kassa_mobile','kassa_sber',
+			'kassa_ma','kassa_pb','kassa_qw','kassa_cr','kassa_wm','kassa_mobile','kassa_sber',
 			'kassa_alfa','kassa_ym','kassa_method','kassa_cards','kassa_cash',
 			'kassa_text_connect','kassa_text_enable','kassa_text_testmode', 'kassa_text_realmode','kassa_text_dynamic','kassa_text_help_url', 'kassa_text_help_cburl',
 			'kassa_text_status','kassa_text_debug_help','kassa_text_debug_dis','kassa_text_debug_en','kassa_text_debug','kassa_text_adv_head',
@@ -642,7 +642,7 @@ class ControllerFeedYamodule extends Controller {
 			'active_off','log','button_cancel','text_installed','button_save','button_cancel','pokupki_text_status'
 		);
 		foreach ($arLang as $lang_name) $data[$lang_name] = $this->language->get($lang_name);
-		$data['mod_off'] = sprintf($this->language->get('mod_off'), $this->url->link($for23.'payment/install', 'token=' . $this->session->data['token'] . '&extension=yamodule', true));
+		$data['mod_off'] = sprintf($this->language->get('mod_off'), $this->url->link('extension/payment', 'token=' . $this->session->data['token'] . '&extension=yamodule', true));
 
 		foreach (array('pickup','cancelled','delivery','processing','unpaid','delivered') as $val) $data['pokupki_text_status_'.$val] = $this->language->get('pokupki_text_status_'.$val);
         $data['ya_market_stock_days']= $this->Sget('ya_market_stock_days');
@@ -968,6 +968,7 @@ class ControllerFeedYamodule extends Controller {
 		$this->model_setting_setting->editSetting('yandexbuy_customer', array('yandexbuy_customer' => $customer_id));
 		$this->model_setting_setting->editSetting('yamodule_status', array('yamodule_status' => 1));
 		$this->model_extension_extension->install('payment', 'yamodule');
+		$this->model_extension_extension->getInstalled('payment');
 		//$this->load->controller('extension/modification/refresh');
 		$this->load->model('user/user_group');
 		$this->installFastPaySettings();

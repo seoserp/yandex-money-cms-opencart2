@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']      = 'Y.CMS by <a target="_blank" href="https://kassa.yandex.ru">Yandex.Checkout</a>';
 $_['heading_title_ya']      = 'Y.CMS by Yandex.Checkout';
-$_['ya_version']      = '2.2.5';
+$_['ya_version']      = '2.2.6';
 $_['text_license']      = "By working with the module, you agree with <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>terms of its use</a>.";
 $_['text_need_update']      = "Your module is outdated. You can <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>download and install</a> the new one (%s)";;
 
@@ -108,7 +108,7 @@ $_['kassa_alfa']       = 'Payment via Alfa-Click.';
 $_['kassa_ma']       = 'Payment via MasterPass.';
 $_['kassa_pb']       = 'Payment via Promsvyazbank.';
 $_['kassa_qw']       = 'Payment via QIWI Wallet.';
-$_['kassa_qp']       = 'Payment using promised payment (QPPI.ru).';
+$_['kassa_cr']       = 'Заплатить по частям.';
 
 $_['kassa_sv']       = 'Save';
 $_['kassa_text_sort_order']       = 'Sorting order';
