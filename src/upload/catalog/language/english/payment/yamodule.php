@@ -24,7 +24,7 @@ $_['text_method_alfa']       = 'Payment via Alfa-Click';
 $_['text_method_ma']       = 'Payment via MasterPass';
 $_['text_method_pb']       = 'Payment via Promsvyazbank';
 $_['text_method_qw']       = 'Payment via QIWI Wallet';
-$_['text_method_qp']       = 'Payment using promised payment service (QPPI.ru)';
+$_['text_method_cr']       = 'Заплатить по частям';
 
 $_['text_order'] = 'Order';
 $_['text_comment'] = 'Commentary';

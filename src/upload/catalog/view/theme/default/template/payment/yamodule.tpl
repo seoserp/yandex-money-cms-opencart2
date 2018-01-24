@@ -28,7 +28,7 @@
 					'method_ma' => 'MA',
 					'method_pb' => 'PB',
 					'method_qw' => 'QW',
-					'method_qp' => 'QP') as $var_name => $pay_name){
+					'method_cr' => 'CR') as $var_name => $pay_name){
 				$ic++;
 				if (${$var_name}){ ?>
 					<div class="form-inline form-group">
