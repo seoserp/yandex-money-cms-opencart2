@@ -23,11 +23,20 @@ Class ModelYamodelPokupki extends Model
 			$products[$k]['price'] = $product['price'];
 		}
 
-		$ret['goods'] = $products;
 		if ($this->config->get('ya_metrika_order'))
 			$data = '<script>
 					$(window).load(function() {
-							metrikaReach(\'metrikaOrder\', '.json_encode($ret).');
+					    window.dataLayer = window.dataLayer || [];
+					    dataLayer.push({
+                            "ecommerce": {
+                                "purchase": {
+                                    "actionField": {
+                                        "id" : "'.$ret['order_id'].'"
+                                    },
+                                    "products": '.json_encode($products).'
+                                }
+                            }
+                        });
 					});
 					</script>
 			';
