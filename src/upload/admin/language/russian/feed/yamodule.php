@@ -2,7 +2,7 @@
 // Heading
 $_['heading_title']    = 'Y.CMS от <a target="_blank" href="https://kassa.yandex.ru">Яндекс.Кассы</a>';
 $_['heading_title_ya'] = 'Y.CMS от Яндекс.Кассы';
-$_['ya_version']       = '2.2.7';
+$_['ya_version']       = '2.2.8';
 $_['text_license']     = "Работая с модулем, вы автоматически соглашаетесь с <a href='https://money.yandex.ru/doc.xml?id=527052' target='_blank'>условиями его использования</a>.";
 $_['text_need_update'] = "У вас неактуальная версия модуля. Вы можете <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-opencart2/releases'>загрузить и установить</a> новую (%s)";;
 
@@ -32,11 +32,11 @@ $_['market_out']     = 'Выгружать';
 $_['market_out_all'] = 'Все товары';
 $_['market_out_sel'] = 'Выбранные категории';
 
-$_['market_dostup']   = 'Срок доставки в пункт самовывоза';
-$_['market_dostup_1'] = 'До 2 дней для всех товаров';
-$_['market_dostup_2'] = 'До 2 дней для товаров в наличии';
-$_['market_dostup_3'] = 'Определяется индивидуально';
-$_['market_dostup_4'] = 'Самовывоза нет';
+$_['market_dostup']   = 'Доступность';
+$_['market_dostup_1'] = 'Все доступны';
+$_['market_dostup_2'] = 'Доступны если > 0, остальные на заказ';
+$_['market_dostup_3'] = 'Если = 0, не выгружать';
+$_['market_dostup_4'] = 'Все на заказ';
 
 $_['market_s_name']       = 'Название магазина';
 $_['market_d_cost']       = 'Стоимость доставки в домашнем регионе';
